@@ -1,0 +1,64 @@
+﻿🔧 Codex Instructions: Fix Profile Saving Bug (experienceLevel vs experience_level)
+Task: Ensure that no part of the app ever sends experienceLevel directly to Supabase’s .insert() method.
+________________
+
+
+✅ 1. Check Every Call to saveProfile()
+Anywhere in the app where saveProfile is called, confirm that it only passes this shape:
+ts
+CopyEdit
+{
+  name: string,
+  email?: string,
+  interests: string[],
+  experienceLevel: 'none' | 'beginner' | 'intermediate' | 'advanced'
+}
+
+
+✅ That’s fine—experienceLevel is expected here.
+________________
+
+
+✅ 2. Inside saveProfile() (in /lib/profile.ts), make sure:
+* experienceLevel is never passed directly to Supabase.
+
+* It is remapped to experience_level.
+
+Like so:
+ts
+CopyEdit
+const dbProfile = {
+  name: profile.name,
+  email: profile.email ?? null,
+  interests: profile.interests,
+  experience_level: profile.experienceLevel, // ✅ snake_case here
+};
+
+
+const { data, error } = await supabase
+  .from('profiles')
+  .insert([dbProfile])
+  .select('id')
+  .single();
+
+
+________________
+
+
+✅ 3. Delete any stale builds or restart the dev server
+After updates, make sure you restart:
+bash
+CopyEdit
+npm run dev
+
+
+Also clear browser cache or try a hard refresh in case the old JS bundle is still in memory.
+________________
+
+
+✅ 4. Confirm Working
+   * No mention of experienceLevel in any insert() call
+
+   * saveProfile() logs show proper insert with no Supabase schema errors
+
+   * Data shows up in the profiles table with the experience_level column filled
