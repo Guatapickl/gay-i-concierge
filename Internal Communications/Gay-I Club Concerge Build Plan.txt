@@ -1,0 +1,114 @@
+﻿Love it—let’s build this thing right. Here's a Phase 1 development plan for your GPT-powered Concierge web app, tailored to help launch your AI club with flair and long-term functionality.
+________________
+
+
+🚀 PHASE 1: Concierge MVP – What It Does
+🧠 Core Features
+Feature
+	Description
+	💬 Chat with the Concierge
+	A custom-branded GPT-4o assistant for FAQs, club intros, invite help, and AI tool suggestions
+	📇 Save Member Profiles
+	Ask for a name, profession, interests, and what they want from the club—store it for future use
+	🧰 Recommend AI Tools
+	Suggest curated tools by role (designer, dev, entrepreneur, etc.) with links
+	📅 RSVP Flow
+	Let users RSVP to events directly from chat (store or export RSVPs)
+	🧾 Custom Invite Generator
+	User asks for an invite → concierge writes them a witty message to share
+	🧠 Persistent Memory
+	Save user state (name, club goals, projects) using Supabase or Firebase
+	________________
+
+
+🏗️ Tech Stack Recommendation
+🧑‍💻 Frontend
+* Framework: Next.js (React + SSR = fast + SEO)
+
+* Styling: Tailwind CSS
+
+* UI: ShadCN for elegant, clean UI components
+
+* Extras: Framer Motion for subtle animations
+
+🧠 Backend
+   * LangChain or plain OpenAI API to power the GPT bot
+
+   * Supabase for database (storing member profiles, RSVP status, project logs)
+
+   * Optional Auth: Clerk.dev or Supabase Auth (if you want members to log in)
+
+________________
+
+
+🗂️ Project Structure Outline
+/concierge-app
+├── pages/
+│   ├── index.tsx            # Landing page with embedded concierge
+│   ├── api/chat.ts          # API route to handle GPT calls
+│   ├── api/rsvp.ts          # RSVP submission endpoint
+├── components/
+│   ├── ChatWindow.tsx       # Main chat interface
+│   ├── MessageBubble.tsx    # Individual message display
+│   ├── InviteCard.tsx       # Custom invite preview + copy button
+├── lib/
+│   ├── openai.ts            # OpenAI API handler
+│   ├── supabase.ts          # Supabase client
+├── utils/
+│   ├── prompts.ts           # System prompt template & example interactions
+├── styles/
+│   ├── globals.css
+├── .env.local               # API keys & environment variables
+├── tailwind.config.js
+
+
+________________
+
+
+🧠 Example System Prompt for Concierge Bot
+You are the AI concierge for a queer professional AI club based in NYC.
+
+
+Your tone is smart, supportive, a little cheeky. You help new users feel welcome, tell them about the club, recommend AI tools based on their job or interests, help them RSVP to events, and write playful invites they can send to friends.
+
+
+You remember users' names, what they’re interested in, and what projects they might want help with. Keep it casual, but useful.
+
+
+________________
+
+
+🪜 Step-by-Step Dev Guide (Phase 1)
+✅ Week 1 — Setup & Chat
+      * Scaffold Next.js app with Tailwind + ShadCN
+
+      * Add GPT API route + fetch function
+
+      * Create a basic chat UI with streamed replies
+
+      * Integrate a system prompt + sample behaviors
+
+✅ Week 2 — Storage & Profiles
+         * Integrate Supabase for profile storage
+
+         * Add questions to collect name, goals, profession
+
+         * Store and retrieve profile on next chat
+
+✅ Week 3 — RSVP & Invite Features
+            * Add RSVP interface (store in Supabase)
+
+            * Build InviteCard component for generating custom invites
+
+            * Add “share this invite” buttons (copy to clipboard)
+
+✅ Week 4 — Polish & Deploy
+               * Add mobile responsiveness
+
+               * Add subtle animations
+
+               * Deploy on Vercel or Netlify
+
+               * Share the link with your first invitees 🚀
+
+________________
