@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { saveProfile } from "@/lib/profile";
+import { saveRsvp } from "@/lib/rsvp";
 import { Profile } from "@/types/supabase";
 
 export default function ChatWindow() {
@@ -16,6 +17,7 @@ export default function ChatWindow() {
   const [profileInput, setProfileInput] = useState<ProfileInput>({ name: "", email: "", interests: [] });
   // experienceLevel state not needed; handle directly on selection
   const [tempInput, setTempInput] = useState<string>("");
+  const [showRsvpPrompt, setShowRsvpPrompt] = useState<boolean>(false);
 
   async function sendMessage() {
     if (!input.trim()) return;
@@ -62,6 +64,22 @@ export default function ChatWindow() {
     }
   }, []);
 
+  // After onboarding, prompt for RSVP if we haven't yet
+  useEffect(() => {
+    if (!hasOnboarded) return;
+    const status = localStorage.getItem('rsvp_status');
+    if (!status) {
+      setShowRsvpPrompt(true);
+      setMessages(prev => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: 'Would you like to RSVP for our next meetup on June 20th?',
+        },
+      ]);
+    }
+  }, [hasOnboarded]);
+
   // Handle onboarding steps for name, email, interests
   const handleOnboardingNext = () => {
     if (onboardingStep === 0) {
@@ -99,6 +117,25 @@ export default function ChatWindow() {
       { role: 'assistant', content: `Welcome, ${newProfile.name}! Thanks for joining us. Let me know how I can help you explore AI today.` },
     ]);
     setHasOnboarded(true);
+  };
+
+  const handleRsvpResponse = async (response: 'yes' | 'no') => {
+    if (response === 'yes') {
+      const profileId = localStorage.getItem('profile_id');
+      if (profileId) {
+        const ok = await saveRsvp(profileId, '2025-06-20');
+        if (ok) {
+          setMessages(prev => [...prev, { role: 'assistant', content: "Awesome! You're on the guest list. See you there!" }]);
+          localStorage.setItem('rsvp_status', 'yes');
+        } else {
+          setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, there was a problem saving your RSVP.' }]);
+        }
+      }
+    } else {
+      localStorage.setItem('rsvp_status', 'no');
+      setMessages(prev => [...prev, { role: 'assistant', content: 'No problem, maybe next time!' }]);
+    }
+    setShowRsvpPrompt(false);
   };
 
   // Render onboarding or chat UI
@@ -164,6 +201,23 @@ export default function ChatWindow() {
           </div>
         ))}
       </div>
+
+      {showRsvpPrompt && (
+        <div className="flex gap-2">
+          <button
+            onClick={() => handleRsvpResponse('yes')}
+            className="px-4 py-2 bg-blue-600 text-white rounded"
+          >
+            Yes
+          </button>
+          <button
+            onClick={() => handleRsvpResponse('no')}
+            className="px-4 py-2 bg-gray-300 rounded"
+          >
+            No thanks
+          </button>
+        </div>
+      )}
 
       <div className="flex gap-2">
         <input

@@ -10,3 +10,12 @@ export type Profile = {
   experienceLevel: 'none' | 'beginner' | 'intermediate' | 'advanced' | null;
   created_at: string;
 };
+/**
+ * RSVP type reflects the 'rsvps' table schema in Supabase.
+ */
+export type Rsvp = {
+  id: string;
+  profile_id: string;
+  event_date: string;
+  created_at: string;
+};
