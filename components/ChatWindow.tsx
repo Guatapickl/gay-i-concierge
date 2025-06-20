@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { saveProfile } from "@/lib/profile";
 import { saveRsvp } from "@/lib/rsvp";
+import { getUpcomingEvents } from '@/lib/events';
 import { Profile } from "@/types/supabase";
 
 export default function ChatWindow() {
@@ -18,6 +19,7 @@ export default function ChatWindow() {
   // experienceLevel state not needed; handle directly on selection
   const [tempInput, setTempInput] = useState<string>("");
   const [showRsvpPrompt, setShowRsvpPrompt] = useState<boolean>(false);
+  const [nextEventId, setNextEventId] = useState<string | null>(null);
 
   async function sendMessage() {
     if (!input.trim()) return;
@@ -64,20 +66,27 @@ export default function ChatWindow() {
     }
   }, []);
 
-  // After onboarding, prompt for RSVP if we haven't yet
+  // After onboarding, prompt for RSVP for the next event if not already prompted
   useEffect(() => {
     if (!hasOnboarded) return;
-    const status = localStorage.getItem('rsvp_status');
-    if (!status) {
+    (async () => {
+      const events = await getUpcomingEvents();
+      if (events.length === 0) return;
+      const next = events[0];
+      const lastPrompted = localStorage.getItem('last_prompted_event_id');
+      if (lastPrompted === next.id) return;
+
       setShowRsvpPrompt(true);
       setMessages(prev => [
         ...prev,
         {
           role: 'assistant',
-          content: 'Would you like to RSVP for our next meetup on June 20th?',
+          content: `Would you like to RSVP for our next event: "${next.title}" on ${new Date(next.event_datetime).toLocaleString()}?`,
         },
       ]);
-    }
+      localStorage.setItem('last_prompted_event_id', next.id);
+      setNextEventId(next.id);
+    })();
   }, [hasOnboarded]);
 
   // Handle onboarding steps for name, email, interests
@@ -120,20 +129,20 @@ export default function ChatWindow() {
   };
 
   const handleRsvpResponse = async (response: 'yes' | 'no') => {
-    if (response === 'yes') {
+    if (response === 'yes' && nextEventId) {
       const profileId = localStorage.getItem('profile_id');
       if (profileId) {
-        const ok = await saveRsvp(profileId, '2025-06-20');
+        const ok = await saveRsvp(profileId, nextEventId);
         if (ok) {
           setMessages(prev => [...prev, { role: 'assistant', content: "Awesome! You're on the guest list. See you there!" }]);
-          localStorage.setItem('rsvp_status', 'yes');
         } else {
           setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, there was a problem saving your RSVP.' }]);
         }
+      } else {
+        setMessages(prev => [...prev, { role: 'assistant', content: 'Please create a profile first to RSVP.' }]);
       }
     } else {
-      localStorage.setItem('rsvp_status', 'no');
-      setMessages(prev => [...prev, { role: 'assistant', content: 'No problem, maybe next time!' }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: response === 'no' ? 'No problem, maybe next time!' : 'Okay, maybe later.' }]);
     }
     setShowRsvpPrompt(false);
   };
