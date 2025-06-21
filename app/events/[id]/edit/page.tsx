@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { updateEvent, getEventById } from '@/lib/events';
+import { updateEvent, getEventById, deleteEvent } from '@/lib/events';
 
 export default function EditEventPage() {
   const router = useRouter();
@@ -101,6 +101,25 @@ export default function EditEventPage() {
           disabled={saving}
         >
           {saving ? 'Updating...' : 'Update Event'}
+        </button>
+        <button
+          type="button"
+          className="bg-red-600 text-white px-4 py-2 rounded ml-2"
+          onClick={async () => {
+            if (!confirm('Delete this event?')) return;
+            setSaving(true);
+            setMessage(null);
+            const success = await deleteEvent(eventId as string);
+            setSaving(false);
+            if (success) {
+              setMessage('✅ Event deleted successfully!');
+              setTimeout(() => router.push('/events'), 1000);
+            } else {
+              setMessage('❌ Failed to delete event.');
+            }
+          }}
+        >
+          Delete Event
         </button>
         {message && <p className="mt-2">{message}</p>}
       </form>
