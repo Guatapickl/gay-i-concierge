@@ -66,3 +66,13 @@ export async function getEventById(id: string): Promise<Event | null> {
   }
   return data as Event;
 }
+
+// Delete an event by ID
+export async function deleteEvent(eventId: string): Promise<boolean> {
+  const { error } = await supabase.from('events').delete().eq('id', eventId);
+  if (error) {
+    console.error('Failed to delete event:', error.message);
+    return false;
+  }
+  return true;
+}
