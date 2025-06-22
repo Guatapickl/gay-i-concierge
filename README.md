@@ -4,6 +4,10 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
+## Features
+
+- RSVP only allowed after completing onboarding.
+- `/invite` page lets you generate a short invite and copy it.
 
 First, run the development server:
 

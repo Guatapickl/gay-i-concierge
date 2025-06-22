@@ -9,6 +9,7 @@ export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [rsvpMessage, setRsvpMessage] = useState<string | null>(null);
+  const [rsvpedEvents, setRsvpedEvents] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     (async () => {
@@ -35,24 +36,29 @@ export default function EventsPage() {
             {event.location && <p><strong>Location:</strong> {event.location}</p>}
             {event.description && <p>{event.description}</p>}
             <div className="mt-2 space-x-4">
-              <button
-                className="px-4 py-2 bg-blue-600 text-white rounded"
-                onClick={async () => {
-                  const profileId = localStorage.getItem('profile_id');
-                  if (!profileId) {
-                    setRsvpMessage('Please complete the onboarding chat to create a profile before RSVPing.');
-                    return;
-                  }
-                  const success = await saveRsvp(profileId, event.id);
-                  if (success) {
-                    setRsvpMessage(`✅ You have RSVPed for "${event.title}"!`);
-                  } else {
-                    setRsvpMessage('❌ Failed to RSVP. Please try again.');
-                  }
-                }}
-              >
-                RSVP
-              </button>
+              {rsvpedEvents.has(event.id) ? (
+                <span className="text-green-600 font-semibold">✅ RSVPed</span>
+              ) : (
+                <button
+                  className="px-4 py-2 bg-blue-600 text-white rounded"
+                  onClick={async () => {
+                    const profileId = localStorage.getItem('profile_id');
+                    if (!profileId) {
+                      setRsvpMessage('Please complete onboarding to create a profile before RSVPing.');
+                      return;
+                    }
+                    const success = await saveRsvp(profileId, event.id);
+                    if (success) {
+                      setRsvpMessage(`✅ You have RSVPed for "${event.title}"!`);
+                      setRsvpedEvents(prev => new Set(prev).add(event.id));
+                    } else {
+                      setRsvpMessage('❌ Failed to RSVP. Please try again.');
+                    }
+                  }}
+                >
+                  RSVP
+                </button>
+              )}
               <a href={`/events/${event.id}/edit`} className="text-sm text-blue-600 underline">Edit</a>
             </div>
           </li>
