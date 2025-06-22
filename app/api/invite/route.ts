@@ -4,7 +4,7 @@ export const runtime = "edge";
 
 /**
  * POST /api/invite
- * Generates a short quirky invite using OpenAI Chat Completion.
+ * Generates a short invite using OpenAI Chat Completion.
  * Optional body: { style?: string } to add extra style hints to the prompt.
  */
 export async function POST(req: Request) {
@@ -22,7 +22,8 @@ export async function POST(req: Request) {
   }
 
   const prompt =
-    "Write a short quirky invite (≤ 3 sentences) that includes the URL https://gayiclub.com." +
+    "Write a friendly 2-3 sentence invite encouraging friends to learn about and discuss the latest AI developments." +
+    " Include the URL https://gayiclub.com." +
     (style ? ` ${style}` : "");
 
   const apiRes = await fetch("https://api.openai.com/v1/chat/completions", {
