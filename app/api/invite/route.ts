@@ -22,7 +22,7 @@ export async function POST(req: Request) {
   }
 
   const prompt =
-    "Write a short quirky invite (≤ 3 sentences) that includes the URL https://gayiclub.com." +
+    "Write a short quirky invite (≤ 3 sentences) for an artificial intelligence clubthat includes the URL https://gayiclub.com." +
     (style ? ` ${style}` : "");
 
   const apiRes = await fetch("https://api.openai.com/v1/chat/completions", {
