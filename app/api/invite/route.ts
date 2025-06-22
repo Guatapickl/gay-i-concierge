@@ -22,8 +22,9 @@ export async function POST(req: Request) {
   }
 
   const prompt =
-    "Write a friendly 2-3 sentence invite encouraging friends to learn about and discuss the latest AI developments." +
-    " Include the URL https://gayiclub.com." +
+    "Write a warm, 2-3 sentence message an existing member of an AI club can text or email to friends inviting them to join." +
+    " Tone: upbeat, inclusive, a dash of geeky excitement—but do not imply the sender founded the club." +
+    " End with the link https://gayiclub.com." +
     (style ? ` ${style}` : "");
 
   const apiRes = await fetch("https://api.openai.com/v1/chat/completions", {
