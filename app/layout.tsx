@@ -18,6 +18,11 @@ export const metadata: Metadata = {
   description: "Gay-I Club Concierge App",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -27,9 +32,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} flex flex-col min-h-screen antialiased`}>
         <header className="bg-white shadow">
-          <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-pink-600">Gay-I Club Concierge</h1>
-            <nav className="space-x-4">
+          <div className="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between md:items-center">
+            <h1 className="text-2xl font-bold text-pink-600 text-center md:text-left">Gay-I Club Concierge</h1>
+            <nav className="mt-2 md:mt-0 flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 text-center">
               <Link href="/" className="text-sm">Home</Link>
               <Link href="/events" className="text-sm">Events</Link>
               <Link href="/invite" className="text-sm">Invite</Link>
