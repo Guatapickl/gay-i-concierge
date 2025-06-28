@@ -6,18 +6,24 @@ export default function ParticleBackground() {
     const container = document.getElementById('particle-canvas');
     if (!container) return;
 
-    const options = {
-      particleColor: '#ff5ebc',
-      background: '#0a0a0a',
-      interactive: true,
-      speed: 'slow',
-      density: 10000,
-    } as const;
+    (async () => {
+      const mod = await import('canvas-particle-network');
+      const ParticleNetwork = mod.default ?? mod;
 
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const ParticleNetwork = require('canvas-particle-network');
-    new ParticleNetwork(container, options);
-  }, []); // run once on mount
+      if (typeof ParticleNetwork !== 'function') {
+        console.error('ParticleNetwork export looks wrong →', mod);
+        return;
+      }
+
+      new ParticleNetwork(container, {
+        particleColor: '#ff5ebc',
+        background: '#0a0a0a',
+        interactive: true,
+        speed: 'slow',
+        density: 10000,
+      });
+    })();
+  }, []);
 
   return null;
 }
