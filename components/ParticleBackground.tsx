@@ -6,22 +6,17 @@ export default function ParticleBackground() {
     const container = document.getElementById('particle-canvas');
     if (!container) return;
 
-    async function init() {
-      const { default: ParticleNetwork } = await import('canvas-particle-network');
+    const options = {
+      particleColor: '#ff5ebc',
+      background: '#0a0a0a',
+      interactive: true,
+      speed: 'slow',
+      density: 10000,
+    } as const;
 
-      const options = {
-        particleColor: '#ff5ebc',
-        background: '#0a0a0a',
-        interactive: true,
-        speed: 'slow',
-        density: 10000,
-      } as const;
-
-      // @ts-expect-error ParticleNetwork might not be recognized as a constructor by TS immediately
-      new ParticleNetwork(container, options);
-    }
-
-    init();
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const ParticleNetwork = require('canvas-particle-network');
+    new ParticleNetwork(container, options);
   }, []); // run once on mount
 
   return null;
