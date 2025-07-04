@@ -14,7 +14,6 @@ export default function ParticleBackground() {
         console.error('ParticleNetwork export looks wrong →', mod);
         return;
       }
-
       new ParticleNetwork(container, {
         particleColor: '#ff5ebc',
         background: '#0a0a0a',
@@ -25,5 +24,5 @@ export default function ParticleBackground() {
     })();
   }, []);
 
-  return null;
+  return null; // nothing to render – the lib injects a <canvas>
 }
