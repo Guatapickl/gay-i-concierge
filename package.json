@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.9",
+    "@tsparticles/engine": "3.8.1",
     "ai": "^4.3.16",
     "clsx": "^2.1.1",
     "lucide-react": "^0.511.0",
