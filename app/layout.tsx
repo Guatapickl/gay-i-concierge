@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from 'next/link';
+import BackgroundParticles from "@/components/BackgroundParticles";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -31,6 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} flex flex-col min-h-screen antialiased relative`}>
+        <BackgroundParticles />
         <header className="bg-white shadow">
           <div className="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between md:items-center">
             <h1 className="text-2xl font-bold text-pink-600 text-center md:text-left">Gay-I Club Concierge</h1>
