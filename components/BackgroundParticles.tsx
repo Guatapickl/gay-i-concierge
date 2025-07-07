@@ -49,10 +49,6 @@ export default function BackgroundParticles() {
             straight: false
           },
           number: {
-            density: {
-              enable: true,
-              area: 800
-            },
             value: 60
           },
           opacity: {
