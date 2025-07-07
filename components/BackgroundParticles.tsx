@@ -1,36 +1,91 @@
 "use client";
 
-import Particles from "react-tsparticles";
-import type { Engine as OldEngine } from "tsparticles-engine";
-import type { Engine } from "@tsparticles/engine";
-import { loadFull } from "tsparticles";
-import { useCallback } from "react";
+import { useEffect, useState } from "react";
+import Particles, { initParticlesEngine } from "@tsparticles/react";
+import { loadSlim } from "@tsparticles/slim";
 
 export default function BackgroundParticles() {
-  const particlesInit = useCallback(async (engine: OldEngine) => {
-    await loadFull(engine as unknown as Engine);
+  const [init, setInit] = useState(false);
+
+  useEffect(() => {
+    initParticlesEngine(async (engine) => {
+      await loadSlim(engine);
+    }).then(() => {
+      setInit(true);
+    });
   }, []);
+
+  if (!init) return null;
 
   return (
     <Particles
-      id="background-particles"
-      init={particlesInit}
+      id="tsparticles"
       options={{
-        fullScreen: { enable: true, zIndex: 0 },
-        background: { color: "transparent" },
+        fullScreen: {
+          enable: true,
+          zIndex: -1
+        },
+        background: {
+          color: { value: "transparent" }
+        },
+        fpsLimit: 60,
         particles: {
-          number: { value: 60, density: { enable: true, area: 800 } },
           color: { value: "#ff69b4" },
           links: {
-            enable: true,
             color: "#ff69b4",
             distance: 150,
+            enable: true,
             opacity: 0.5,
+            width: 1
           },
-          move: { enable: true, speed: 1 },
-          size: { value: { min: 1, max: 3 } },
-          opacity: { value: 0.5 },
+          move: {
+            direction: "none",
+            enable: true,
+            outModes: {
+              default: "bounce"
+            },
+            random: false,
+            speed: 1,
+            straight: false
+          },
+          number: {
+            density: {
+              enable: true,
+              area: 800
+            },
+            value: 60
+          },
+          opacity: {
+            value: 0.5
+          },
+          shape: {
+            type: "circle"
+          },
+          size: {
+            value: { min: 1, max: 3 }
+          }
         },
+        detectRetina: true,
+        responsive: [
+          {
+            maxWidth: 1024,
+            options: {
+              particles: {
+                number: { value: 40 }
+              },
+              fpsLimit: 45
+            }
+          },
+          {
+            maxWidth: 768,
+            options: {
+              particles: {
+                number: { value: 25 }
+              },
+              fpsLimit: 30
+            }
+          }
+        ]
       }}
     />
   );
