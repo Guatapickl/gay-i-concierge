@@ -48,8 +48,8 @@ export default function RootLayout({
           </div>
         </header>
         <main className="container mx-auto px-4 py-8 flex-1 relative z-10">{children}</main>
-        <footer className="bg-gray-100 relative z-10">
-          <div className="container mx-auto px-4 py-4 text-center text-sm text-gray-500">
+        <footer className="bg-gray-900/80 backdrop-blur-lg relative z-10">
+          <div className="container mx-auto px-4 py-4 text-center text-sm text-gray-400">
             © {new Date().getFullYear()} Gay-I Club Concierge. All rights reserved.
           </div>
         </footer>

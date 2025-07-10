@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #000000;
+  --foreground: #ffffff;
 }
 
 @theme inline {
@@ -170,7 +170,11 @@ body {
 
 /* Holographic text style */
 .base-holographic {
-  @apply bg-gradient-to-r from-cyan-400 via-purple-500 to-red-500 bg-clip-text text-transparent filter drop-shadow-[0_0_30px_rgba(139,92,246,0.5)];
+  background: linear-gradient(90deg, #22d3ee, #3b82f6, #8b5cf6, #ec4899, #ef4444);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 30px rgba(139,92,246,0.5));
 }
 
 @keyframes glitch {
