@@ -29,9 +29,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.className} ${orbitron.variable}`}>
-      <body className="flex flex-col min-h-screen antialiased relative">
+      <body className="flex flex-col min-h-screen antialiased relative bg-black">
         <BackgroundParticles />
-        <header className="bg-white shadow relative z-10">
+        <header className="bg-gray-900/80 backdrop-blur-lg shadow relative z-10">
           <div className="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between md:items-center">
             <HeaderTitle />
             <nav className="flex items-center space-x-4 font-orbitron relative z-10">
