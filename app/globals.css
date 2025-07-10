@@ -112,9 +112,6 @@ body {
 .interactive-nav-button {
   position: relative;
   isolation: isolate;
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  perspective: 1000px;
 }
 
 .interactive-nav-button > * {
@@ -122,27 +119,27 @@ body {
   z-index: 1;
 }
 
-/* Custom ripple animation */
+/* Custom ripple animation - REPLACE the existing one */
 @keyframes ripple-expand {
   0% {
-    width: 10px;
-    height: 10px;
-    opacity: 0.5;
+    width: 0;
+    height: 0;
+    opacity: 0.4;
   }
   100% {
-    width: 100px;
-    height: 100px;
+    width: 40px;
+    height: 40px;
     opacity: 0;
   }
 }
 
 .animate-ripple-expand {
   animation: ripple-expand 0.6s ease-out forwards;
-}
-
-/* Ensure button doesn't change size on click */
-.interactive-nav-button:active {
-  transform: none !important;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 
 @keyframes scan-line {
