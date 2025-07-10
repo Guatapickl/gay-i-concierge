@@ -36,6 +36,7 @@ export function InteractiveNavButton({ href, children, className = '' }: Interac
 
   const buttonStyles = useMemo(() => `
     relative px-6 py-3 text-sm font-medium uppercase tracking-wider
+    min-w-[120px]
     bg-white/5 backdrop-blur-sm border border-cyan-400/50
     text-cyan-400 rounded-lg overflow-hidden interactive-nav-button
     transition-all duration-300 ease-out cursor-pointer
@@ -88,14 +89,14 @@ export function InteractiveNavButton({ href, children, className = '' }: Interac
 
       {/* Particle Dots Effect */}
       {isHovered && (
-        <div className="absolute inset-0 pointer-events-none animate-fade-in">
+        <div className="absolute inset-1 pointer-events-none animate-fade-in overflow-hidden">
           {[...Array(16)].map((_, i) => (
             <div
               key={i}
               className="absolute w-1 h-1 bg-current rounded-full animate-particle-float"
               style={{
-                left: `${10 + (i % 4) * 25}%`,
-                top: `${15 + Math.floor(i / 4) * 25}%`,
+                left: `${15 + (i % 4) * 20}%`,
+                top: `${20 + Math.floor(i / 4) * 20}%`,
                 animationDelay: `${i * 0.08}s`,
               }}
             />
