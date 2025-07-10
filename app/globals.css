@@ -189,3 +189,35 @@ body {
 .glitch-active {
   animation: glitch 0.15s linear;
 }
+
+/* Navigation button improvements */
+.nav-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Ensure buttons have consistent sizing */
+.nav-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 140px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 640px) {
+  .nav-button-container {
+    gap: 0.5rem;
+  }
+
+  .nav-button {
+    min-width: 110px;
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+  }
+}
