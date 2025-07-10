@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { saveProfile } from "@/lib/profile";
 import { saveRsvp } from "@/lib/rsvp";
 import { getUpcomingEvents } from '@/lib/events';
+import { fetchInterests, findOrCreateInterest, linkUserInterests } from '@/lib/interests';
 import { Profile } from "@/types/supabase";
 
 export default function ChatWindow() {
@@ -20,6 +21,12 @@ export default function ChatWindow() {
   const [tempInput, setTempInput] = useState<string>("");
   const [showRsvpPrompt, setShowRsvpPrompt] = useState<boolean>(false);
   const [nextEventId, setNextEventId] = useState<string | null>(null);
+  // Interests data
+  type Interest = { id: string; name: string };
+  const [interestsList, setInterestsList] = useState<Interest[]>([]);
+  const [selectedInterests, setSelectedInterests] = useState<Interest[]>([]);
+  const [newInterest, setNewInterest] = useState<string>("");
+  const [interestIdsToSave, setInterestIdsToSave] = useState<string[]>([]);
 
   async function sendMessage() {
     if (!input.trim()) return;
@@ -86,6 +93,11 @@ export default function ChatWindow() {
     }
   }, []);
 
+  // Fetch interests list on mount
+  useEffect(() => {
+    fetchInterests().then(setInterestsList);
+  }, []);
+
   // After onboarding, prompt for RSVP for the next event if not already prompted
   useEffect(() => {
     if (!hasOnboarded) return;
@@ -110,7 +122,7 @@ export default function ChatWindow() {
   }, [hasOnboarded]);
 
   // Handle onboarding steps for name, email, interests
-  const handleOnboardingNext = () => {
+  const handleOnboardingNext = async () => {
     if (onboardingStep === 0) {
       if (!tempInput.trim()) return;
       setProfileInput(prev => ({ ...prev, name: tempInput.trim() }));
@@ -122,9 +134,23 @@ export default function ChatWindow() {
       setTempInput("");
       setOnboardingStep(2);
     } else if (onboardingStep === 2) {
-      const interestsArray = tempInput.split(',').map(s => s.trim()).filter(Boolean);
-      setProfileInput(prev => ({ ...prev, interests: interestsArray }));
-      setTempInput("");
+      const updated = [...selectedInterests];
+      const ids = updated.map(i => i.id);
+      const names = updated.map(i => i.name);
+      const trimmed = newInterest.trim();
+      if (trimmed) {
+        const created = await findOrCreateInterest(trimmed);
+        if (created) {
+          updated.push(created);
+          ids.push(created.id);
+          names.push(created.name);
+          setInterestsList(prev => [...prev, created]);
+        }
+        setNewInterest("");
+      }
+      setSelectedInterests(updated);
+      setInterestIdsToSave(ids);
+      setProfileInput(prev => ({ ...prev, interests: names }));
       setOnboardingStep(3);
     }
   };
@@ -140,6 +166,8 @@ export default function ChatWindow() {
     const id = await saveProfile(newProfile);
     if (!id) {
       console.warn('Failed to save profile, proceeding without confirmation.');
+    } else {
+      await linkUserInterests(id, interestIdsToSave);
     }
     // Greet the user and finish onboarding
     setMessages([
@@ -175,28 +203,65 @@ export default function ChatWindow() {
           <p className="font-bold">
             {onboardingStep === 0 && `Welcome! What's your name?`}
             {onboardingStep === 1 && `Great! What's your email?`}
-            {onboardingStep === 2 && `What are your interests? (comma-separated)`}
+            {onboardingStep === 2 && `Select your interests (choose all that apply):`}
             {onboardingStep === 3 && `How much have you worked with AI so far?`}
           </p>
         </div>
         {onboardingStep < 3 && (
-          <div className="flex gap-2">
-            <input
-              value={tempInput}
-              onChange={e => setTempInput(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === 'Enter') handleOnboardingNext();
-              }}
-              className="flex-1 p-2 border rounded"
-              placeholder="Type your answer and press Enter..."
-            />
-            <button
-              onClick={handleOnboardingNext}
-              className="px-4 py-2 bg-blue-600 text-white rounded"
-            >
-              Next
-            </button>
-          </div>
+          onboardingStep === 2 ? (
+            <div>
+              {interestsList.map((interest) => (
+                <label key={interest.id} className="block mb-1">
+                  <input
+                    type="checkbox"
+                    checked={selectedInterests.some(i => i.id === interest.id)}
+                    onChange={e => {
+                      if (e.target.checked) {
+                        setSelectedInterests(prev => [...prev, interest]);
+                      } else {
+                        setSelectedInterests(prev => prev.filter(i => i.id !== interest.id));
+                      }
+                    }}
+                    className="mr-2"
+                  />
+                  {interest.name}
+                </label>
+              ))}
+              <label className="block mt-2">
+                Other interest:
+                <input
+                  type="text"
+                  className="border ml-2 px-1"
+                  value={newInterest}
+                  onChange={e => setNewInterest(e.target.value)}
+                />
+              </label>
+              <button
+                onClick={handleOnboardingNext}
+                className="mt-2 px-4 py-2 bg-blue-600 text-white rounded"
+              >
+                Next
+              </button>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <input
+                value={tempInput}
+                onChange={e => setTempInput(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') handleOnboardingNext();
+                }}
+                className="flex-1 p-2 border rounded"
+                placeholder="Type your answer and press Enter..."
+              />
+              <button
+                onClick={handleOnboardingNext}
+                className="px-4 py-2 bg-blue-600 text-white rounded"
+              >
+                Next
+              </button>
+            </div>
+          )
         )}
         {onboardingStep === 3 && (
           <div className="flex flex-col gap-2">
