@@ -38,10 +38,12 @@ export default function RootLayout({
         </header>
         <main className="container mx-auto px-4 py-8 flex-1 relative z-10">{children}</main>
         <nav className="bg-gray-900/80 backdrop-blur-lg shadow relative z-10">
-          <div className="container mx-auto px-4 py-4 flex justify-center gap-6 md:gap-8 font-orbitron">
-            <InteractiveNavButton href="/">Home</InteractiveNavButton>
-            <InteractiveNavButton href="/events">Events</InteractiveNavButton>
-            <InteractiveNavButton href="/invite">Invite</InteractiveNavButton>
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex justify-center items-center gap-4 md:gap-6 lg:gap-8 font-orbitron flex-wrap">
+              <InteractiveNavButton href="/">Home</InteractiveNavButton>
+              <InteractiveNavButton href="/events">Events</InteractiveNavButton>
+              <InteractiveNavButton href="/invite">Invite</InteractiveNavButton>
+            </div>
           </div>
         </nav>
         <footer className="bg-gray-900/80 backdrop-blur-lg relative z-10">
