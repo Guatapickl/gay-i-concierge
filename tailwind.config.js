@@ -8,7 +8,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        space: ['var(--font-orbitron)', 'sans-serif'],
+        orbitron: ['var(--font-orbitron)', 'monospace'],
       },
     },
   },
