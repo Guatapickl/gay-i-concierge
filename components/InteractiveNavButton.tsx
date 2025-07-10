@@ -125,7 +125,7 @@ export function InteractiveNavButton({ href, children, className = '' }: Interac
       )}
 
       {/* Button Content */}
-      <span className="relative z-10">
+      <span className="relative z-10 flex items-center justify-center w-full">
         {children}
       </span>
     </Link>
