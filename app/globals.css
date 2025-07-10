@@ -27,15 +27,19 @@ body {
   font-family: var(--font-inter), Arial, Helvetica, sans-serif;
 }
 
-/* Smooth particle float animation */
+/* Particle float animation */
 @keyframes particle-float {
   0%, 100% {
-    transform: translateY(0px) scale(1);
-    opacity: 0.3;
+    opacity: 0;
+    transform: translateY(0) scale(0);
   }
-  50% {
+  20% {
+    opacity: 0.8;
     transform: translateY(-8px) scale(1.2);
-    opacity: 0.7;
+  }
+  80% {
+    opacity: 0.8;
+    transform: translateY(-12px) scale(1);
   }
 }
 
@@ -116,4 +120,53 @@ body {
 .interactive-nav-button > * {
   position: relative;
   z-index: 1;
+}
+
+/* Custom ripple animation */
+@keyframes ripple-expand {
+  0% {
+    width: 10px;
+    height: 10px;
+    opacity: 0.5;
+  }
+  100% {
+    width: 100px;
+    height: 100px;
+    opacity: 0;
+  }
+}
+
+.animate-ripple-expand {
+  animation: ripple-expand 0.6s ease-out forwards;
+}
+
+/* Ensure button doesn't change size on click */
+.interactive-nav-button:active {
+  transform: none !important;
+}
+
+@keyframes scan-line {
+  0% {
+    transform: translateX(-150%) skewX(-12deg);
+  }
+  100% {
+    transform: translateX(150%) skewX(-12deg);
+  }
+}
+
+.animate-scan-line {
+  animation: scan-line 0.8s ease-in-out forwards;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
 }
