@@ -31,7 +31,7 @@ export default function RootLayout({
         <header className="bg-white shadow">
           <div className="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between md:items-center">
             <h1 className="text-2xl font-bold text-pink-600 text-center md:text-left">Gay-I Club Concierge</h1>
-            <nav className="flex items-center space-x-4 font-orbitron">
+            <nav className="flex items-center space-x-4 font-orbitron relative z-10">
               <InteractiveNavButton href="/">
                 Home
               </InteractiveNavButton>
