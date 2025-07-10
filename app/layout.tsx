@@ -37,7 +37,7 @@ export default function RootLayout({
           </div>
         </header>
         <main className="container mx-auto px-4 py-8 flex-1 relative z-10">{children}</main>
-        <nav className="bg-gray-900/80 backdrop-blur-lg shadow relative z-10 border-t border-gray-800">
+        <nav className="bg-gray-900/80 backdrop-blur-lg shadow relative z-10">
           <div className="container mx-auto px-4 py-6">
             <div className="nav-button-container">
               <InteractiveNavButton href="/" className="nav-button">
