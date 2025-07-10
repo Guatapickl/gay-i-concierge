@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Orbitron } from "next/font/google";
 import { InteractiveNavButton } from '@/components/InteractiveNavButton'
+import BackgroundParticles from '@/components/BackgroundParticles'
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -28,7 +29,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.className} ${orbitron.variable}`}>
       <body className="flex flex-col min-h-screen antialiased relative">
-        <header className="bg-white shadow">
+        <BackgroundParticles />
+        <header className="bg-white shadow relative z-10">
           <div className="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between md:items-center">
             <h1 className="text-2xl font-bold text-pink-600 text-center md:text-left">Gay-I Club Concierge</h1>
             <nav className="flex items-center space-x-4 font-orbitron relative z-10">
@@ -44,8 +46,8 @@ export default function RootLayout({
             </nav>
           </div>
         </header>
-        <main className="container mx-auto px-4 py-8 flex-1">{children}</main>
-        <footer className="bg-gray-100">
+        <main className="container mx-auto px-4 py-8 flex-1 relative z-10">{children}</main>
+        <footer className="bg-gray-100 relative z-10">
           <div className="container mx-auto px-4 py-4 text-center text-sm text-gray-500">
             © {new Date().getFullYear()} Gay-I Club Concierge. All rights reserved.
           </div>
