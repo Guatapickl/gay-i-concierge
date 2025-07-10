@@ -51,9 +51,35 @@ body {
   }
 }
 
+/* Generic ping animation used by Tailwind */
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/* Generic pulse animation used by Tailwind */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
 /* Apply custom animations */
 .animate-particle-float {
   animation: particle-float 2s ease-in-out infinite;
+}
+
+.animate-ping {
+  animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 .animate-enhanced-ping {
@@ -80,7 +106,14 @@ body {
 
 /* Add to your globals.css for smoother animations */
 .interactive-nav-button {
+  position: relative;
+  isolation: isolate;
   transform: translateZ(0);
   backface-visibility: hidden;
   perspective: 1000px;
+}
+
+.interactive-nav-button > * {
+  position: relative;
+  z-index: 1;
 }

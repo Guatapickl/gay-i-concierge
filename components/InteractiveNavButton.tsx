@@ -77,7 +77,7 @@ export function InteractiveNavButton({ href, children, className = '' }: Interac
       {ripples.map((ripple) => (
         <motion.span
           key={ripple.id}
-          className="absolute rounded-full border-2 border-current pointer-events-none"
+          className="absolute rounded-full border-2 border-red-500 pointer-events-none z-50"
           style={{
             left: ripple.x - 20,
             top: ripple.y - 20,
@@ -98,8 +98,8 @@ export function InteractiveNavButton({ href, children, className = '' }: Interac
 
       {/* Enhanced Particle Dots Effect - Phase 2 Requirement */}
       {isHovered && (
-        <motion.div 
-          className="absolute inset-0 pointer-events-none"
+        <motion.div
+          className="absolute inset-0 pointer-events-none z-40"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -132,9 +132,9 @@ export function InteractiveNavButton({ href, children, className = '' }: Interac
 
       {/* Enhanced Scan Line Effect - Phase 2 Requirement */}
       <motion.span
-        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent transform -skew-x-12 pointer-events-none"
+        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent transform -skew-x-12 pointer-events-none z-30"
         initial={{ x: '-150%' }}
-        animate={{ 
+        animate={{
           x: isHovered ? '150%' : '-150%'
         }}
         transition={{ 
