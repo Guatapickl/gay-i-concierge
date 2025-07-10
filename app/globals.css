@@ -167,3 +167,21 @@ body {
 .animate-fade-in {
   animation: fade-in 0.2s ease-out;
 }
+
+/* Holographic text style */
+.base-holographic {
+  @apply bg-gradient-to-r from-cyan-400 via-blue-500 via-purple-500 via-pink-500 to-red-500 bg-clip-text text-transparent filter drop-shadow-[0_0_30px_rgba(139,92,246,0.5)];
+}
+
+@keyframes glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+  100% { transform: translate(0); }
+}
+
+.glitch-active {
+  animation: glitch 0.15s linear;
+}
