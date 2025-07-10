@@ -77,3 +77,10 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Add to your globals.css for smoother animations */
+.interactive-nav-button {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}

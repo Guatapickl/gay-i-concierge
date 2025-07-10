@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useMemo } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -23,17 +23,29 @@ export function InteractiveNavButton({ href, children, className = '' }: Interac
 
     switch (href) {
       case '/':
-        return 'bg-white/20 border-orange-400 text-orange-400 shadow-[0_0_30px_rgba(251,146,60,0.6)]'
+        return 'bg-orange-500/20 border-orange-400 text-orange-400 shadow-[0_0_25px_rgba(251,146,60,0.6)]'
       case '/events':
-        return 'bg-white/20 border-purple-400 text-purple-400 shadow-[0_0_30px_rgba(168,85,247,0.6)]'
+        return 'bg-purple-500/20 border-purple-400 text-purple-400 shadow-[0_0_25px_rgba(168,85,247,0.6)]'
       case '/invite':
-        return 'bg-white/20 border-emerald-400 text-emerald-400 shadow-[0_0_30px_rgba(16,185,129,0.6)]'
+        return 'bg-emerald-500/20 border-emerald-400 text-emerald-400 shadow-[0_0_25px_rgba(16,185,129,0.6)]'
       default:
-        return 'bg-white/20 border-cyan-400 text-cyan-400 shadow-[0_0_30px_rgba(34,211,238,0.6)]'
+        return 'bg-cyan-500/20 border-cyan-400 text-cyan-400 shadow-[0_0_25px_rgba(34,211,238,0.6)]'
     }
   }
 
   const activeStyles = getActiveStyles(pathname, href)
+
+  const buttonStyles = useMemo(() => `
+    relative px-6 py-3 text-sm font-medium uppercase tracking-wider
+    bg-white/5 backdrop-blur-sm border border-cyan-400/50
+    text-cyan-400 rounded-lg overflow-hidden interactive-nav-button
+    transition-all duration-300 ease-out cursor-pointer
+    hover:scale-105 hover:bg-white/10 hover:border-cyan-400
+    hover:shadow-[0_0_20px_rgba(34,211,238,0.3)]
+    focus:outline-none focus:ring-2 focus:ring-cyan-400/50
+    ${activeStyles}
+    ${className}
+  `, [activeStyles, className])
 
   const handleClick = (e: React.MouseEvent) => {
     const rect = buttonRef.current?.getBoundingClientRect()
@@ -56,37 +68,35 @@ export function InteractiveNavButton({ href, children, className = '' }: Interac
     <Link
       ref={buttonRef}
       href={href}
-      className={`
-        relative px-6 py-3 text-sm font-medium uppercase tracking-wider
-        bg-white/5 backdrop-blur-sm border border-cyan-400/50 
-        text-cyan-400 rounded-lg overflow-hidden
-        transition-all duration-300 ease-out cursor-pointer
-        hover:scale-105 hover:bg-white/10 hover:border-cyan-400
-        hover:shadow-[0_0_20px_rgba(34,211,238,0.3)]
-        focus:outline-none focus:ring-2 focus:ring-cyan-400/50
-        ${activeStyles}
-        ${className}
-      `}
+      className={buttonStyles}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={handleClick}
     >
-      {/* Ripple Effects */}
+      {/* Enhanced Ripple Effects - Phase 2 Requirement */}
       {ripples.map((ripple) => (
-        <span
+        <motion.span
           key={ripple.id}
-          className="absolute rounded-full bg-cyan-400 opacity-30 pointer-events-none animate-ping"
+          className="absolute rounded-full border-2 border-current pointer-events-none"
           style={{
-            left: ripple.x - 6,
-            top: ripple.y - 6,
-            width: 12,
-            height: 12,
-            animationDuration: '0.6s'
+            left: ripple.x - 20,
+            top: ripple.y - 20,
+            width: 40,
+            height: 40,
+          }}
+          initial={{ scale: 0, opacity: 0.6 }}
+          animate={{
+            scale: [0, 2, 3],
+            opacity: [0.6, 0.3, 0]
+          }}
+          transition={{
+            duration: 0.6,
+            ease: 'easeOut'
           }}
         />
       ))}
 
-      {/* Particle Dots Effect - MISSING FROM PHASE 2 */}
+      {/* Enhanced Particle Dots Effect - Phase 2 Requirement */}
       {isHovered && (
         <motion.div 
           className="absolute inset-0 pointer-events-none"
@@ -95,24 +105,24 @@ export function InteractiveNavButton({ href, children, className = '' }: Interac
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
         >
-          {[...Array(12)].map((_, i) => (
+          {[...Array(16)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute w-1 h-1 bg-cyan-400 rounded-full opacity-60"
+              className="absolute w-1 h-1 bg-current rounded-full opacity-70"
               style={{
-                left: `${15 + (i % 4) * 20}%`,
-                top: `${20 + Math.floor(i / 4) * 20}%`,
+                left: `${10 + (i % 4) * 25}%`,
+                top: `${15 + Math.floor(i / 4) * 25}%`,
               }}
               initial={{ opacity: 0, scale: 0 }}
               animate={{ 
-                opacity: [0, 1, 0],
-                scale: [0, 1, 0],
-                y: [0, -10, 0]
+                opacity: [0, 0.8, 0],
+                scale: [0, 1.2, 0],
+                y: [0, -12, 0]
               }}
               transition={{
-                duration: 1.5,
+                duration: 2,
                 repeat: Infinity,
-                delay: i * 0.1,
+                delay: i * 0.08,
                 ease: 'easeInOut'
               }}
             />
@@ -120,18 +130,31 @@ export function InteractiveNavButton({ href, children, className = '' }: Interac
         </motion.div>
       )}
 
-      {/* Scan Line Effect */}
-      <span
-        className={`
-          absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent
-          transform -skew-x-12 transition-transform duration-500 pointer-events-none
-          ${isHovered ? 'translate-x-full' : '-translate-x-full'}
-        `}
+      {/* Enhanced Scan Line Effect - Phase 2 Requirement */}
+      <motion.span
+        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent transform -skew-x-12 pointer-events-none"
+        initial={{ x: '-150%' }}
+        animate={{ 
+          x: isHovered ? '150%' : '-150%'
+        }}
+        transition={{ 
+          duration: 0.8,
+          ease: 'easeInOut',
+          delay: isHovered ? 0.1 : 0
+        }}
       />
 
       {/* Active Page Indicator */}
       {isActive && (
-        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.8)]" />
+        <motion.span 
+          className={`absolute bottom-0 left-0 right-0 h-0.5 shadow-[0_0_8px_currentColor]`}
+          style={{
+            backgroundColor: 'currentColor'
+          }}
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ duration: 0.3 }}
+        />
       )}
 
       {/* Button Content */}
