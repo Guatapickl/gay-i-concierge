@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Orbitron } from "next/font/google";
 import { InteractiveNavButton } from '@/components/InteractiveNavButton'
 import BackgroundParticles from '@/components/BackgroundParticles';
+import HeaderTitle from '@/components/HeaderTitle';
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -32,7 +33,7 @@ export default function RootLayout({
         <BackgroundParticles />
         <header className="bg-white shadow relative z-10">
           <div className="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between md:items-center">
-            <h1 className="text-2xl font-bold text-pink-600 text-center md:text-left">Gay-I Club Concierge</h1>
+            <HeaderTitle />
             <nav className="flex items-center space-x-4 font-orbitron relative z-10">
               <InteractiveNavButton href="/">
                 Home
