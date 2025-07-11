@@ -235,7 +235,7 @@ export default function ChatWindow() {
   // Render onboarding or chat UI
   if (!hasOnboarded) {
     return (
-      <div className="w-full max-w-3xl mx-auto p-4 space-y-4">
+      <div className="w-full max-w-3xl mx-auto px-8 py-4 space-y-4">
         <div className="p-4 bg-white rounded-lg shadow">
           <p className="font-bold">
             {onboardingStep === 0 && `Welcome! What's your name?`}
@@ -317,7 +317,7 @@ export default function ChatWindow() {
     );
   }
   return (
-    <div className="w-full max-w-3xl mx-auto p-4 space-y-4">
+    <div className="w-full max-w-3xl mx-auto px-8 py-4 space-y-4">
       <div className="space-y-2 max-h-80 overflow-y-auto w-full">
         {messages.map((msg, i) => (
           <div
