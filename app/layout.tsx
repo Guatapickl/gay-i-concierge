@@ -36,7 +36,7 @@ export default function RootLayout({
             <HeaderTitle />
           </div>
         </header>
-        <main className="container mx-auto px-4 py-8 flex-1 relative z-10">{children}</main>
+        <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 relative z-10 max-w-7xl">{children}</main>
         <nav className="bg-gray-900/80 backdrop-blur-lg shadow relative z-10">
           <div className="container mx-auto px-4 py-6">
             <div className="nav-button-container">
