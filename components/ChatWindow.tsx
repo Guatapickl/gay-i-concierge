@@ -4,7 +4,40 @@ import { useState, useEffect, useRef } from "react";
 import { saveProfile } from "@/lib/profile";
 import { saveRsvp } from "@/lib/rsvp";
 import { getUpcomingEvents } from '@/lib/events';
+import { fetchInterests, findOrCreateInterest, linkUserInterests } from '@/lib/interests';
 import { Profile } from "@/types/supabase";
+
+const SYSTEM_PROMPT = `You are AIlex, an energetic, witty, and deeply knowledgeable AI-powered assistant for an AI club primarily composed of gay men in their 30's and 40's living in New York City. With over two decades of expertise in AI education, club management, and technology community engagement, you embody a playful yet professional persona. Your primary goals are to educate, entertain, foster community spirit, and stimulate enthusiasm about artificial intelligence and club activities.
+
+Conversational Guidelines:
+
+Always begin interactions with a warm, humorous greeting designed to make users feel instantly welcomed and included.
+
+Briefly introduce yourself as their AI-powered club assistant, highlighting your dual role as both a knowledgeable guide and friendly companion.
+
+Clearly offer assistance by proactively mentioning you can answer questions about club membership, upcoming events, AI topics, projects, and general club inquiries.
+
+Encourage newcomers to ask introductory questions
+
+Suggest playful, interactive queries for returning members to encourage ongoing engagement
+
+Maintain a consistently approachable, inclusive, and enthusiastic tone to nurture community interactions and cultivate a lively, engaging environment.
+
+Use humor thoughtfully to enhance interactions, ensuring it remains tasteful, inclusive, and resonates positively with the target audience.
+
+Personality Traits to Exhibit:
+
+Warm and approachable
+
+Humorous and witty
+
+Knowledgeable and insightful
+
+Playful yet professional
+
+Inclusive and welcoming
+
+Always strive to create memorable, engaging interactions that encourage community-building and excitement around AI exploration.`;
 
 export default function ChatWindow() {
   type ExperienceLevel = 'none' | 'beginner' | 'intermediate' | 'advanced';
@@ -21,6 +54,12 @@ export default function ChatWindow() {
   const [onboardingError, setOnboardingError] = useState<string>("");
   const [showRsvpPrompt, setShowRsvpPrompt] = useState<boolean>(false);
   const [nextEventId, setNextEventId] = useState<string | null>(null);
+  // Interests data
+  type Interest = { id: string; name: string };
+  const [interestsList, setInterestsList] = useState<Interest[]>([]);
+  const [selectedInterests, setSelectedInterests] = useState<Interest[]>([]);
+  const [newInterest, setNewInterest] = useState<string>("");
+  const [interestIdsToSave, setInterestIdsToSave] = useState<string[]>([]);
 
   // Keep an abort controller to stop previous in-flight requests
   const currentRequest = useRef<AbortController | null>(null);
@@ -35,8 +74,21 @@ export default function ChatWindow() {
     setInput("");
     setIsLoading(true);
 
+<<<<<<< HEAD
     const controller = new AbortController();
     currentRequest.current = controller;
+=======
+    const payloadMessages = [
+      { role: "system", content: SYSTEM_PROMPT },
+      ...newMessages,
+    ];
+
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages: payloadMessages }),
+    });
+>>>>>>> 6f320bcab6f18eda2b36ab4b93db51b702d5ac2f
 
     try {
       const res = await fetch("/api/chat", {
@@ -114,6 +166,11 @@ export default function ChatWindow() {
     }
   }, []);
 
+  // Fetch interests list on mount
+  useEffect(() => {
+    fetchInterests().then(setInterestsList);
+  }, []);
+
   // After onboarding, prompt for RSVP for the next event if not already prompted
   useEffect(() => {
     if (!hasOnboarded) return;
@@ -138,7 +195,7 @@ export default function ChatWindow() {
   }, [hasOnboarded]);
 
   // Handle onboarding steps for name, email, interests
-  const handleOnboardingNext = () => {
+  const handleOnboardingNext = async () => {
     if (onboardingStep === 0) {
       const name = tempInput.trim();
       if (!name || name.length < 2) {
@@ -161,6 +218,7 @@ export default function ChatWindow() {
       setTempInput("");
       setOnboardingStep(2);
     } else if (onboardingStep === 2) {
+<<<<<<< HEAD
       const interestsArray = tempInput
         .split(',')
         .map(s => s.trim())
@@ -174,6 +232,25 @@ export default function ChatWindow() {
       setOnboardingError('');
       setProfileInput(prev => ({ ...prev, interests: interestsArray }));
       setTempInput("");
+=======
+      const updated = [...selectedInterests];
+      const ids = updated.map(i => i.id);
+      const names = updated.map(i => i.name);
+      const trimmed = newInterest.trim();
+      if (trimmed) {
+        const created = await findOrCreateInterest(trimmed);
+        if (created) {
+          updated.push(created);
+          ids.push(created.id);
+          names.push(created.name);
+          setInterestsList(prev => [...prev, created]);
+        }
+        setNewInterest("");
+      }
+      setSelectedInterests(updated);
+      setInterestIdsToSave(ids);
+      setProfileInput(prev => ({ ...prev, interests: names }));
+>>>>>>> 6f320bcab6f18eda2b36ab4b93db51b702d5ac2f
       setOnboardingStep(3);
     }
   };
@@ -189,6 +266,8 @@ export default function ChatWindow() {
     const id = await saveProfile(newProfile);
     if (!id) {
       console.warn('Failed to save profile, proceeding without confirmation.');
+    } else {
+      await linkUserInterests(id, interestIdsToSave);
     }
     // Persist profile locally for future visits
     if (id) {
@@ -224,33 +303,70 @@ export default function ChatWindow() {
   // Render onboarding or chat UI
   if (!hasOnboarded) {
     return (
-      <div className="space-y-4">
+      <div className="w-full max-w-3xl mx-auto px-8 py-4 space-y-4">
         <div className="p-4 bg-white rounded-lg shadow">
           <p className="font-bold">
             {onboardingStep === 0 && `Welcome! What's your name?`}
             {onboardingStep === 1 && `Great! What's your email?`}
-            {onboardingStep === 2 && `What are your interests? (comma-separated)`}
+            {onboardingStep === 2 && `Select your interests (choose all that apply):`}
             {onboardingStep === 3 && `How much have you worked with AI so far?`}
           </p>
         </div>
         {onboardingStep < 3 && (
-          <div className="flex gap-2">
-            <input
-              value={tempInput}
-              onChange={e => setTempInput(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === 'Enter') handleOnboardingNext();
-              }}
-              className="flex-1 p-2 border rounded"
-              placeholder="Type your answer and press Enter..."
-            />
-            <button
-              onClick={handleOnboardingNext}
-              className="px-4 py-2 bg-blue-600 text-white rounded"
-            >
-              Next
-            </button>
-          </div>
+          onboardingStep === 2 ? (
+            <div>
+              {interestsList.map((interest) => (
+                <label key={interest.id} className="block mb-1">
+                  <input
+                    type="checkbox"
+                    checked={selectedInterests.some(i => i.id === interest.id)}
+                    onChange={e => {
+                      if (e.target.checked) {
+                        setSelectedInterests(prev => [...prev, interest]);
+                      } else {
+                        setSelectedInterests(prev => prev.filter(i => i.id !== interest.id));
+                      }
+                    }}
+                    className="mr-2"
+                  />
+                  {interest.name}
+                </label>
+              ))}
+              <label className="block mt-2">
+                Other interest:
+                <input
+                  type="text"
+                  className="border ml-2 px-1"
+                  value={newInterest}
+                  onChange={e => setNewInterest(e.target.value)}
+                />
+              </label>
+              <button
+                onClick={handleOnboardingNext}
+                className="mt-2 px-4 py-2 bg-blue-600 text-white rounded"
+              >
+                Next
+              </button>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <input
+                value={tempInput}
+                onChange={e => setTempInput(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') handleOnboardingNext();
+                }}
+                className="flex-1 p-2 border rounded"
+                placeholder="Type your answer and press Enter..."
+              />
+              <button
+                onClick={handleOnboardingNext}
+                className="px-4 py-2 bg-blue-600 text-white rounded"
+              >
+                Next
+              </button>
+            </div>
+          )
         )}
         {onboardingError && (
           <p className="text-sm text-red-600">{onboardingError}</p>
@@ -272,12 +388,16 @@ export default function ChatWindow() {
     );
   }
   return (
-    <div className="space-y-4">
-      <div className="space-y-2 max-h-80 overflow-y-auto">
+    <div className="w-full max-w-3xl mx-auto px-8 py-4 space-y-4">
+      <div className="space-y-2 max-h-80 overflow-y-auto w-full">
         {messages.map((msg, i) => (
           <div
             key={i}
+<<<<<<< HEAD
             className={`p-2 rounded text-sm leading-relaxed ${
+=======
+            className={`p-2 rounded max-w-full break-words ${
+>>>>>>> 6f320bcab6f18eda2b36ab4b93db51b702d5ac2f
               msg.role === "user"
                 ? "bg-blue-600 text-white"
                 : "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100"

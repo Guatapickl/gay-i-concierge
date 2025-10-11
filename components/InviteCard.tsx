@@ -10,21 +10,43 @@ export default function InviteCard() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const generateInvite = async () => {
     setLoading(true);
     setMessage(null);
+    setError(null);
     setCopied(false);
-    const res = await fetch("/api/invite", { method: "POST" });
-    if (!res.ok) {
-      setMessage(null);
+    
+    try {
+      console.log("Sending request to /api/invite");
+      const res = await fetch("/api/invite", { 
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      console.log("Response status:", res.status);
+      
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ error: "Unknown error" }));
+        console.error("API Error:", errorData);
+        setError(`Error ${res.status}: ${errorData.error || "Couldn't generate invite"}`);
+        setLoading(false);
+        return;
+      }
+      
+      const data = await res.json();
+      console.log("Success:", data);
+      setMessage(data.message);
+      
+    } catch (fetchError) {
+      console.error("Fetch error:", fetchError);
+      setError("Network error: Couldn't connect to server");
+    } finally {
       setLoading(false);
-      setMessage("Couldn't generate invite, please try again.");
-      return;
     }
-    const data = await res.json();
-    setMessage(data.message);
-    setLoading(false);
   };
 
   const copyInvite = async () => {
@@ -47,9 +69,18 @@ export default function InviteCard() {
       >
         {loading ? "Generating..." : "Generate Invite"}
       </button>
+      
+      {error && (
+        <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+          <strong>Error:</strong> {error}
+        </div>
+      )}
+      
       {message && (
         <div className="space-y-2">
-          <p className="whitespace-pre-line">{message}</p>
+          <div className="p-3 bg-green-50 border border-green-200 rounded">
+            <p className="whitespace-pre-line">{message}</p>
+          </div>
           <button
             onClick={copyInvite}
             className="text-sm text-blue-600 underline"
