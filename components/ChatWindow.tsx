@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { saveProfile } from "@/lib/profile";
 import { saveRsvp } from "@/lib/rsvp";
 import { getUpcomingEvents } from '@/lib/events';
@@ -18,61 +18,89 @@ export default function ChatWindow() {
   const [profileInput, setProfileInput] = useState<ProfileInput>({ name: "", email: "", interests: [] });
   // experienceLevel state not needed; handle directly on selection
   const [tempInput, setTempInput] = useState<string>("");
+  const [onboardingError, setOnboardingError] = useState<string>("");
   const [showRsvpPrompt, setShowRsvpPrompt] = useState<boolean>(false);
   const [nextEventId, setNextEventId] = useState<string | null>(null);
 
+  // Keep an abort controller to stop previous in-flight requests
+  const currentRequest = useRef<AbortController | null>(null);
+
   async function sendMessage() {
     if (!input.trim()) return;
+    // Abort any previous stream
+    currentRequest.current?.abort();
+
     const newMessages = [...messages, { role: "user", content: input }];
     setMessages(newMessages);
     setInput("");
     setIsLoading(true);
 
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: newMessages }),
-    });
+    const controller = new AbortController();
+    currentRequest.current = controller;
 
-    if (!res.ok) {
-      console.error("Error calling /api/chat", await res.text());
-      setIsLoading(false);
-      return;
-    }
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: newMessages }),
+        signal: controller.signal,
+      });
 
-    const reader = res.body?.getReader();
-    const decoder = new TextDecoder();
-    let assistantReply = "";
-    let buffer = "";
+      if (!res.ok) {
+        console.error("Error calling /api/chat", await res.text());
+        setIsLoading(false);
+        return;
+      }
 
-    while (true) {
-      const { done, value } = await reader!.read();
-      if (done) break;
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split("\n");
-      buffer = lines.pop() || "";
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (!trimmed || !trimmed.startsWith("data:")) continue;
-        const data = trimmed.slice(5).trim();
-        if (data === "[DONE]") {
-          buffer = "";
-          break;
-        }
-        try {
-          const parsed = JSON.parse(data);
-          const content = parsed.choices?.[0]?.delta?.content;
-          if (content) {
-            assistantReply += content;
-            setMessages([...newMessages, { role: "assistant", content: assistantReply }]);
+      const reader = res.body?.getReader();
+      if (!reader) {
+        console.error("No response body to read");
+        setIsLoading(false);
+        return;
+      }
+
+      const decoder = new TextDecoder();
+      let assistantReply = "";
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed || !trimmed.startsWith("data:")) continue;
+          const data = trimmed.slice(5).trim();
+          if (data === "[DONE]") {
+            buffer = "";
+            break;
           }
-        } catch (err) {
-          console.error("Failed to parse chunk", err, line);
+          try {
+            const parsed = JSON.parse(data);
+            const content = parsed.choices?.[0]?.delta?.content;
+            if (content) {
+              assistantReply += content;
+              // Update once per chunk; could throttle further if needed
+              setMessages([...newMessages, { role: "assistant", content: assistantReply }]);
+            }
+          } catch (err) {
+            console.error("Failed to parse chunk", err, line);
+          }
         }
       }
+    } catch (err) {
+      const isAbort = !!(err && typeof err === 'object' && 'name' in err && (err as { name?: string }).name === 'AbortError');
+      if (!isAbort) {
+        console.error("Chat request failed", err);
+      }
+    } finally {
+      setIsLoading(false);
+      if (currentRequest.current === controller) {
+        currentRequest.current = null;
+      }
     }
-
-    setIsLoading(false);
   }
   // On mount, check for existing profile
   useEffect(() => {
@@ -112,17 +140,38 @@ export default function ChatWindow() {
   // Handle onboarding steps for name, email, interests
   const handleOnboardingNext = () => {
     if (onboardingStep === 0) {
-      if (!tempInput.trim()) return;
-      setProfileInput(prev => ({ ...prev, name: tempInput.trim() }));
+      const name = tempInput.trim();
+      if (!name || name.length < 2) {
+        setOnboardingError('Please enter your name (2+ characters).');
+        return;
+      }
+      setOnboardingError('');
+      setProfileInput(prev => ({ ...prev, name }));
       setTempInput("");
       setOnboardingStep(1);
     } else if (onboardingStep === 1) {
-      if (!tempInput.trim()) return;
-      setProfileInput(prev => ({ ...prev, email: tempInput.trim() }));
+      const email = tempInput.trim();
+      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      if (!emailOk) {
+        setOnboardingError('Please enter a valid email.');
+        return;
+      }
+      setOnboardingError('');
+      setProfileInput(prev => ({ ...prev, email }));
       setTempInput("");
       setOnboardingStep(2);
     } else if (onboardingStep === 2) {
-      const interestsArray = tempInput.split(',').map(s => s.trim()).filter(Boolean);
+      const interestsArray = tempInput
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean)
+        .slice(0, 10)
+        .map(s => s.slice(0, 30));
+      if (interestsArray.length === 0) {
+        setOnboardingError('Please add at least one interest (comma-separated).');
+        return;
+      }
+      setOnboardingError('');
       setProfileInput(prev => ({ ...prev, interests: interestsArray }));
       setTempInput("");
       setOnboardingStep(3);
@@ -140,6 +189,11 @@ export default function ChatWindow() {
     const id = await saveProfile(newProfile);
     if (!id) {
       console.warn('Failed to save profile, proceeding without confirmation.');
+    }
+    // Persist profile locally for future visits
+    if (id) {
+      localStorage.setItem('profile_id', id);
+      localStorage.setItem('profile_name', newProfile.name ?? '');
     }
     // Greet the user and finish onboarding
     setMessages([
@@ -198,6 +252,9 @@ export default function ChatWindow() {
             </button>
           </div>
         )}
+        {onboardingError && (
+          <p className="text-sm text-red-600">{onboardingError}</p>
+        )}
         {onboardingStep === 3 && (
           <div className="flex flex-col gap-2">
             {(['none', 'beginner', 'intermediate', 'advanced'] as ExperienceLevel[]).map(level => (
@@ -220,10 +277,10 @@ export default function ChatWindow() {
         {messages.map((msg, i) => (
           <div
             key={i}
-            className={`p-2 rounded ${
+            className={`p-2 rounded text-sm leading-relaxed ${
               msg.role === "user"
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100"
             }`}
           >
             {msg.content}

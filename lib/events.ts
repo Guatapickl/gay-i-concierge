@@ -76,3 +76,18 @@ export async function deleteEvent(eventId: string): Promise<boolean> {
   }
   return true;
 }
+
+// Fetch events by array of IDs (helper for "My RSVPs")
+export async function getEventsByIds(ids: string[]): Promise<Event[]> {
+  if (!ids.length) return [];
+  const { data, error } = await supabase
+    .from('events')
+    .select('*')
+    .in('id', ids)
+    .order('event_datetime', { ascending: true });
+  if (error) {
+    console.error('Error fetching events by IDs:', error.message);
+    return [];
+  }
+  return (data || []) as Event[];
+}

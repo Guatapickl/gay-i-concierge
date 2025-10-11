@@ -32,7 +32,11 @@ export default function RootLayout({
             <nav className="space-x-4">
               <Link href="/" className="text-sm">Home</Link>
               <Link href="/events" className="text-sm">Events</Link>
+              <Link href="/events/my" className="text-sm">My RSVPs</Link>
               <Link href="/invite" className="text-sm">Invite</Link>
+              <Link href="/alerts" className="text-sm">Alerts</Link>
+              <Link href="/alerts/unsubscribe" className="text-sm">Unsubscribe</Link>
+              <Link href="/auth/sign-in" className="text-sm">Login</Link>
             </nav>
           </div>
         </header>

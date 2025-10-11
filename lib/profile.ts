@@ -2,7 +2,9 @@ import { supabase } from './supabase';
 import { Profile } from '@/types/supabase';
 
 /**
- * Save a new profile to Supabase and store its ID and name in localStorage.
+ * Save a new profile to Supabase.
+ * Note: This function is side-effect free (does not touch localStorage).
+ * Caller components can persist returned IDs in localStorage as needed.
  * @param profile - Profile data without 'id' and 'created_at'
  * @returns The new profile ID, or null on error
  */
@@ -41,10 +43,5 @@ export async function saveProfile(
     );
     return null;
   }
-
-  // Store in localStorage for future visits
-  localStorage.setItem('profile_id', data.id);
-  // profile.name may be null, default to empty string
-  localStorage.setItem('profile_name', profile.name ?? '');
   return data.id;
 }

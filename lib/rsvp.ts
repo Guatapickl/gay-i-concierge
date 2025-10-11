@@ -18,3 +18,34 @@ export async function saveRsvp(profileId: string, eventId: string): Promise<bool
 
   return true;
 }
+
+/**
+ * Delete an RSVP for the given profile and event.
+ */
+export async function deleteRsvp(profileId: string, eventId: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('rsvps')
+    .delete()
+    .eq('profile_id', profileId)
+    .eq('event_id', eventId);
+  if (error) {
+    console.error('Failed to delete RSVP:', error.message);
+    return false;
+  }
+  return true;
+}
+
+/**
+ * Get event IDs that the profile has RSVPed for.
+ */
+export async function getRsvpedEventIds(profileId: string): Promise<string[]> {
+  const { data, error } = await supabase
+    .from('rsvps')
+    .select('event_id')
+    .eq('profile_id', profileId);
+  if (error) {
+    console.error('Failed to load RSVPs:', error.message);
+    return [];
+  }
+  return (data || []).map(r => r.event_id);
+}

@@ -1,0 +1,51 @@
+import { NextResponse } from 'next/server';
+import { supabase } from '@/lib/supabase';
+import { rateLimit, getClientId } from '@/lib/rateLimit';
+
+export const runtime = 'edge';
+
+export async function GET(req: Request) {
+  const id = getClientId(req);
+  if (!rateLimit(`alerts-confirm:${id}`, 20, 60_000)) {
+    return NextResponse.json({ error: 'Too many requests.' }, { status: 429 });
+  }
+  const url = new URL(req.url);
+  const token = url.searchParams.get('token') || '';
+  if (!token) return NextResponse.json({ error: 'Missing token' }, { status: 400 });
+
+  const { data: rows, error } = await supabase
+    .from('alerts_confirmations')
+    .select('*')
+    .eq('token', token)
+    .is('consumed_at', null)
+    .limit(1);
+  if (error) return NextResponse.json({ error: 'Lookup failed' }, { status: 500 });
+  const row = rows?.[0];
+  if (!row) return NextResponse.json({ error: 'Invalid or used token' }, { status: 400 });
+  if (row.expires_at && new Date(row.expires_at) < new Date()) {
+    return NextResponse.json({ error: 'Token expired' }, { status: 400 });
+  }
+  if (row.action !== 'subscribe') return NextResponse.json({ error: 'Wrong token action' }, { status: 400 });
+
+  if (row.channel === 'email' && row.email) {
+    const { error: upErr } = await supabase
+      .from('alerts_subscribers')
+      .upsert({ email: row.email, email_opt_in: true }, { onConflict: 'email' });
+    if (upErr) return NextResponse.json({ error: 'Update failed' }, { status: 500 });
+  } else if (row.channel === 'sms' && row.phone) {
+    const { error: upErr } = await supabase
+      .from('alerts_subscribers')
+      .upsert({ phone: row.phone, sms_opt_in: true }, { onConflict: 'phone' });
+    if (upErr) return NextResponse.json({ error: 'Update failed' }, { status: 500 });
+  } else {
+    return NextResponse.json({ error: 'Token incomplete' }, { status: 400 });
+  }
+
+  await supabase
+    .from('alerts_confirmations')
+    .update({ consumed_at: new Date().toISOString() })
+    .eq('token', token);
+
+  return NextResponse.json({ ok: true });
+}
+

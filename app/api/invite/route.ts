@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { rateLimit, getClientId } from "@/lib/rateLimit";
 
 export const runtime = "edge";
 
@@ -8,6 +9,13 @@ export const runtime = "edge";
  * Optional body: { style?: string } to add extra style hints to the prompt.
  */
 export async function POST(req: Request) {
+  const id = getClientId(req);
+  if (!rateLimit(`invite:${id}`, 10, 60_000)) {
+    return NextResponse.json(
+      { error: "Too many requests. Please slow down." },
+      { status: 429, headers: { "Retry-After": "60" } }
+    );
+  }
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     return NextResponse.json({ error: "Missing OpenAI API key" }, { status: 500 });
@@ -21,8 +29,11 @@ export async function POST(req: Request) {
     // ignore invalid json / empty body
   }
 
+  // Guardrails: trim and cap style length
+  style = style.replace(/\s+/g, " ").trim().slice(0, 200);
+
   const prompt =
-    "Write a short quirky invite (≤ 3 sentences) for an artificial intelligence clubthat includes the URL https://gayiclub.com." +
+    "Write a short quirky invite (≤ 3 sentences) for an artificial intelligence club that includes the URL https://gayiclub.com." +
     (style ? ` ${style}` : "");
 
   const apiRes = await fetch("https://api.openai.com/v1/chat/completions", {

@@ -1,12 +1,21 @@
 {
-  "name": "gay-i-concerege",
+  "name": "gay-i-concierge",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:lint": "next lint",
+    "test:type": "tsc --noEmit",
+    "test:smoke": "node scripts/smoke-tests.mjs",
+    "test": "npm run test:lint && npm run test:type && npm run test:smoke && npm run build",
+    "test:unit": "vitest run",
+    "test:all": "npm run test:type && npm run test:smoke && npm run test:unit"
+  },
+  "vitest": {
+    "testTimeout": 20000
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.9",
@@ -28,6 +37,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.3.3",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^1.6.0"
   }
 }
