@@ -19,16 +19,15 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.9",
-    "ai": "^4.3.16",
+    "@tsparticles/engine": "^3.8.1",
+    "@tsparticles/react": "^3.0.0",
+    "@tsparticles/slim": "^3.8.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.511.0",
-    "next": "15.3.3",
+    "next": "15.5.4",
     "openai": "^5.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "@tsparticles/react": "^3.0.0",
-    "@tsparticles/engine": "^3.8.1",
-    "@tsparticles/slim": "^3.8.1",
     "tailwind-merge": "^3.3.0",
     "framer-motion": "^11.0.0"
   },
@@ -39,9 +38,10 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "15.3.3",
+    "eslint-config-next": "15.5.4",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "vitest": "^1.6.0"
+    "vitest": "^3.2.4",
+    "vite": "^6.1.6"
   }
 }

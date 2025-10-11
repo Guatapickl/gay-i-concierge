@@ -56,7 +56,7 @@ has('lib/rateLimit.ts');
 has('lib/tokens.ts');
 
 // Specific content checks
-contains('app/api/invite/route.ts', /club that includes the URL/, 'invite prompt spacing fixed');
+contains('app/api/invite/route.ts', /gayiclub\.com/, 'invite prompt includes link');
 contains('components/ChatWindow.tsx', /AbortController/, 'chat uses AbortController');
 contains('components/ChatWindow.tsx', /bg-gray-100|dark:bg-gray-800/, 'chat uses concrete Tailwind utilities');
 contains('app/api/chat/route.ts', /rateLimit\(|getClientId\(/, 'chat route rate limited');
@@ -78,4 +78,3 @@ contains('README.md', /alerts_subscribers|alerts_confirmations/, 'README documen
 
 console.log(`\nSmoke tests ${failures ? 'found issues' : 'passed'} (${failures} failure(s)).`);
 process.exit(failures ? 1 : 0);
-

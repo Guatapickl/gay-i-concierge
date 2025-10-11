@@ -74,27 +74,18 @@ export default function ChatWindow() {
     setInput("");
     setIsLoading(true);
 
-<<<<<<< HEAD
     const controller = new AbortController();
     currentRequest.current = controller;
-=======
     const payloadMessages = [
       { role: "system", content: SYSTEM_PROMPT },
       ...newMessages,
     ];
 
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: payloadMessages }),
-    });
->>>>>>> 6f320bcab6f18eda2b36ab4b93db51b702d5ac2f
-
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: newMessages }),
+        body: JSON.stringify({ messages: payloadMessages }),
         signal: controller.signal,
       });
 
@@ -218,21 +209,6 @@ export default function ChatWindow() {
       setTempInput("");
       setOnboardingStep(2);
     } else if (onboardingStep === 2) {
-<<<<<<< HEAD
-      const interestsArray = tempInput
-        .split(',')
-        .map(s => s.trim())
-        .filter(Boolean)
-        .slice(0, 10)
-        .map(s => s.slice(0, 30));
-      if (interestsArray.length === 0) {
-        setOnboardingError('Please add at least one interest (comma-separated).');
-        return;
-      }
-      setOnboardingError('');
-      setProfileInput(prev => ({ ...prev, interests: interestsArray }));
-      setTempInput("");
-=======
       const updated = [...selectedInterests];
       const ids = updated.map(i => i.id);
       const names = updated.map(i => i.name);
@@ -250,7 +226,6 @@ export default function ChatWindow() {
       setSelectedInterests(updated);
       setInterestIdsToSave(ids);
       setProfileInput(prev => ({ ...prev, interests: names }));
->>>>>>> 6f320bcab6f18eda2b36ab4b93db51b702d5ac2f
       setOnboardingStep(3);
     }
   };
@@ -393,11 +368,7 @@ export default function ChatWindow() {
         {messages.map((msg, i) => (
           <div
             key={i}
-<<<<<<< HEAD
-            className={`p-2 rounded text-sm leading-relaxed ${
-=======
-            className={`p-2 rounded max-w-full break-words ${
->>>>>>> 6f320bcab6f18eda2b36ab4b93db51b702d5ac2f
+            className={`p-2 rounded max-w-full break-words text-sm leading-relaxed ${
               msg.role === "user"
                 ? "bg-blue-600 text-white"
                 : "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100"

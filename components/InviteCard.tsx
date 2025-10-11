@@ -19,15 +19,12 @@ export default function InviteCard() {
     setCopied(false);
     
     try {
-      console.log("Sending request to /api/invite");
       const res = await fetch("/api/invite", { 
         method: "POST",
         headers: {
           'Content-Type': 'application/json'
         }
       });
-      
-      console.log("Response status:", res.status);
       
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({ error: "Unknown error" }));
@@ -38,7 +35,6 @@ export default function InviteCard() {
       }
       
       const data = await res.json();
-      console.log("Success:", data);
       setMessage(data.message);
       
     } catch (fetchError) {

@@ -4,7 +4,6 @@ type Bucket = {
 };
 
 declare global {
-  // eslint-disable-next-line no-var
   var __rate_buckets: Map<string, Bucket> | undefined;
 }
 
