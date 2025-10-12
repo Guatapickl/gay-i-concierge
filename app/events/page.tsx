@@ -29,7 +29,7 @@ export default function EventsPage() {
   }, []);
 
   if (loading) return <div>Loading events...</div>;
-  if (!loading && events.length === 0) return <div><em>No upcoming events.</em></div>;
+  // Always render the page shell so the Add button is visible even when empty
 
   return (
     <div className="space-y-6">
@@ -37,6 +37,9 @@ export default function EventsPage() {
         <h2 className="text-2xl font-bold mb-4">Upcoming Events</h2>
         <Link href="/events/new" className="text-white bg-green-600 px-3 py-2 rounded">+ Add New Event</Link>
       </div>
+      {events.length === 0 ? (
+        <div className="text-sm text-gray-400 italic">No upcoming events.</div>
+      ) : (
       <ul className="space-y-4">
         {events.map(event => (
           <li key={event.id} className="border p-4 rounded">
@@ -113,6 +116,7 @@ export default function EventsPage() {
           </li>
         ))}
       </ul>
+      )}
       {rsvpMessage && <div className="mt-4 text-center">{rsvpMessage}</div>}
     </div>
   );
