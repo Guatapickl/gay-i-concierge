@@ -22,7 +22,7 @@ export default function AuthCallbackPage() {
         } else {
           setMessage('No session returned.');
         }
-      } catch (err) {
+      } catch {
         setMessage('Sign-in failed.');
       }
     })();
@@ -34,4 +34,3 @@ export default function AuthCallbackPage() {
     </div>
   );
 }
-

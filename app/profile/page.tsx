@@ -17,7 +17,8 @@ export default function ProfilePage() {
   // Profile fields
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
-  const [experience, setExperience] = useState<'none'|'beginner'|'intermediate'|'advanced'>('none');
+  type ExperienceLevel = 'none' | 'beginner' | 'intermediate' | 'advanced';
+  const [experience, setExperience] = useState<ExperienceLevel>('none');
 
   // Interests
   const [allInterests, setAllInterests] = useState<Interest[]>([]);
@@ -47,7 +48,10 @@ export default function ProfilePage() {
       if (profileRow) {
         setFullName(profileRow.full_name ?? '');
         setPhone(profileRow.phone ?? '');
-        setExperience((profileRow.experience_level ?? 'none') as any);
+        const expVals = ['none','beginner','intermediate','advanced'] as const;
+        const raw = (profileRow.experience_level ?? 'none') as string;
+        const nextExp: ExperienceLevel = (expVals as readonly string[]).includes(raw) ? (raw as ExperienceLevel) : 'none';
+        setExperience(nextExp);
         setSelectedInterests(profileRow.interests ?? []);
       }
 
@@ -130,11 +134,11 @@ export default function ProfilePage() {
 
       // Visual confirmation
       alert('Profile saved');
-    } catch (err: any) {
-      setError(err?.message || 'Failed to save profile.');
-    } finally {
-      setSaving(false);
-    }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to save profile.');
+      } finally {
+        setSaving(false);
+      }
   };
 
   if (loading) {
@@ -167,7 +171,11 @@ export default function ProfilePage() {
 
         <section>
           <h3 className="font-semibold mb-2">Experience Level</h3>
-          <select className="border px-3 py-2 rounded" value={experience} onChange={e => setExperience(e.target.value as any)}>
+          <select
+            className="border px-3 py-2 rounded"
+            value={experience}
+            onChange={e => setExperience(e.target.value as ExperienceLevel)}
+          >
             <option value="none">None</option>
             <option value="beginner">Beginner</option>
             <option value="intermediate">Intermediate</option>
