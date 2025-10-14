@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Mock Supabase client used in routes
+// Mock Supabase ADMIN client used in routes
 const upsert = vi.fn().mockResolvedValue({ error: null });
 const insert = vi.fn().mockResolvedValue({ error: null });
 const updateChain = () => ({ eq: vi.fn().mockResolvedValue({ error: null }) });
@@ -14,8 +14,8 @@ const selectBuilder = (rows: any[]) => ({
 
 let confirmRows: any[] = [];
 
-vi.mock('@/lib/supabase', () => ({
-  supabase: {
+vi.mock('@/lib/supabaseAdmin', () => ({
+  supabaseAdmin: {
     from(table: string) {
       if (table === 'alerts_subscribers') {
         return { upsert, update } as any;
