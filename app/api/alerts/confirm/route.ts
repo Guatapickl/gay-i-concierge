@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { rateLimit, getClientId } from '@/lib/rateLimit';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 export async function GET(req: Request) {
   const id = getClientId(req);
@@ -13,7 +13,7 @@ export async function GET(req: Request) {
   const token = url.searchParams.get('token') || '';
   if (!token) return NextResponse.json({ error: 'Missing token' }, { status: 400 });
 
-  const { data: rows, error } = await supabase
+  const { data: rows, error } = await supabaseAdmin
     .from('alerts_confirmations')
     .select('*')
     .eq('token', token)
@@ -28,12 +28,12 @@ export async function GET(req: Request) {
   if (row.action !== 'subscribe') return NextResponse.json({ error: 'Wrong token action' }, { status: 400 });
 
   if (row.channel === 'email' && row.email) {
-    const { error: upErr } = await supabase
+    const { error: upErr } = await supabaseAdmin
       .from('alerts_subscribers')
       .upsert({ email: row.email, email_opt_in: true }, { onConflict: 'email' });
     if (upErr) return NextResponse.json({ error: 'Update failed' }, { status: 500 });
   } else if (row.channel === 'sms' && row.phone) {
-    const { error: upErr } = await supabase
+    const { error: upErr } = await supabaseAdmin
       .from('alerts_subscribers')
       .upsert({ phone: row.phone, sms_opt_in: true }, { onConflict: 'phone' });
     if (upErr) return NextResponse.json({ error: 'Update failed' }, { status: 500 });
@@ -41,11 +41,10 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Token incomplete' }, { status: 400 });
   }
 
-  await supabase
+  await supabaseAdmin
     .from('alerts_confirmations')
     .update({ consumed_at: new Date().toISOString() })
     .eq('token', token);
 
   return NextResponse.json({ ok: true });
 }
-

@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getClientId, rateLimit } from '@/lib/rateLimit';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { generateToken, expiresIn } from '@/lib/tokens';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 type Payload = {
   email?: string;
@@ -50,7 +50,7 @@ export async function POST(req: Request) {
   const tokens: { channel: 'email' | 'sms'; token: string }[] = [];
   if (wantsEmail && email) {
     const token = generateToken();
-    const { error } = await supabase.from('alerts_confirmations').insert([
+    const { error } = await supabaseAdmin.from('alerts_confirmations').insert([
       { token, action: 'unsubscribe', channel: 'email', email, expires_at: expiresIn(2) },
     ]);
     if (error) {
@@ -61,7 +61,7 @@ export async function POST(req: Request) {
   }
   if (wantsSms && phone) {
     const token = generateToken();
-    const { error } = await supabase.from('alerts_confirmations').insert([
+    const { error } = await supabaseAdmin.from('alerts_confirmations').insert([
       { token, action: 'unsubscribe', channel: 'sms', phone, expires_at: expiresIn(2) },
     ]);
     if (error) {

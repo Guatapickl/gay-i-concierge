@@ -33,6 +33,7 @@ Provide these in `.env.local` (do not commit secrets):
 OPENAI_API_KEY=...
 NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...  # server-only, used by alerts endpoints in production
 ```
 
 Note: Ensure Supabase RLS policies allow the intended anon operations or move sensitive mutations server-side.
@@ -112,7 +113,75 @@ create index if not exists alerts_confirmations_token_idx on alerts_confirmation
 
 In production, send email/SMS containing links to these pages. During development, the subscribe/unsubscribe APIs return generated tokens in the response for testing.
 
-Auth (optional):
+Auth and Profiles:
 
-- Simple login page at `/auth/sign-in` supporting magic link and Google OAuth via Supabase Auth. Configure providers in the Supabase dashboard and set site URL to your deployment.
+- Email/password sign up: `/auth/sign-up`, email/password sign in: `/auth/sign-in`. Magic link and Google OAuth remain available.
+- Profile management: `/profile` lets authenticated users edit name, phone, experience level, interests, and opt-in/out of email/SMS alerts.
+- Configure Supabase Auth site URL to your deployment and enable any OAuth providers you want.
+
+Supabase schema additions (run in SQL editor):
+
+```
+-- User profiles keyed by auth.users.id (separate from existing anon 'profiles' used by chat onboarding)
+create table if not exists user_profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  full_name text,
+  email text,
+  phone text,
+  experience_level text check (experience_level in ('none','beginner','intermediate','advanced')),
+  interests text[] default '{}',
+  created_at timestamptz default now()
+);
+
+-- Interests catalog and user join table
+create table if not exists interests (
+  id uuid primary key default gen_random_uuid(),
+  name text unique not null
+);
+
+create table if not exists user_interests (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  interest_id uuid not null references interests(id) on delete cascade,
+  primary key (user_id, interest_id)
+);
+
+-- RLS policies
+alter table user_profiles enable row level security;
+create policy "profile self-select" on user_profiles for select using (auth.uid() = id);
+create policy "profile self-upsert" on user_profiles for insert with check (auth.uid() = id);
+create policy "profile self-update" on user_profiles for update using (auth.uid() = id);
+
+alter table interests enable row level security;
+-- Read for everyone; restrict inserts in production as needed
+create policy "interests read" on interests for select using (true);
+create policy "interests insert" on interests for insert to authenticated with check (true);
+
+alter table user_interests enable row level security;
+create policy "user_interests self-select" on user_interests for select using (auth.uid() = user_id);
+create policy "user_interests self-insert" on user_interests for insert with check (auth.uid() = user_id);
+create policy "user_interests self-delete" on user_interests for delete using (auth.uid() = user_id);
+
+-- Alerts tables from earlier notes
+-- Ensure select permissions for reading current opt-in status
+alter table alerts_subscribers enable row level security;
+do $$ begin
+  perform 1;
+exception when undefined_table then null; end $$;
+-- Example permissive policies for demo; tighten in production
+create policy if not exists "alerts select" on alerts_subscribers for select using (true);
+create policy if not exists "alerts insert anon" on alerts_subscribers for insert to anon with check (true);
+create policy if not exists "alerts insert auth" on alerts_subscribers for insert to authenticated with check (true);
+create policy if not exists "alerts update" on alerts_subscribers for update using (true) with check (true);
+```
+
+Notes:
+
+- The profile page uses the authenticated user’s ID to upsert into `profiles` and to manage `user_interests`.
+- Email/SMS opt-in toggles call the existing `/api/alerts/subscribe` and `/api/alerts/unsubscribe` endpoints using the saved email/phone.
+- If you prefer to bind alert subscriptions to `auth.uid()` directly, add a `user_id` column to `alerts_subscribers` and adjust the code/policies accordingly.
+
+Production security:
+
+- For alerts subscribe/unsubscribe/confirm routes, production uses a service-role Supabase client on server-only Node runtime. Never expose `SUPABASE_SERVICE_ROLE_KEY` to the browser.
+- Alternatively, use the included `Supabase Production.sql` to lock tables and call provided RPCs instead of service role.
 ```

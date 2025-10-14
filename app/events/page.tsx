@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getUpcomingEvents } from '@/lib/events';
 import { saveRsvp, deleteRsvp, getRsvpedEventIds } from '@/lib/rsvp';
+import { supabase } from '@/lib/supabase';
 import { downloadICS, googleCalendarUrl } from '@/lib/calendar';
 import type { Event } from '@/types/supabase';
 
@@ -12,18 +13,26 @@ export default function EventsPage() {
   const [loading, setLoading] = useState(true);
   const [rsvpMessage, setRsvpMessage] = useState<string | null>(null);
   const [rsvpedEvents, setRsvpedEvents] = useState<Set<string>>(new Set());
-  const [profileId, setProfileId] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   useEffect(() => {
     (async () => {
       const data = await getUpcomingEvents();
       setEvents(data);
       setLoading(false);
-      const pid = localStorage.getItem('profile_id');
-      setProfileId(pid);
-      if (pid) {
-        const ids = await getRsvpedEventIds(pid);
+      const { data: authData } = await supabase.auth.getUser();
+      const uid = authData.user?.id || null;
+      setUserId(uid);
+      if (uid) {
+        const ids = await getRsvpedEventIds(uid);
         setRsvpedEvents(new Set(ids));
+        // Minimal admin check: exists in app_admins
+        const { count } = await supabase
+          .from('app_admins')
+          .select('user_id', { count: 'exact', head: true })
+          .eq('user_id', uid);
+        setIsAdmin(!!count && count > 0);
       }
     })();
   }, []);
@@ -35,7 +44,9 @@ export default function EventsPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold mb-4">Upcoming Events</h2>
-        <Link href="/events/new" className="text-white bg-green-600 px-3 py-2 rounded">+ Add New Event</Link>
+        {isAdmin && (
+          <Link href="/events/new" className="text-white bg-green-600 px-3 py-2 rounded">+ Add New Event</Link>
+        )}
       </div>
       {events.length === 0 ? (
         <div className="text-sm text-gray-400 italic">No upcoming events.</div>
@@ -56,11 +67,11 @@ export default function EventsPage() {
                   <button
                     className="px-3 py-1 bg-gray-200 rounded text-sm"
                     onClick={async () => {
-                      if (!profileId) {
-                        setRsvpMessage('Please complete onboarding first.');
+                      if (!userId) {
+                        setRsvpMessage('Please sign in first.');
                         return;
                       }
-                      const ok = await deleteRsvp(profileId, event.id);
+                      const ok = await deleteRsvp(userId, event.id);
                       if (ok) {
                         setRsvpedEvents(prev => {
                           const n = new Set(prev);
@@ -80,11 +91,11 @@ export default function EventsPage() {
                 <button
                   className="px-4 py-2 bg-blue-600 text-white rounded"
                   onClick={async () => {
-                    if (!profileId) {
-                      setRsvpMessage('Please complete onboarding to create a profile before RSVPing.');
+                    if (!userId) {
+                      setRsvpMessage('Please sign in before RSVPing.');
                       return;
                     }
-                    const success = await saveRsvp(profileId, event.id);
+                    const success = await saveRsvp(userId, event.id);
                     if (success) {
                       setRsvpMessage(`✅ You have RSVPed for "${event.title}"!`);
                       setRsvpedEvents(prev => new Set(prev).add(event.id));
@@ -111,7 +122,9 @@ export default function EventsPage() {
               >
                 Add to Google Calendar
               </a>
-              <a href={`/events/${event.id}/edit`} className="text-sm text-blue-600 underline ml-auto">Edit</a>
+              {isAdmin && (
+                <a href={`/events/${event.id}/edit`} className="text-sm text-blue-600 underline ml-auto">Edit</a>
+              )}
             </div>
           </li>
         ))}

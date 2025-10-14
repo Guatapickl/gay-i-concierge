@@ -1,11 +1,10 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { saveProfile } from "@/lib/profile";
 import { saveRsvp } from "@/lib/rsvp";
 import { getUpcomingEvents } from '@/lib/events';
-import { fetchInterests, findOrCreateInterest, linkUserInterests } from '@/lib/interests';
-import { Profile } from "@/types/supabase";
+import { fetchInterests } from '@/lib/interests';
+import { supabase } from '@/lib/supabase';
 
 const SYSTEM_PROMPT = `You are AIlex, an energetic, witty, and deeply knowledgeable AI-powered assistant for an AI club primarily composed of gay men in their 30's and 40's living in New York City. With over two decades of expertise in AI education, club management, and technology community engagement, you embody a playful yet professional persona. Your primary goals are to educate, entertain, foster community spirit, and stimulate enthusiasm about artificial intelligence and club activities.
 
@@ -59,7 +58,7 @@ export default function ChatWindow() {
   const [interestsList, setInterestsList] = useState<Interest[]>([]);
   const [selectedInterests, setSelectedInterests] = useState<Interest[]>([]);
   const [newInterest, setNewInterest] = useState<string>("");
-  const [interestIdsToSave, setInterestIdsToSave] = useState<string[]>([]);
+  // no separate interest ID saving; interests are stored as names in user_profiles
 
   // Keep an abort controller to stop previous in-flight requests
   const currentRequest = useRef<AbortController | null>(null);
@@ -145,16 +144,25 @@ export default function ChatWindow() {
       }
     }
   }
-  // On mount, check for existing profile
+  // On mount, check auth and greet using user profile
   useEffect(() => {
-    const id = localStorage.getItem('profile_id');
-    const name = localStorage.getItem('profile_name');
-    if (id && name) {
-      setMessages([
-        { role: 'assistant', content: `Welcome back, ${name}! Let me know what you're working on or if you want to explore something new.` },
-      ]);
+    (async () => {
+      const { data } = await supabase.auth.getUser();
+      const user = data.user;
+      if (!user) {
+        setMessages([{ role: 'assistant', content: `Welcome! Please sign in to get started. Use the LOGIN button below.` }]);
+        setHasOnboarded(false);
+        return;
+      }
+      const { data: p } = await supabase
+        .from('user_profiles')
+        .select('full_name')
+        .eq('id', user.id)
+        .maybeSingle();
+      const greetName = p?.full_name || user.email || 'friend';
+      setMessages([{ role: 'assistant', content: `Welcome back, ${greetName}! What shall we explore today?` }]);
       setHasOnboarded(true);
-    }
+    })();
   }, []);
 
   // Fetch interests list on mount
@@ -210,21 +218,16 @@ export default function ChatWindow() {
       setOnboardingStep(2);
     } else if (onboardingStep === 2) {
       const updated = [...selectedInterests];
-      const ids = updated.map(i => i.id);
       const names = updated.map(i => i.name);
       const trimmed = newInterest.trim();
       if (trimmed) {
-        const created = await findOrCreateInterest(trimmed);
-        if (created) {
-          updated.push(created);
-          ids.push(created.id);
-          names.push(created.name);
-          setInterestsList(prev => [...prev, created]);
-        }
+        // Add as free-form interest name (no DB insert in production)
+        const pseudo = { id: `local-${Date.now()}`, name: trimmed };
+        updated.push(pseudo);
+        names.push(trimmed);
         setNewInterest("");
       }
       setSelectedInterests(updated);
-      setInterestIdsToSave(ids);
       setProfileInput(prev => ({ ...prev, interests: names }));
       setOnboardingStep(3);
     }
@@ -232,42 +235,44 @@ export default function ChatWindow() {
 
   // Handle experience selection, save profile, and greet
   const handleExperienceSelect = async (level: ExperienceLevel) => {
-    const newProfile: Omit<Profile, 'id' | 'created_at'> = {
-      name: profileInput.name,
-      email: profileInput.email,
-      interests: profileInput.interests,
-      experienceLevel: level,
-    };
-    const id = await saveProfile(newProfile);
-    if (!id) {
-      console.warn('Failed to save profile, proceeding without confirmation.');
-    } else {
-      await linkUserInterests(id, interestIdsToSave);
+    const { data } = await supabase.auth.getUser();
+    const user = data.user;
+    if (!user) {
+      setOnboardingError('Please sign in first (use the Login button).');
+      return;
     }
-    // Persist profile locally for future visits
-    if (id) {
-      localStorage.setItem('profile_id', id);
-      localStorage.setItem('profile_name', newProfile.name ?? '');
+    // Upsert user profile tied to auth user
+    const { error } = await supabase.from('user_profiles').upsert({
+      id: user.id,
+      full_name: profileInput.name || null,
+      email: profileInput.email || user.email || null,
+      phone: null,
+      experience_level: level,
+      interests: profileInput.interests || [],
+    }, { onConflict: 'id' });
+    if (error) {
+      console.warn('Failed to save profile', error.message);
     }
-    // Greet the user and finish onboarding
+    const greetName = profileInput.name || user.email || 'friend';
     setMessages([
-      { role: 'assistant', content: `Welcome, ${newProfile.name}! Thanks for joining us. Let me know how I can help you explore AI today.` },
+      { role: 'assistant', content: `Welcome, ${greetName}! Thanks for joining us. Let me know how I can help you explore AI today.` },
     ]);
     setHasOnboarded(true);
   };
 
   const handleRsvpResponse = async (response: 'yes' | 'no') => {
     if (response === 'yes' && nextEventId) {
-      const profileId = localStorage.getItem('profile_id');
-      if (profileId) {
-        const ok = await saveRsvp(profileId, nextEventId);
+      const { data } = await supabase.auth.getUser();
+      const uid = data.user?.id;
+      if (uid) {
+        const ok = await saveRsvp(uid, nextEventId);
         if (ok) {
           setMessages(prev => [...prev, { role: 'assistant', content: "Awesome! You're on the guest list. See you there!" }]);
         } else {
           setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, there was a problem saving your RSVP.' }]);
         }
       } else {
-        setMessages(prev => [...prev, { role: 'assistant', content: 'Please create a profile first to RSVP.' }]);
+        setMessages(prev => [...prev, { role: 'assistant', content: 'Please sign in to RSVP.' }]);
       }
     } else {
       setMessages(prev => [...prev, { role: 'assistant', content: response === 'no' ? 'No problem, maybe next time!' : 'Okay, maybe later.' }]);

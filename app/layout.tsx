@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Orbitron } from "next/font/google";
 import { InteractiveNavButton } from '@/components/InteractiveNavButton'
+import AuthNav from '@/components/AuthNav'
 import BackgroundParticles from '@/components/BackgroundParticles';
 import HeaderTitle from '@/components/HeaderTitle';
 import "./globals.css";
@@ -46,7 +47,7 @@ export default function RootLayout({
               <InteractiveNavButton href="/invite" className="nav-button">INVITE</InteractiveNavButton>
               <InteractiveNavButton href="/alerts" className="nav-button">ALERTS</InteractiveNavButton>
               <InteractiveNavButton href="/alerts/unsubscribe" className="nav-button">UNSUBSCRIBE</InteractiveNavButton>
-              <InteractiveNavButton href="/auth/sign-in" className="nav-button">LOGIN</InteractiveNavButton>
+              <AuthNav />
             </div>
           </div>
         </nav>

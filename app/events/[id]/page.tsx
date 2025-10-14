@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import type { Event } from '@/types/supabase';
 import { getEventById } from '@/lib/events';
 import { getRsvpedEventIds, saveRsvp, deleteRsvp } from '@/lib/rsvp';
+import { supabase } from '@/lib/supabase';
 import { downloadICS, googleCalendarUrl } from '@/lib/calendar';
 
 export default function EventDetailsPage() {
@@ -15,7 +16,7 @@ export default function EventDetailsPage() {
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
-  const [profileId, setProfileId] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [isRsvped, setIsRsvped] = useState(false);
 
   useEffect(() => {
@@ -23,10 +24,11 @@ export default function EventDetailsPage() {
     (async () => {
       const e = await getEventById(eventId);
       setEvent(e);
-      const pid = localStorage.getItem('profile_id');
-      setProfileId(pid);
-      if (pid) {
-        const ids = await getRsvpedEventIds(pid);
+      const { data: authData } = await supabase.auth.getUser();
+      const uid = authData.user?.id || null;
+      setUserId(uid);
+      if (uid) {
+        const ids = await getRsvpedEventIds(uid);
         setIsRsvped(ids.includes(eventId));
       }
       setLoading(false);
@@ -54,8 +56,8 @@ export default function EventDetailsPage() {
             <button
               className="px-4 py-2 bg-gray-200 rounded"
               onClick={async () => {
-                if (!profileId) { setMessage('Please complete onboarding first.'); return; }
-                const ok = await deleteRsvp(profileId, event.id);
+                if (!userId) { setMessage('Please sign in first.'); return; }
+                const ok = await deleteRsvp(userId, event.id);
                 if (ok) { setIsRsvped(false); setMessage('Canceled RSVP.'); }
                 else { setMessage('Failed to cancel RSVP.'); }
               }}
@@ -67,8 +69,8 @@ export default function EventDetailsPage() {
           <button
             className="px-4 py-2 bg-blue-600 text-white rounded"
             onClick={async () => {
-              if (!profileId) { setMessage('Please complete onboarding before RSVPing.'); return; }
-              const ok = await saveRsvp(profileId, event.id);
+              if (!userId) { setMessage('Please sign in before RSVPing.'); return; }
+              const ok = await saveRsvp(userId, event.id);
               if (ok) { setIsRsvped(true); setMessage('✅ You RSVPed to this event.'); }
               else { setMessage('❌ Failed to RSVP.'); }
             }}
@@ -106,4 +108,3 @@ export default function EventDetailsPage() {
     </div>
   );
 }
-

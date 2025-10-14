@@ -1,0 +1,225 @@
+Supabase Setup Requirements for Gay-I Club Concierge
+
+This document enumerates exactly what to configure in Supabase for this app to work with authenticated profiles, events, RSVPs, interests, and alerts (email/SMS). Use it as a checklist and copy/paste SQL where indicated.
+
+
+2) Auth Configuration
+- Enable Email/Password: Dashboard → Authentication → Providers → Email: ON.
+- (Optional) Enable OAuth providers (e.g., Google) and configure credentials.
+- Site URL: Dashboard → Authentication → URL Configuration → Site URL → set to your local/prod URL.
+  - Add `https://<your-domain>/auth/callback` to Redirect URLs.
+- (Optional) Require email confirmation for sign-up (recommended for production).
+
+3) Database Extensions
+Run once in SQL Editor:
+```
+create extension if not exists pgcrypto; -- for gen_random_uuid()
+```
+
+4) Schema: Tables
+Run the following SQL in order. If tables already exist, adjust or skip.
+
+-- 4.1 user_profiles (auth-coupled profile used by chat/profile pages)
+```
+create table if not exists user_profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  full_name text,
+  email text,
+  phone text,
+  experience_level text check (experience_level in ('none','beginner','intermediate','advanced')),
+  interests text[] default '{}',
+  created_at timestamptz default now()
+);
+
+alter table user_profiles enable row level security;
+
+-- Self-access policies
+drop policy if exists "profile self-select" on user_profiles;
+create policy "profile self-select" on user_profiles
+  for select using (auth.uid() = id);
+
+drop policy if exists "profile self-upsert" on user_profiles;
+create policy "profile self-upsert" on user_profiles
+  for insert with check (auth.uid() = id);
+
+drop policy if exists "profile self-update" on user_profiles;
+create policy "profile self-update" on user_profiles
+  for update using (auth.uid() = id);
+```
+
+-- 4.2 interests (catalog + suggestions shown in profile/onboarding)
+```
+create table if not exists interests (
+  id uuid primary key default gen_random_uuid(),
+  name text unique not null
+);
+
+alter table interests enable row level security;
+
+-- Allow everyone to read (you can tighten later)
+drop policy if exists "interests read" on interests;
+create policy "interests read" on interests for select using (true);
+
+-- Allow signed-in users to add new interest names (optional; tighten in prod)
+drop policy if exists "interests insert" on interests;
+create policy "interests insert" on interests for insert to authenticated with check (true);
+```
+
+-- 4.3 events (event list used across pages)
+```
+create table if not exists events (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  description text,
+  event_datetime timestamptz not null,
+  location text,
+  created_at timestamptz default now()
+);
+
+alter table events enable row level security;
+
+-- Minimal policies: anyone can read; restrict writes to authenticated (or to an admin role in production).
+drop policy if exists "events select" on events;
+create policy "events select" on events for select using (true);
+
+drop policy if exists "events insert" on events;
+create policy "events insert" on events for insert to authenticated with check (true);
+
+drop policy if exists "events update" on events;
+create policy "events update" on events for update to authenticated using (true);
+
+drop policy if exists "events delete" on events;
+create policy "events delete" on events for delete to authenticated using (true);
+
+-- Production hardening idea: replace the above three with a single admin-only policy
+-- that checks a JWT claim or membership in an admins table.
+```
+
+-- 4.4 rsvps (stores a user’s RSVP per event using auth.uid())
+```
+create table if not exists rsvps (
+  id uuid primary key default gen_random_uuid(),
+  profile_id uuid not null references auth.users(id) on delete cascade,
+  event_id uuid not null references events(id) on delete cascade,
+  event_date timestamptz,
+  created_at timestamptz default now(),
+  unique (profile_id, event_id)
+);
+
+alter table rsvps enable row level security;
+
+-- Self-service RSVP
+drop policy if exists "rsvps self-select" on rsvps;
+create policy "rsvps self-select" on rsvps for select using (profile_id = auth.uid());
+
+drop policy if exists "rsvps self-insert" on rsvps;
+create policy "rsvps self-insert" on rsvps for insert with check (profile_id = auth.uid());
+
+drop policy if exists "rsvps self-delete" on rsvps;
+create policy "rsvps self-delete" on rsvps for delete using (profile_id = auth.uid());
+```
+
+-- 4.5 alerts_subscribers (email/SMS opt-in registry)
+```
+create table if not exists alerts_subscribers (
+  id uuid primary key default gen_random_uuid(),
+  email text,
+  phone text,
+  email_opt_in boolean not null default false,
+  sms_opt_in boolean not null default false,
+  created_at timestamptz default now(),
+  unique (email),
+  unique (phone)
+);
+
+alter table alerts_subscribers enable row level security;
+
+-- Permissive demo policies used by the app’s public endpoints
+drop policy if exists "alerts select" on alerts_subscribers;
+create policy "alerts select" on alerts_subscribers for select using (true);
+
+drop policy if exists "alerts insert anon" on alerts_subscribers;
+create policy "alerts insert anon" on alerts_subscribers for insert to anon with check (true);
+
+drop policy if exists "alerts insert auth" on alerts_subscribers;
+create policy "alerts insert auth" on alerts_subscribers for insert to authenticated with check (true);
+
+drop policy if exists "alerts update" on alerts_subscribers;
+create policy "alerts update" on alerts_subscribers for update using (true) with check (true);
+
+-- Production hardening idea: restrict updates to exact email/phone match via USING/CHECK,
+-- or handle writes through protected RPCs / server actions with service role.
+```
+
+-- 4.6 alerts_confirmations (double opt-in/out tokens)
+```
+create table if not exists alerts_confirmations (
+  id uuid primary key default gen_random_uuid(),
+  token text not null,
+  action text not null check (action in ('subscribe','unsubscribe')),
+  channel text not null check (channel in ('email','sms')),
+  email text,
+  phone text,
+  expires_at timestamptz,
+  consumed_at timestamptz,
+  created_at timestamptz default now()
+);
+create index if not exists alerts_confirmations_token_idx on alerts_confirmations (token);
+
+alter table alerts_confirmations enable row level security;
+
+-- App endpoints need to create and read tokens by anyone, then mark as consumed
+drop policy if exists "alerts tokens select" on alerts_confirmations;
+create policy "alerts tokens select" on alerts_confirmations for select using (true);
+
+drop policy if exists "alerts tokens insert" on alerts_confirmations;
+create policy "alerts tokens insert" on alerts_confirmations for insert using (true) with check (true);
+
+drop policy if exists "alerts tokens update" on alerts_confirmations;
+create policy "alerts tokens update" on alerts_confirmations for update using (true) with check (true);
+
+-- Production hardening idea: restrict updates to WHERE token = current token via RPC, or run endpoints with service role.
+```
+
+5) Optional: Seed Data (quick start)
+```
+insert into interests (name) values
+  ('GenAI'), ('ML Engineering'), ('Prompting'), ('LLM Apps'), ('Data Viz')
+on conflict (name) do nothing;
+
+insert into events (title, description, event_datetime, location)
+values ('Kickoff Mixer', 'Meet the club and chat AI.', now() + interval '7 days', 'NYC – Chelsea')
+on conflict do nothing;
+```
+
+6) Verification Checklist
+- Auth
+  - Sign up with email/password → confirm → sign in.
+  - Check Supabase → Authentication → Users shows your account.
+- Profiles
+  - Visit `/profile`, save name/phone/experience, pick interests. Row appears in `user_profiles` with your `auth.uid()`.
+- Interests
+  - Selecting/adding interests in `/profile` works (new names insert into `interests`).
+- Events
+  - `/events` lists seeded event; create/update requires authenticated user (with current permissive policy).
+- RSVPs
+  - RSVP from `/events` or event details; row appears in `rsvps` with `profile_id = auth.uid()`.
+- Alerts
+  - Subscribe/unsubscribe from `/alerts` and `/profile` toggles; tokens are written to `alerts_confirmations`; subscribers updated in `alerts_subscribers`.
+
+7) Security Notes (Production)
+- Replace permissive events/alerts policies with stricter ones:
+  - Events writes: limit to admins (JWT custom claim or membership table).
+  - Alerts writes: restrict update USING/CHECK to email/phone match or move to RPC with service role.
+- Consider service role on server (Edge Runtime limits secrets exposure—be careful with environment scoping).
+
+8) Legacy Migration TODOs (for later)
+- You mentioned you don’t have a mapping from previous anonymous `profiles` to `auth.users` yet. When you do:
+  - Create/confirm `user_profiles` for each real user.
+  - Add a temporary mapping table `legacy_profile_to_user(user_profile_id uuid, auth_user_id uuid)`.
+  - Migrate RSVPs: `update rsvps r set profile_id = m.auth_user_id from legacy_profile_to_user m where r.profile_id = m.user_profile_id;`
+  - Optionally drop the old anonymous `profiles` and `user_interests` if no longer used.
+- If early accounts were email-only (no password), enable password assignment by sending password reset emails via Supabase Auth (or provide a “set password” flow using `updateUser`).
+
+If you want, I can generate an “Admin SQL” version that locks everything down for production and moves all writes behind RPCs.
+

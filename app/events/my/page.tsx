@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { getEventsByIds } from '@/lib/events';
 import { getRsvpedEventIds, deleteRsvp } from '@/lib/rsvp';
+import { supabase } from '@/lib/supabase';
 import type { Event } from '@/types/supabase';
 import { downloadICS, googleCalendarUrl } from '@/lib/calendar';
 
@@ -10,25 +11,26 @@ export default function MyRsvpsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
-  const [profileId, setProfileId] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
-      const pid = localStorage.getItem('profile_id');
-      setProfileId(pid);
-      if (!pid) {
+      const { data: authData } = await supabase.auth.getUser();
+      const uid = authData.user?.id || null;
+      setUserId(uid);
+      if (!uid) {
         setLoading(false);
         return;
       }
-      const ids = await getRsvpedEventIds(pid);
+      const ids = await getRsvpedEventIds(uid);
       const data = await getEventsByIds(ids);
       setEvents(data);
       setLoading(false);
     })();
   }, []);
 
-  if (!profileId) {
-    return <div>Please complete onboarding to view your RSVPs.</div>;
+  if (!userId) {
+    return <div>Please sign in to view your RSVPs.</div>;
   }
   if (loading) return <div>Loading your RSVPs...</div>;
   if (!events.length) return <div><em>You have no RSVPs yet.</em></div>;
@@ -63,8 +65,8 @@ export default function MyRsvpsPage() {
               <button
                 className="ml-auto px-3 py-1 bg-red-600 text-white rounded text-sm"
                 onClick={async () => {
-                  if (!profileId) return;
-                  const ok = await deleteRsvp(profileId, event.id);
+                  if (!userId) return;
+                  const ok = await deleteRsvp(userId, event.id);
                   if (ok) {
                     setEvents(prev => prev.filter(e => e.id !== event.id));
                     setMessage(`Canceled RSVP for "${event.title}".`);
@@ -83,4 +85,3 @@ export default function MyRsvpsPage() {
     </div>
   );
 }
-
