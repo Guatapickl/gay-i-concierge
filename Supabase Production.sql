@@ -36,6 +36,7 @@ create policy "interests insert admin" on interests for insert to authenticated
 
 -- 4) events hardening
 -- Replace permissive write policies with admin-only
+alter table events add column if not exists agenda jsonb;
 alter table events enable row level security;
 drop policy if exists "events insert" on events;
 drop policy if exists "events update" on events;
@@ -171,9 +172,37 @@ grant execute on function rpc_create_alert_token(text, text, text, text, int) to
 grant execute on function rpc_consume_alert_token(text) to anon, authenticated;
 
 -- 8) Notes
+
+-- 9) Resources library (admin-augmented RLS)
+create table if not exists resources (
+  id uuid primary key default gen_random_uuid(),
+  owner_user_id uuid not null references auth.users(id) on delete cascade,
+  url text not null,
+  title text not null,
+  description text,
+  category text,
+  tags text[] default '{}',
+  is_pinned boolean not null default false,
+  clicks int not null default 0,
+  created_at timestamptz default now(),
+  updated_at timestamptz
+);
+
+alter table resources enable row level security;
+
+drop policy if exists "resources select" on resources;
+create policy "resources select" on resources for select to authenticated using (true);
+
+drop policy if exists "resources insert" on resources;
+create policy "resources insert" on resources for insert to authenticated with check (owner_user_id = auth.uid() or is_admin());
+
+drop policy if exists "resources update" on resources;
+create policy "resources update" on resources for update to authenticated using (owner_user_id = auth.uid() or is_admin()) with check (owner_user_id = auth.uid() or is_admin());
+
+drop policy if exists "resources delete" on resources;
+create policy "resources delete" on resources for delete to authenticated using (owner_user_id = auth.uid() or is_admin());
 -- - Ensure that your Next.js API routes handling alerts run server-side (Node runtime) and
 --   use either the service role client or call the above RPCs. Do NOT run service role in the browser.
 -- - Admin management: insert your UID(s) into app_admins to gain event/interest write access:
 --   insert into app_admins(user_id) values ('<your-auth-uid>') on conflict do nothing;
 -- - Consider adding database constraints and indices fitting your usage patterns.
-

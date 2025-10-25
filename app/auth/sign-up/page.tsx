@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { Button, FormInput, Alert } from '@/components/ui';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -43,35 +44,40 @@ export default function SignUpPage() {
     <div className="max-w-sm mx-auto">
       <h2 className="text-2xl font-bold mb-4">Create Account</h2>
       <form onSubmit={onSubmit} className="space-y-3">
-        <input
+        <FormInput
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
-          className="w-full border px-3 py-2 rounded"
           required
         />
-        <input
+        <FormInput
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
-          className="w-full border px-3 py-2 rounded"
           required
         />
-        <input
+        <FormInput
           type="password"
           value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
           placeholder="Confirm password"
-          className="w-full border px-3 py-2 rounded"
           required
         />
-        <button type="submit" disabled={loading} className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50 w-full">
+        <Button type="submit" disabled={loading} variant="primary" fullWidth>
           {loading ? 'Signing up…' : 'Sign Up'}
-        </button>
+        </Button>
       </form>
-      {message && <p className="mt-3 text-sm">{message}</p>}
+      {message && (
+        <Alert
+          variant={message.includes('Check your email') ? 'success' : 'error'}
+          className="mt-4"
+          onClose={() => setMessage(null)}
+        >
+          {message}
+        </Alert>
+      )}
     </div>
   );
 }

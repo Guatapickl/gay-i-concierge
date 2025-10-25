@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getClientId, rateLimit } from '@/lib/rateLimit';
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
 import { generateToken, expiresIn } from '@/lib/tokens';
 
 export const runtime = 'nodejs';
@@ -48,7 +48,7 @@ export async function POST(req: Request) {
 
   // Ensure subscriber rows exist (but do not opt-in yet)
   if (wantsEmail && email) {
-    const { error } = await supabaseAdmin
+    const { error } = await getSupabaseAdmin()
       .from('alerts_subscribers')
       .upsert({ email, email_opt_in: false }, { onConflict: 'email' });
     if (error) {
@@ -57,7 +57,7 @@ export async function POST(req: Request) {
     }
   }
   if (wantsSms && phone) {
-    const { error } = await supabaseAdmin
+    const { error } = await getSupabaseAdmin()
       .from('alerts_subscribers')
       .upsert({ phone, sms_opt_in: false }, { onConflict: 'phone' });
     if (error) {
@@ -70,7 +70,7 @@ export async function POST(req: Request) {
   const tokens: { channel: 'email' | 'sms'; token: string }[] = [];
   if (wantsEmail && email) {
     const token = generateToken();
-    const { error } = await supabaseAdmin.from('alerts_confirmations').insert([
+    const { error } = await getSupabaseAdmin().from('alerts_confirmations').insert([
       { token, action: 'subscribe', channel: 'email', email, expires_at: expiresIn(24) },
     ]);
     if (error) {
@@ -81,7 +81,7 @@ export async function POST(req: Request) {
   }
   if (wantsSms && phone) {
     const token = generateToken();
-    const { error } = await supabaseAdmin.from('alerts_confirmations').insert([
+    const { error } = await getSupabaseAdmin().from('alerts_confirmations').insert([
       { token, action: 'subscribe', channel: 'sms', phone, expires_at: expiresIn(24) },
     ]);
     if (error) {

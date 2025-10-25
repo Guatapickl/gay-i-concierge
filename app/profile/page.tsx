@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { Button, FormInput, Alert, LoadingSpinner } from '@/components/ui';
 // Simple suggestion list pulling from `interests` table if present
 type Interest = { id: string; name: string };
 
@@ -142,29 +143,33 @@ export default function ProfilePage() {
   };
 
   if (loading) {
-    return <div className="max-w-md mx-auto">Loading profile…</div>;
+    return <LoadingSpinner text="Loading profile..." className="mt-8" />;
   }
 
   return (
     <div className="max-w-2xl mx-auto">
       <h2 className="text-2xl font-bold mb-4">Your Profile</h2>
-      {error && <div className="mb-3 text-sm text-rose-400">{error}</div>}
+      {error && (
+        <Alert variant="error" className="mb-4" onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      )}
       <form onSubmit={saveProfile} className="space-y-6">
         <section>
           <h3 className="font-semibold mb-2">Contact</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm mb-1">Full name</label>
-              <input className="w-full border px-3 py-2 rounded" value={fullName} onChange={e => setFullName(e.target.value)} />
+              <FormInput value={fullName} onChange={e => setFullName(e.target.value)} />
             </div>
             <div>
               <label className="block text-sm mb-1">Phone</label>
-              <input className="w-full border px-3 py-2 rounded" placeholder="+15551234567" value={phone} onChange={e => setPhone(e.target.value)} />
+              <FormInput placeholder="+15551234567" value={phone} onChange={e => setPhone(e.target.value)} />
               <p className="text-xs text-gray-500 mt-1">Use E.164 format, e.g., +15551234567.</p>
             </div>
             <div className="md:col-span-2">
               <label className="block text-sm mb-1">Email</label>
-              <input className="w-full border px-3 py-2 rounded bg-gray-100" value={userEmail ?? ''} disabled />
+              <FormInput value={userEmail ?? ''} disabled className="bg-gray-100" />
             </div>
           </div>
         </section>
@@ -195,8 +200,8 @@ export default function ProfilePage() {
               ))}
             </div>
             <div className="flex gap-2">
-              <input className="flex-1 border px-3 py-2 rounded" placeholder="Add new interest" value={newInterest} onChange={e => setNewInterest(e.target.value)} />
-              <button type="button" className="border px-3 py-2 rounded" onClick={addNewInterest}>Add</button>
+              <FormInput className="flex-1" placeholder="Add new interest" value={newInterest} onChange={e => setNewInterest(e.target.value)} />
+              <Button type="button" variant="outline" onClick={addNewInterest}>Add</Button>
             </div>
             {selectedInterests.length > 0 && (
               <div className="text-xs text-gray-400">Selected: {selectedInterests.join(', ')}</div>
@@ -213,9 +218,9 @@ export default function ProfilePage() {
           </div>
         </section>
 
-        <button type="submit" disabled={!canSave || saving} className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50">
+        <Button type="submit" disabled={!canSave || saving} variant="primary">
           {saving ? 'Saving…' : 'Save Profile'}
-        </button>
+        </Button>
       </form>
     </div>
   );

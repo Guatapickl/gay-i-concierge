@@ -15,20 +15,22 @@ const selectBuilder = (rows: any[]) => ({
 let confirmRows: any[] = [];
 
 vi.mock('@/lib/supabaseAdmin', () => ({
-  supabaseAdmin: {
-    from(table: string) {
-      if (table === 'alerts_subscribers') {
-        return { upsert, update } as any;
-      }
-      if (table === 'alerts_confirmations') {
-        return {
-          insert,
-          select: () => selectBuilder(confirmRows),
-          update,
-        } as any;
-      }
-      throw new Error(`Unexpected table ${table}`);
-    },
+  getSupabaseAdmin() {
+    return {
+      from(table: string) {
+        if (table === 'alerts_subscribers') {
+          return { upsert, update } as any;
+        }
+        if (table === 'alerts_confirmations') {
+          return {
+            insert,
+            select: () => selectBuilder(confirmRows),
+            update,
+          } as any;
+        }
+        throw new Error(`Unexpected table ${table}`);
+      },
+    } as any;
   },
 }));
 

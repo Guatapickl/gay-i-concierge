@@ -3,6 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createEvent } from '@/lib/events';
+import AgendaEditor from '@/components/AgendaEditor';
+import type { AgendaItem } from '@/types/supabase';
+import { Button, FormInput, FormTextarea, Alert } from '@/components/ui';
 
 export default function NewEventPage() {
   const router = useRouter();
@@ -10,6 +13,7 @@ export default function NewEventPage() {
   const [description, setDescription] = useState('');
   const [dateTime, setDateTime] = useState('');
   const [location, setLocation] = useState('');
+  const [agenda, setAgenda] = useState<AgendaItem[]>([]);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -21,11 +25,21 @@ export default function NewEventPage() {
           e.preventDefault();
           setSaving(true);
           setMessage(null);
+          const cleanedAgenda = agenda
+            .map(i => ({
+              time: (i.time || '').trim() || null,
+              title: (i.title || '').trim(),
+              speaker: (i.speaker || '').trim() || null,
+              notes: (i.notes || '').trim() || null,
+            }))
+            .filter(i => i.title);
+
           const success = await createEvent({
             title: title.trim(),
             description: description.trim() || null,
             event_datetime: dateTime,
             location: location.trim() || null,
+            agenda: cleanedAgenda.length ? cleanedAgenda : undefined,
           });
           setSaving(false);
           if (success) {
@@ -38,9 +52,8 @@ export default function NewEventPage() {
       >
         <div className="mb-3">
           <label className="block font-medium mb-1">Title</label>
-          <input
+          <FormInput
             type="text"
-            className="w-full border px-3 py-2"
             value={title}
             onChange={e => setTitle(e.target.value)}
             required
@@ -48,8 +61,7 @@ export default function NewEventPage() {
         </div>
         <div className="mb-3">
           <label className="block font-medium mb-1">Description</label>
-          <textarea
-            className="w-full border px-3 py-2"
+          <FormTextarea
             value={description}
             onChange={e => setDescription(e.target.value)}
             rows={3}
@@ -57,9 +69,8 @@ export default function NewEventPage() {
         </div>
         <div className="mb-3">
           <label className="block font-medium mb-1">Date &amp; Time</label>
-          <input
+          <FormInput
             type="datetime-local"
-            className="w-full border px-3 py-2"
             value={dateTime}
             onChange={e => setDateTime(e.target.value)}
             required
@@ -67,21 +78,31 @@ export default function NewEventPage() {
         </div>
         <div className="mb-3">
           <label className="block font-medium mb-1">Location</label>
-          <input
+          <FormInput
             type="text"
-            className="w-full border px-3 py-2"
             value={location}
             onChange={e => setLocation(e.target.value)}
           />
         </div>
-        <button
+        <div className="mb-4">
+          <AgendaEditor value={agenda} onChange={setAgenda} />
+        </div>
+        <Button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          variant="primary"
           disabled={saving}
         >
           {saving ? 'Saving...' : 'Create Event'}
-        </button>
-        {message && <p className="mt-2">{message}</p>}
+        </Button>
+        {message && (
+          <Alert
+            variant={message.includes('✅') ? 'success' : 'error'}
+            className="mt-4"
+            onClose={() => setMessage(null)}
+          >
+            {message}
+          </Alert>
+        )}
       </form>
     </div>
   );

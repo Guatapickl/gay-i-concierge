@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { updateEvent, getEventById, deleteEvent } from '@/lib/events';
+import AgendaEditor from '@/components/AgendaEditor';
+import type { AgendaItem } from '@/types/supabase';
+import { Button, FormInput, FormTextarea, Alert, LoadingSpinner } from '@/components/ui';
 
 export default function EditEventPage() {
   const router = useRouter();
@@ -13,6 +16,7 @@ export default function EditEventPage() {
   const [description, setDescription] = useState('');
   const [dateTime, setDateTime] = useState('');
   const [location, setLocation] = useState('');
+  const [agenda, setAgenda] = useState<AgendaItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -26,13 +30,20 @@ export default function EditEventPage() {
         setDescription(event.description || '');
         setDateTime(event.event_datetime ? event.event_datetime.substring(0,16) : '');
         setLocation(event.location || '');
+        setAgenda(event.agenda || []);
       }
       setLoading(false);
     })();
   }, [eventId]);
 
-  if (!eventId) return <div>Error: No event ID provided.</div>;
-  if (loading) return <div>Loading event...</div>;
+  if (!eventId) {
+    return (
+      <Alert variant="error">
+        Error: No event ID provided.
+      </Alert>
+    );
+  }
+  if (loading) return <LoadingSpinner text="Loading event..." className="mt-8" />;
 
   return (
     <div className="max-w-md mx-auto">
@@ -42,11 +53,21 @@ export default function EditEventPage() {
           e.preventDefault();
           setSaving(true);
           setMessage(null);
+          const cleanedAgenda = agenda
+            .map(i => ({
+              time: (i.time || '').trim() || null,
+              title: (i.title || '').trim(),
+              speaker: (i.speaker || '').trim() || null,
+              notes: (i.notes || '').trim() || null,
+            }))
+            .filter(i => i.title);
+
           const success = await updateEvent(eventId as string, {
             title: title.trim(),
             description: description.trim() || null,
             event_datetime: dateTime,
             location: location.trim() || null,
+            ...(cleanedAgenda.length ? { agenda: cleanedAgenda } : {}),
           });
           setSaving(false);
           if (success) {
@@ -59,9 +80,8 @@ export default function EditEventPage() {
       >
         <div className="mb-3">
           <label className="block font-medium mb-1">Title</label>
-          <input
+          <FormInput
             type="text"
-            className="w-full border px-3 py-2"
             value={title}
             onChange={e => setTitle(e.target.value)}
             required
@@ -69,8 +89,7 @@ export default function EditEventPage() {
         </div>
         <div className="mb-3">
           <label className="block font-medium mb-1">Description</label>
-          <textarea
-            className="w-full border px-3 py-2"
+          <FormTextarea
             value={description}
             onChange={e => setDescription(e.target.value)}
             rows={3}
@@ -78,9 +97,8 @@ export default function EditEventPage() {
         </div>
         <div className="mb-3">
           <label className="block font-medium mb-1">Date &amp; Time</label>
-          <input
+          <FormInput
             type="datetime-local"
-            className="w-full border px-3 py-2"
             value={dateTime}
             onChange={e => setDateTime(e.target.value)}
             required
@@ -88,40 +106,52 @@ export default function EditEventPage() {
         </div>
         <div className="mb-3">
           <label className="block font-medium mb-1">Location</label>
-          <input
+          <FormInput
             type="text"
-            className="w-full border px-3 py-2"
             value={location}
             onChange={e => setLocation(e.target.value)}
           />
         </div>
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-          disabled={saving}
-        >
-          {saving ? 'Updating...' : 'Update Event'}
-        </button>
-        <button
-          type="button"
-          className="bg-red-600 text-white px-4 py-2 rounded ml-2"
-          onClick={async () => {
-            if (!confirm('Delete this event?')) return;
-            setSaving(true);
-            setMessage(null);
-            const success = await deleteEvent(eventId as string);
-            setSaving(false);
-            if (success) {
-              setMessage('✅ Event deleted successfully!');
-              setTimeout(() => router.push('/events'), 1000);
-            } else {
-              setMessage('❌ Failed to delete event.');
-            }
-          }}
-        >
-          Delete Event
-        </button>
-        {message && <p className="mt-2">{message}</p>}
+        <div className="mb-3">
+          <AgendaEditor value={agenda} onChange={setAgenda} />
+        </div>
+        <div className="flex gap-2">
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={saving}
+          >
+            {saving ? 'Updating...' : 'Update Event'}
+          </Button>
+          <Button
+            type="button"
+            variant="danger"
+            onClick={async () => {
+              if (!confirm('Delete this event?')) return;
+              setSaving(true);
+              setMessage(null);
+              const success = await deleteEvent(eventId as string);
+              setSaving(false);
+              if (success) {
+                setMessage('✅ Event deleted successfully!');
+                setTimeout(() => router.push('/events'), 1000);
+              } else {
+                setMessage('❌ Failed to delete event.');
+              }
+            }}
+          >
+            Delete Event
+          </Button>
+        </div>
+        {message && (
+          <Alert
+            variant={message.includes('✅') ? 'success' : 'error'}
+            className="mt-4"
+            onClose={() => setMessage(null)}
+          >
+            {message}
+          </Alert>
+        )}
       </form>
     </div>
   );

@@ -73,6 +73,7 @@ create table if not exists events (
   description text,
   event_datetime timestamptz not null,
   location text,
+  agenda jsonb,
   created_at timestamptz default now()
 );
 
@@ -93,6 +94,8 @@ create policy "events delete" on events for delete to authenticated using (true)
 
 -- Production hardening idea: replace the above three with a single admin-only policy
 -- that checks a JWT claim or membership in an admins table.
+-- If migrating an existing DB, add the agenda column separately:
+alter table events add column if not exists agenda jsonb;
 ```
 
 -- 4.4 rsvps (stores a user’s RSVP per event using auth.uid())
@@ -181,6 +184,41 @@ create policy "alerts tokens update" on alerts_confirmations for update using (t
 -- Production hardening idea: restrict updates to WHERE token = current token via RPC, or run endpoints with service role.
 ```
 
+-- 4.7 resources (shared resource library)
+```
+create table if not exists resources (
+  id uuid primary key default gen_random_uuid(),
+  owner_user_id uuid not null references auth.users(id) on delete cascade,
+  url text not null,
+  title text not null,
+  description text,
+  category text,
+  tags text[] default '{}',
+  is_pinned boolean not null default false,
+  clicks int not null default 0,
+  created_at timestamptz default now(),
+  updated_at timestamptz
+);
+
+alter table resources enable row level security;
+
+-- Only signed-in users can read
+drop policy if exists "resources select" on resources;
+create policy "resources select" on resources for select to authenticated using (true);
+
+-- Users can insert their own entries
+drop policy if exists "resources insert" on resources;
+create policy "resources insert" on resources for insert to authenticated with check (owner_user_id = auth.uid());
+
+-- Users can update their own entries
+drop policy if exists "resources update" on resources;
+create policy "resources update" on resources for update to authenticated using (owner_user_id = auth.uid()) with check (owner_user_id = auth.uid());
+
+-- Users can delete their own entries
+drop policy if exists "resources delete" on resources;
+create policy "resources delete" on resources for delete to authenticated using (owner_user_id = auth.uid());
+```
+
 5) Optional: Seed Data (quick start)
 ```
 insert into interests (name) values
@@ -222,4 +260,3 @@ on conflict do nothing;
 - If early accounts were email-only (no password), enable password assignment by sending password reset emails via Supabase Auth (or provide a “set password” flow using `updateUser`).
 
 If you want, I can generate an “Admin SQL” version that locks everything down for production and moves all writes behind RPCs.
-

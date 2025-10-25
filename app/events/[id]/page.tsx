@@ -49,6 +49,28 @@ export default function EventDetailsPage() {
       {event.location && <p><strong>Location:</strong> {event.location}</p>}
       {event.description && <p className="whitespace-pre-line">{event.description}</p>}
 
+      {/* Agenda section */}
+      {Array.isArray(event.agenda) && event.agenda.length > 0 && (
+        <div className="mt-4">
+          <h2 className="text-xl font-semibold mb-2">Agenda</h2>
+          <ul className="space-y-2">
+            {(event.agenda || []).map((item, idx) => (
+              <li key={idx} className="border rounded p-3">
+                <div className="flex flex-wrap items-baseline gap-2">
+                  {item?.time && <span className="font-mono text-sm text-gray-700">{item.time}</span>}
+                  <span className="font-medium">{item?.title}</span>
+                  {item?.speaker && <span className="text-sm text-gray-600">• {item.speaker}</span>}
+                </div>
+                {item?.notes && <p className="text-sm text-gray-700 mt-1 whitespace-pre-line">{item.notes}</p>}
+              </li>
+            ))}
+          </ul>
+          <div className="mt-2">
+            <a href={`/events/${event.id}/agenda`} className="text-sm underline">View full agenda</a>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-wrap gap-3 items-center">
         {isRsvped ? (
           <>

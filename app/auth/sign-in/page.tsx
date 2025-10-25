@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { Button, FormInput, Alert } from '@/components/ui';
 
 export default function SignInPage() {
   const [email, setEmail] = useState('');
@@ -67,39 +68,45 @@ export default function SignInPage() {
     <div className="max-w-sm mx-auto">
       <h2 className="text-2xl font-bold mb-4">Sign In</h2>
       <form onSubmit={signInWithPassword} className="space-y-3">
-        <input
+        <FormInput
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
-          className="w-full border px-3 py-2 rounded"
           required
         />
-        <input
+        <FormInput
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
-          className="w-full border px-3 py-2 rounded"
           required
         />
-        <button type="submit" disabled={loading} className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50">
+        <Button type="submit" disabled={loading} variant="primary" fullWidth>
           {loading ? 'Signing in…' : 'Sign In'}
-        </button>
+        </Button>
       </form>
       <div className="my-4 text-center text-sm text-gray-500">or</div>
       <form onSubmit={sendMagicLink} className="space-y-3 mb-4">
-        <button type="submit" disabled={loading} className="w-full bg-gray-700 text-white px-4 py-2 rounded disabled:opacity-50">
+        <Button type="submit" disabled={loading} variant="secondary" fullWidth>
           {loading ? 'Sending…' : 'Send Magic Link'}
-        </button>
+        </Button>
       </form>
-      <button onClick={signInWithGoogle} disabled={loading} className="w-full bg-gray-900 text-white px-4 py-2 rounded disabled:opacity-50">
+      <Button onClick={signInWithGoogle} disabled={loading} variant="ghost" fullWidth>
         Continue with Google
-      </button>
+      </Button>
       <div className="mt-4 text-sm text-gray-500 text-center">
         New here? <a href="/auth/sign-up" className="underline">Create an account</a>
       </div>
-      {message && <p className="mt-3 text-sm">{message}</p>}
+      {message && (
+        <Alert
+          variant={message.includes('Signed in') || message.includes('Check your email') ? 'success' : 'error'}
+          className="mt-4"
+          onClose={() => setMessage(null)}
+        >
+          {message}
+        </Alert>
+      )}
     </div>
   );
 }

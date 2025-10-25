@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { Event } from '@/types/supabase';
+import { Event, AgendaItem } from '@/types/supabase';
 
 // Fetch upcoming events sorted by date
 export async function getUpcomingEvents(): Promise<Event[]> {
@@ -21,15 +21,19 @@ export async function createEvent(newEvent: {
   description?: string | null;
   event_datetime: string;
   location?: string | null;
+  agenda?: AgendaItem[] | null;
 }): Promise<boolean> {
-  const { error } = await supabase.from('events').insert([
-    {
-      title: newEvent.title,
-      description: newEvent.description ?? null,
-      event_datetime: newEvent.event_datetime,
-      location: newEvent.location ?? null,
-    },
-  ]);
+  // Build row object conditionally to avoid errors if DB column doesn't exist yet
+  const row: Partial<Event> = {
+    title: newEvent.title,
+    description: newEvent.description ?? null,
+    event_datetime: newEvent.event_datetime,
+    location: newEvent.location ?? null,
+  };
+  if (typeof newEvent.agenda !== 'undefined') {
+    row.agenda = newEvent.agenda; // requires events.agenda jsonb column in DB
+  }
+  const { error } = await supabase.from('events').insert([row]);
   if (error) {
     console.error('Failed to insert event:', error.message);
     return false;

@@ -5,7 +5,8 @@ import { getEventsByIds } from '@/lib/events';
 import { getRsvpedEventIds, deleteRsvp } from '@/lib/rsvp';
 import { supabase } from '@/lib/supabase';
 import type { Event } from '@/types/supabase';
-import { downloadICS, googleCalendarUrl } from '@/lib/calendar';
+import { Alert, LoadingSpinner } from '@/components/ui';
+import EventListItem from '@/components/EventListItem';
 
 export default function MyRsvpsPage() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -30,10 +31,20 @@ export default function MyRsvpsPage() {
   }, []);
 
   if (!userId) {
-    return <div>Please sign in to view your RSVPs.</div>;
+    return (
+      <Alert variant="info">
+        Please sign in to view your RSVPs.
+      </Alert>
+    );
   }
-  if (loading) return <div>Loading your RSVPs...</div>;
-  if (!events.length) return <div><em>You have no RSVPs yet.</em></div>;
+  if (loading) return <LoadingSpinner text="Loading your RSVPs..." className="mt-8" />;
+  if (!events.length) {
+    return (
+      <div className="text-sm text-gray-400 italic">
+        You have no RSVPs yet.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -42,46 +53,32 @@ export default function MyRsvpsPage() {
       </div>
       <ul className="space-y-4">
         {events.map((event) => (
-          <li key={event.id} className="border p-4 rounded">
-            <h3 className="text-xl font-semibold">{event.title}</h3>
-            <p><strong>Date:</strong> {new Date(event.event_datetime).toLocaleString()}</p>
-            {event.location && <p><strong>Location:</strong> {event.location}</p>}
-            {event.description && <p>{event.description}</p>}
-            <div className="mt-2 flex gap-3 items-center">
-              <button
-                className="px-3 py-1 bg-gray-200 rounded text-sm"
-                onClick={() => downloadICS(event)}
-              >
-                Add to Calendar (.ics)
-              </button>
-              <a
-                className="px-3 py-1 bg-gray-200 rounded text-sm"
-                href={googleCalendarUrl(event)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Add to Google Calendar
-              </a>
-              <button
-                className="ml-auto px-3 py-1 bg-red-600 text-white rounded text-sm"
-                onClick={async () => {
-                  if (!userId) return;
-                  const ok = await deleteRsvp(userId, event.id);
-                  if (ok) {
-                    setEvents(prev => prev.filter(e => e.id !== event.id));
-                    setMessage(`Canceled RSVP for "${event.title}".`);
-                  } else {
-                    setMessage('Failed to cancel RSVP.');
-                  }
-                }}
-              >
-                Cancel RSVP
-              </button>
-            </div>
-          </li>
+          <EventListItem
+            key={event.id}
+            event={event}
+            isRsvped={true}
+            showViewAgenda={false}
+            onCancelRsvp={async () => {
+              if (!userId) return;
+              const ok = await deleteRsvp(userId, event.id);
+              if (ok) {
+                setEvents(prev => prev.filter(e => e.id !== event.id));
+                setMessage(`Canceled RSVP for "${event.title}".`);
+              } else {
+                setMessage('Failed to cancel RSVP.');
+              }
+            }}
+          />
         ))}
       </ul>
-      {message && <div className="mt-4 text-center">{message}</div>}
+      {message && (
+        <Alert
+          variant={message.includes('Canceled') ? 'success' : 'error'}
+          onClose={() => setMessage(null)}
+        >
+          {message}
+        </Alert>
+      )}
     </div>
   );
 }
