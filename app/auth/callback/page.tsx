@@ -11,17 +11,49 @@ export default function AuthCallbackPage() {
   useEffect(() => {
     (async () => {
       try {
-        const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.href);
-        if (error) {
-          setMessage(`Sign-in failed: ${error.message}`);
+        const href = window.location.href;
+        const url = new URL(href);
+        const error_description = url.searchParams.get('error_description');
+        if (error_description) {
+          setMessage(`Sign-in failed: ${error_description}`);
           return;
         }
-        if (data?.session) {
+
+        // Prefer the code-based exchange (OAuth PKCE and Magic Link)
+        const code = url.searchParams.get('code');
+        if (code) {
+          const { data, error } = await supabase.auth.exchangeCodeForSession(href);
+          if (error) {
+            setMessage(`Sign-in failed: ${error.message}`);
+            return;
+          }
+          if (data?.session) {
+            setMessage('Signed in! Redirecting…');
+            setTimeout(() => router.replace('/'), 600);
+            return;
+          }
+        }
+
+        // Fallback: verifyOtp flow for links that include token_hash
+        const token_hash = url.searchParams.get('token_hash');
+        const type = url.searchParams.get('type') as
+          | 'signup'
+          | 'magiclink'
+          | 'recovery'
+          | 'email_change'
+          | null;
+        if (token_hash && type) {
+          const { error } = await supabase.auth.verifyOtp({ type, token_hash });
+          if (error) {
+            setMessage(`Sign-in failed: ${error.message}`);
+            return;
+          }
           setMessage('Signed in! Redirecting…');
           setTimeout(() => router.replace('/'), 600);
-        } else {
-          setMessage('No session returned.');
+          return;
         }
+
+        setMessage('Invalid callback URL: missing code.');
       } catch {
         setMessage('Sign-in failed.');
       }
