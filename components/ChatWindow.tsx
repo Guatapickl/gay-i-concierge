@@ -368,7 +368,9 @@ export default function ChatWindow() {
     );
   }
   return (
-    <div className="w-full max-w-3xl mx-auto px-8 py-4 space-y-4">
+    // Slightly narrower max width on desktop to keep
+    // the text input and chat content from feeling too wide.
+    <div className="w-full max-w-2xl mx-auto px-8 py-4 space-y-4">
       <div className="space-y-2 max-h-80 overflow-y-auto w-full">
         {messages.map((msg, i) => (
           <div
