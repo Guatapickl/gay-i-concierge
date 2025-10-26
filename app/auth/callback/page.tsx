@@ -53,7 +53,21 @@ export default function AuthCallbackPage() {
           return;
         }
 
-        setMessage('Invalid callback URL: missing code.');
+        // Final fallback: implicit (hash) flow e.g. #access_token=...
+        if (window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token')) {
+          const { data, error } = await supabase.auth.getSessionFromUrl();
+          if (error) {
+            setMessage(`Sign-in failed: ${error.message}`);
+            return;
+          }
+          if (data?.session) {
+            setMessage('Signed in! Redirecting…');
+            setTimeout(() => router.replace('/'), 600);
+            return;
+          }
+        }
+
+        setMessage('Invalid callback URL: missing auth params.');
       } catch {
         setMessage('Sign-in failed.');
       }
