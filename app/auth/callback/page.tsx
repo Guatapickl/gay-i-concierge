@@ -55,15 +55,21 @@ export default function AuthCallbackPage() {
 
         // Final fallback: implicit (hash) flow e.g. #access_token=...
         if (window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token')) {
-          const { data, error } = await supabase.auth.getSessionFromUrl();
-          if (error) {
-            setMessage(`Sign-in failed: ${error.message}`);
-            return;
-          }
-          if (data?.session) {
-            setMessage('Signed in! Redirecting…');
-            setTimeout(() => router.replace('/'), 600);
-            return;
+          const hash = window.location.hash.replace(/^#/, '');
+          const params = new URLSearchParams(hash);
+          const access_token = params.get('access_token') ?? undefined;
+          const refresh_token = params.get('refresh_token') ?? undefined;
+          if (access_token && refresh_token) {
+            const { data, error } = await supabase.auth.setSession({ access_token, refresh_token });
+            if (error) {
+              setMessage(`Sign-in failed: ${error.message}`);
+              return;
+            }
+            if (data?.session) {
+              setMessage('Signed in! Redirecting…');
+              setTimeout(() => router.replace('/'), 600);
+              return;
+            }
           }
         }
 
