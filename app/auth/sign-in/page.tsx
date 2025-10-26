@@ -82,6 +82,9 @@ export default function SignInPage() {
           placeholder="Password"
           required
         />
+        <div className="text-right text-sm text-gray-400">
+          <a className="underline" href="/auth/forgot">Forgot password?</a>
+        </div>
         <Button type="submit" disabled={loading} variant="primary" fullWidth>
           {loading ? 'Signing in…' : 'Sign In'}
         </Button>
