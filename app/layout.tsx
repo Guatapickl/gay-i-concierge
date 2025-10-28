@@ -46,8 +46,7 @@ export default function RootLayout({
               <InteractiveNavButton href="/events/my" className="nav-button">MY RSVPS</InteractiveNavButton>
               <InteractiveNavButton href="/resources" className="nav-button">RESOURCES</InteractiveNavButton>
               <InteractiveNavButton href="/invite" className="nav-button">INVITE</InteractiveNavButton>
-              <InteractiveNavButton href="/alerts" className="nav-button">ALERTS</InteractiveNavButton>
-              <InteractiveNavButton href="/alerts/unsubscribe" className="nav-button">UNSUBSCRIBE</InteractiveNavButton>
+              {/* Alerts consolidated to Profile; keep public Unsubscribe accessible via footer/email links */}
               <AuthNav />
             </div>
           </div>
