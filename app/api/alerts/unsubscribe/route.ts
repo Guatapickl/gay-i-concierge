@@ -9,6 +9,7 @@ type Payload = {
   email?: string;
   phone?: string;
   channels?: Array<'email' | 'sms'>;
+  user_id?: string;
 };
 
 export async function POST(req: Request) {
@@ -36,6 +37,9 @@ export async function POST(req: Request) {
 
   const email = body.email?.trim();
   const phone = body.phone?.trim();
+  const user_id = body.user_id?.trim();
+  const consent_source = (req.headers.get('referer')?.includes('/profile') ? 'profile' : 'unsubscribe_page');
+  const consent_ip = getClientId(req);
 
   if (wantsEmail) {
     const emailOk = !!email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -69,6 +73,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Failed to create unsubscribe token.' }, { status: 500 });
     }
     tokens.push({ channel: 'sms', token });
+  }
+
+  // Optionally record intent (not final consent) on subscriber record
+  if (wantsEmail && email) {
+    await getSupabaseAdmin().from('alerts_subscribers')
+      .upsert({ email, user_id: user_id || null, consent_source, consent_ip }, { onConflict: 'email' });
+  }
+  if (wantsSms && phone) {
+    await getSupabaseAdmin().from('alerts_subscribers')
+      .upsert({ phone, user_id: user_id || null, consent_source, consent_ip }, { onConflict: 'phone' });
   }
 
   const debug = process.env.NODE_ENV !== 'production' ? { tokens } : undefined;

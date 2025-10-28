@@ -27,15 +27,24 @@ export async function GET(req: Request) {
   }
   if (row.action !== 'subscribe') return NextResponse.json({ error: 'Wrong token action' }, { status: 400 });
 
+  const consent_ip = getClientId(req);
+  const consent_source = 'confirm';
+
   if (row.channel === 'email' && row.email) {
     const { error: upErr } = await getSupabaseAdmin()
       .from('alerts_subscribers')
-      .upsert({ email: row.email, email_opt_in: true }, { onConflict: 'email' });
+      .upsert(
+        { email: row.email, email_opt_in: true, email_opt_in_at: new Date().toISOString(), email_opt_out_at: null, consent_source, consent_ip },
+        { onConflict: 'email' }
+      );
     if (upErr) return NextResponse.json({ error: 'Update failed' }, { status: 500 });
   } else if (row.channel === 'sms' && row.phone) {
     const { error: upErr } = await getSupabaseAdmin()
       .from('alerts_subscribers')
-      .upsert({ phone: row.phone, sms_opt_in: true }, { onConflict: 'phone' });
+      .upsert(
+        { phone: row.phone, sms_opt_in: true, sms_opt_in_at: new Date().toISOString(), sms_opt_out_at: null, consent_source, consent_ip },
+        { onConflict: 'phone' }
+      );
     if (upErr) return NextResponse.json({ error: 'Update failed' }, { status: 500 });
   } else {
     return NextResponse.json({ error: 'Token incomplete' }, { status: 400 });

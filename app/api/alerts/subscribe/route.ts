@@ -9,6 +9,7 @@ type Payload = {
   email?: string;
   phone?: string;
   channels?: Array<'email' | 'sms'>;
+  user_id?: string;
 };
 
 export async function POST(req: Request) {
@@ -36,6 +37,9 @@ export async function POST(req: Request) {
 
   const email = body.email?.trim();
   const phone = body.phone?.trim();
+  const user_id = body.user_id?.trim();
+  const consent_source = (req.headers.get('referer')?.includes('/profile') ? 'profile' : 'alerts_page');
+  const consent_ip = getClientId(req);
 
   if (wantsEmail) {
     const emailOk = !!email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -50,7 +54,7 @@ export async function POST(req: Request) {
   if (wantsEmail && email) {
     const { error } = await getSupabaseAdmin()
       .from('alerts_subscribers')
-      .upsert({ email, email_opt_in: false }, { onConflict: 'email' });
+      .upsert({ email, email_opt_in: false, user_id: user_id || null, consent_source, consent_ip }, { onConflict: 'email' });
     if (error) {
       console.error('Failed to upsert email subscriber:', error.message);
       return NextResponse.json({ error: 'Failed to subscribe.' }, { status: 500 });
@@ -59,7 +63,7 @@ export async function POST(req: Request) {
   if (wantsSms && phone) {
     const { error } = await getSupabaseAdmin()
       .from('alerts_subscribers')
-      .upsert({ phone, sms_opt_in: false }, { onConflict: 'phone' });
+      .upsert({ phone, sms_opt_in: false, user_id: user_id || null, consent_source, consent_ip }, { onConflict: 'phone' });
     if (error) {
       console.error('Failed to upsert SMS subscriber:', error.message);
       return NextResponse.json({ error: 'Failed to subscribe.' }, { status: 500 });

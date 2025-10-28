@@ -119,17 +119,17 @@ export default function ProfilePage() {
       // Email
       if (userEmail) {
         if (emailOptIn) {
-          await fetch('/api/alerts/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, channels: ['email'] }) });
+          await fetch('/api/alerts/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, channels: ['email'], user_id: userId }) });
         } else {
-          await fetch('/api/alerts/unsubscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, channels: ['email'] }) });
+          await fetch('/api/alerts/unsubscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, channels: ['email'], user_id: userId }) });
         }
       }
       // SMS
       if (phone) {
         if (smsOptIn) {
-          await fetch('/api/alerts/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone, channels: ['sms'] }) });
+          await fetch('/api/alerts/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone, channels: ['sms'], user_id: userId }) });
         } else {
-          await fetch('/api/alerts/unsubscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone, channels: ['sms'] }) });
+          await fetch('/api/alerts/unsubscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone, channels: ['sms'], user_id: userId }) });
         }
       }
 

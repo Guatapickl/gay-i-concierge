@@ -27,16 +27,19 @@ export async function GET(req: Request) {
   }
   if (row.action !== 'unsubscribe') return NextResponse.json({ error: 'Wrong token action' }, { status: 400 });
 
+  const consent_ip = getClientId(req);
+  const consent_source = 'unsubscribe-confirm';
+
   if (row.channel === 'email' && row.email) {
     const { error: upErr } = await getSupabaseAdmin()
       .from('alerts_subscribers')
-      .update({ email_opt_in: false })
+      .update({ email_opt_in: false, email_opt_out_at: new Date().toISOString(), consent_source, consent_ip })
       .eq('email', row.email);
     if (upErr) return NextResponse.json({ error: 'Update failed' }, { status: 500 });
   } else if (row.channel === 'sms' && row.phone) {
     const { error: upErr } = await getSupabaseAdmin()
       .from('alerts_subscribers')
-      .update({ sms_opt_in: false })
+      .update({ sms_opt_in: false, sms_opt_out_at: new Date().toISOString(), consent_source, consent_ip })
       .eq('phone', row.phone);
     if (upErr) return NextResponse.json({ error: 'Update failed' }, { status: 500 });
   } else {
