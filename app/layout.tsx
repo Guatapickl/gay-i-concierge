@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Inter, Orbitron } from "next/font/google";
-import { InteractiveNavButton } from '@/components/InteractiveNavButton'
 import AuthNav from '@/components/AuthNav'
 import BackgroundParticles from '@/components/BackgroundParticles';
 import HeaderTitle from '@/components/HeaderTitle';
@@ -28,29 +28,45 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const primaryNavLinks = [
+    { href: "/", label: "Home" },
+    { href: "/events", label: "Events" },
+    { href: "/resources", label: "Resources" },
+    { href: "/community", label: "Community" },
+    { href: "/profile", label: "Profile" },
+  ];
+
   return (
     <html lang="en" className={`${inter.className} ${orbitron.variable}`}>
       <body className="flex flex-col min-h-screen antialiased relative bg-black">
         <BackgroundParticles />
         <header className="bg-gray-900/80 backdrop-blur-lg shadow relative z-10">
-          <div className="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between md:items-center">
-            <HeaderTitle />
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:gap-6">
+              <div className="flex items-center md:flex-1 md:justify-start">
+                <HeaderTitle />
+              </div>
+              <nav className="flex justify-center md:flex-1">
+                <ul className="flex flex-wrap items-center justify-center gap-3 text-sm font-semibold uppercase tracking-wide text-gray-200">
+                  {primaryNavLinks.map((link) => (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        className="rounded-md px-3 py-2 transition-colors hover:bg-white/10 hover:text-white"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+              <div className="flex items-center justify-end md:flex-1">
+                <AuthNav />
+              </div>
+            </div>
           </div>
         </header>
         <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 relative z-10 max-w-7xl">{children}</main>
-        <nav className="bg-gray-900/80 backdrop-blur-lg shadow relative z-10">
-          <div className="container mx-auto px-4 py-6">
-            <div className="nav-button-container">
-              <InteractiveNavButton href="/" className="nav-button">HOME</InteractiveNavButton>
-              <InteractiveNavButton href="/events" className="nav-button">EVENTS</InteractiveNavButton>
-              <InteractiveNavButton href="/events/my" className="nav-button">MY RSVPS</InteractiveNavButton>
-              <InteractiveNavButton href="/resources" className="nav-button">RESOURCES</InteractiveNavButton>
-              <InteractiveNavButton href="/invite" className="nav-button">INVITE</InteractiveNavButton>
-              {/* Alerts consolidated to Profile; keep public Unsubscribe accessible via footer/email links */}
-              <AuthNav />
-            </div>
-          </div>
-        </nav>
         <footer className="bg-gray-900/80 backdrop-blur-lg relative z-10">
           <div className="container mx-auto px-4 py-4 text-center text-sm text-gray-400">
             © {new Date().getFullYear()} Gay-I Club Concierge. All rights reserved.
