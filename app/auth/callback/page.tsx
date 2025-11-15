@@ -29,7 +29,7 @@ export default function AuthCallbackPage() {
           }
           if (data?.session) {
             setMessage('Signed in! Redirecting…');
-            setTimeout(() => router.replace('/'), 600);
+            setTimeout(() => router.replace('/hub'), 600);
             return;
           }
         }
@@ -49,7 +49,7 @@ export default function AuthCallbackPage() {
             return;
           }
           setMessage('Signed in! Redirecting…');
-          setTimeout(() => router.replace('/'), 600);
+          setTimeout(() => router.replace('/hub'), 600);
           return;
         }
 
@@ -67,7 +67,7 @@ export default function AuthCallbackPage() {
             }
             if (data?.session) {
               setMessage('Signed in! Redirecting…');
-              setTimeout(() => router.replace('/'), 600);
+              setTimeout(() => router.replace('/hub'), 600);
               return;
             }
           }

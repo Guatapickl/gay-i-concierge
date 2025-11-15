@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Inter, Orbitron } from "next/font/google";
-import { InteractiveNavButton } from '@/components/InteractiveNavButton'
-import AuthNav from '@/components/AuthNav'
+import Link from 'next/link';
+import AuthNav from '@/components/AuthNav';
 import BackgroundParticles from '@/components/BackgroundParticles';
-import HeaderTitle from '@/components/HeaderTitle';
+import ChatModalProvider from "@/components/ChatModalProvider";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -30,32 +30,39 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.className} ${orbitron.variable}`}>
-      <body className="flex flex-col min-h-screen antialiased relative bg-black">
+      <body className="flex min-h-screen antialiased relative bg-background text-foreground">
         <BackgroundParticles />
-        <header className="bg-gray-900/80 backdrop-blur-lg shadow relative z-10">
-          <div className="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between md:items-center">
-            <HeaderTitle />
+        <aside className="w-64 bg-gray-900/80 backdrop-blur-lg shadow relative z-10 flex flex-col">
+          <div className="h-16 flex items-center justify-center">
+            <Link href="/hub" className="text-2xl font-bold text-primary font-orbitron">
+              GAY-I
+            </Link>
           </div>
-        </header>
-        <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 relative z-10 max-w-7xl">{children}</main>
-        <nav className="bg-gray-900/80 backdrop-blur-lg shadow relative z-10">
-          <div className="container mx-auto px-4 py-6">
-            <div className="nav-button-container">
-              <InteractiveNavButton href="/" className="nav-button">HOME</InteractiveNavButton>
-              <InteractiveNavButton href="/events" className="nav-button">EVENTS</InteractiveNavButton>
-              <InteractiveNavButton href="/events/my" className="nav-button">MY RSVPS</InteractiveNavButton>
-              <InteractiveNavButton href="/resources" className="nav-button">RESOURCES</InteractiveNavButton>
-              <InteractiveNavButton href="/invite" className="nav-button">INVITE</InteractiveNavButton>
-              {/* Alerts consolidated to Profile; keep public Unsubscribe accessible via footer/email links */}
-              <AuthNav />
-            </div>
+          <nav className="flex-1 px-4 py-6 space-y-2">
+            <Link href="/hub" className="flex items-center px-4 py-2 text-lg font-medium rounded-md hover:bg-gray-800">
+              Hub
+            </Link>
+            <Link href="/events" className="flex items-center px-4 py-2 text-lg font-medium rounded-md hover:bg-gray-800">
+              Events
+            </Link>
+            <Link href="/resources" className="flex items-center px-4 py-2 text-lg font-medium rounded-md hover:bg-gray-800">
+              Resources
+            </Link>
+            <Link href="/community" className="flex items-center px-4 py-2 text-lg font-medium rounded-md hover:bg-gray-800">
+              Community
+            </Link>
+            <Link href="/profile" className="flex items-center px-4 py-2 text-lg font-medium rounded-md hover:bg-gray-800">
+              Profile
+            </Link>
+          </nav>
+          <div className="px-4 py-6">
+            <AuthNav />
           </div>
-        </nav>
-        <footer className="bg-gray-900/80 backdrop-blur-lg relative z-10">
-          <div className="container mx-auto px-4 py-4 text-center text-sm text-gray-400">
-            © {new Date().getFullYear()} Gay-I Club Concierge. All rights reserved.
-          </div>
-        </footer>
+        </aside>
+        <div className="flex flex-col flex-1">
+          <main className="flex-1 p-8 relative z-10">{children}</main>
+        </div>
+        <ChatModalProvider />
       </body>
     </html>
   );

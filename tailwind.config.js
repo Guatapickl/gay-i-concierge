@@ -1,3 +1,5 @@
+const colors = require('tailwindcss/colors');
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: 'class',
@@ -7,6 +9,15 @@ module.exports = {
   ],
   theme: {
     extend: {
+      colors: {
+        primary: '#ff69b4',
+        secondary: '#8b5cf6',
+        accent: '#22d3ee',
+        background: '#0a0a0a',
+        foreground: '#ededed',
+        indigo: colors.indigo,
+        cyan: colors.cyan,
+      },
       fontFamily: {
         orbitron: ['var(--font-orbitron)', 'monospace'],
         space: ['var(--font-orbitron)', 'sans-serif'],

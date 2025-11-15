@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Button, FormInput, Alert, LoadingSpinner } from '@/components/ui';
+import MyRsvps from '@/components/MyRsvps';
 // Simple suggestion list pulling from `interests` table if present
 type Interest = { id: string; name: string };
 
@@ -222,6 +223,10 @@ export default function ProfilePage() {
           {saving ? 'Saving…' : 'Save Profile'}
         </Button>
       </form>
+
+      <div className="mt-8">
+        <MyRsvps />
+      </div>
     </div>
   );
 }
