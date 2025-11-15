@@ -3,22 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --background: #000000;
-  --foreground: #ffffff;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter);
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --primary: #ff69b4;
+  --secondary: #8b5cf6;
+  --accent: #22d3ee;
 }
 
 body {
@@ -27,35 +16,6 @@ body {
   font-family: var(--font-inter), Arial, Helvetica, sans-serif;
 }
 
-/* Particle float animation */
-@keyframes particle-float {
-  0%, 100% {
-    opacity: 0;
-    transform: translateY(0) scale(0);
-  }
-  20% {
-    opacity: 0.8;
-    transform: translateY(-8px) scale(1.2);
-  }
-  80% {
-    opacity: 0.8;
-    transform: translateY(-12px) scale(1);
-  }
-}
-
-/* Enhanced ping animation for ripples */
-@keyframes enhanced-ping {
-  0% {
-    transform: scale(0);
-    opacity: 1;
-  }
-  75%, 100% {
-    transform: scale(4);
-    opacity: 0;
-  }
-}
-
-/* Generic ping animation used by Tailwind */
 @keyframes ping {
   75%, 100% {
     transform: scale(2);
@@ -63,7 +23,6 @@ body {
   }
 }
 
-/* Generic pulse animation used by Tailwind */
 @keyframes pulse {
   0%, 100% {
     opacity: 1;
@@ -71,11 +30,6 @@ body {
   50% {
     opacity: .5;
   }
-}
-
-/* Apply custom animations */
-.animate-particle-float {
-  animation: particle-float 2s ease-in-out infinite;
 }
 
 .animate-ping {
@@ -86,73 +40,19 @@ body {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-.animate-enhanced-ping {
-  animation: enhanced-ping 0.6s cubic-bezier(0, 0, 0.2, 1);
-}
-
-/* Ensure smooth transitions */
 * {
   transition-property: transform, opacity, box-shadow, background-color, border-color;
 }
 
-/* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   .animate-ping,
-  .animate-pulse,
-  .animate-particle-float {
+  .animate-pulse {
     animation: none;
   }
 
   * {
     transition-duration: 0.01ms !important;
   }
-}
-
-/* Add to your globals.css for smoother animations */
-.interactive-nav-button {
-  position: relative;
-  isolation: isolate;
-}
-
-.interactive-nav-button > * {
-  position: relative;
-  z-index: 1;
-}
-
-/* Custom ripple animation - REPLACE the existing one */
-@keyframes ripple-expand {
-  0% {
-    width: 0;
-    height: 0;
-    opacity: 0.4;
-  }
-  100% {
-    width: 40px;
-    height: 40px;
-    opacity: 0;
-  }
-}
-
-.animate-ripple-expand {
-  animation: ripple-expand 0.6s ease-out forwards;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-}
-
-@keyframes scan-line {
-  0% {
-    transform: translateX(-150%) skewX(-12deg);
-  }
-  100% {
-    transform: translateX(150%) skewX(-12deg);
-  }
-}
-
-.animate-scan-line {
-  animation: scan-line 0.8s ease-in-out forwards;
 }
 
 @keyframes fade-in {
@@ -166,58 +66,4 @@ body {
 
 .animate-fade-in {
   animation: fade-in 0.2s ease-out;
-}
-
-/* Holographic text style */
-.base-holographic {
-  background: linear-gradient(90deg, #22d3ee, #3b82f6, #8b5cf6, #ec4899, #ef4444);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 30px rgba(139,92,246,0.5));
-}
-
-@keyframes glitch {
-  0% { transform: translate(0); }
-  20% { transform: translate(-2px, 2px); }
-  40% { transform: translate(-2px, -2px); }
-  60% { transform: translate(2px, 2px); }
-  80% { transform: translate(2px, -2px); }
-  100% { transform: translate(0); }
-}
-
-.glitch-active {
-  animation: glitch 0.15s linear;
-}
-
-/* Navigation button improvements */
-.nav-button-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-/* Ensure buttons have consistent sizing */
-.nav-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 140px;
-  text-align: center;
-  white-space: nowrap;
-}
-
-/* Mobile responsive adjustments */
-@media (max-width: 640px) {
-  .nav-button-container {
-    gap: 0.5rem;
-  }
-
-  .nav-button {
-    min-width: 110px;
-    padding: 0.625rem 1rem;
-    font-size: 0.875rem;
-  }
 }

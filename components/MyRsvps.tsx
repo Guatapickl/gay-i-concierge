@@ -8,7 +8,7 @@ import type { Event } from '@/types/supabase';
 import { Alert, LoadingSpinner } from '@/components/ui';
 import EventListItem from '@/components/EventListItem';
 
-export default function MyRsvpsPage() {
+export default function MyRsvps() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
