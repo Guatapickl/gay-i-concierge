@@ -3,30 +3,68 @@
 @tailwind utilities;
 
 :root {
-  --background: #0a0a0a;
+  --background: #0f0c29;
   --foreground: #ededed;
-  --primary: #ff69b4;
-  --secondary: #8b5cf6;
-  --accent: #22d3ee;
 }
 
 body {
-  background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+  background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f0c29;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ff00cc;
+  border-radius: 5px;
+  box-shadow: 0 0 10px #ff00cc;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #00ffff;
+}
+
+/* Glassmorphism Utilities */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.glass-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
 @keyframes ping {
-  75%, 100% {
+
+  75%,
+  100% {
     transform: scale(2);
     opacity: 0;
   }
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: .5;
   }
@@ -45,6 +83,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .animate-ping,
   .animate-pulse {
     animation: none;
@@ -59,6 +98,7 @@ body {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }

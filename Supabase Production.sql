@@ -76,6 +76,30 @@ drop policy if exists "alerts update" on alerts_subscribers;
 drop policy if exists "alerts select" on alerts_subscribers;
 create policy "alerts select" on alerts_subscribers for select using (true);
 
+-- Optional: consent metadata columns and update trigger
+alter table alerts_subscribers
+  add column if not exists user_id uuid references auth.users(id) on delete set null,
+  add column if not exists email_opt_in_at timestamptz,
+  add column if not exists email_opt_out_at timestamptz,
+  add column if not exists sms_opt_in_at timestamptz,
+  add column if not exists sms_opt_out_at timestamptz,
+  add column if not exists consent_source text,
+  add column if not exists consent_ip inet,
+  add column if not exists updated_at timestamptz default now();
+
+create or replace function set_updated_at()
+returns trigger as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$ language plpgsql;
+
+drop trigger if exists trg_alerts_subscribers_updated_at on alerts_subscribers;
+create trigger trg_alerts_subscribers_updated_at
+before update on alerts_subscribers
+for each row execute function set_updated_at();
+
 alter table alerts_confirmations enable row level security;
 drop policy if exists "alerts tokens select" on alerts_confirmations;
 drop policy if exists "alerts tokens insert" on alerts_confirmations;

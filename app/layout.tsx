@@ -32,30 +32,31 @@ export default function RootLayout({
     <html lang="en" className={`${inter.className} ${orbitron.variable}`}>
       <body className="flex min-h-screen antialiased relative bg-background text-foreground">
         <BackgroundParticles />
-        <aside className="w-64 bg-gray-900/80 backdrop-blur-lg shadow relative z-10 flex flex-col">
-          <div className="h-16 flex items-center justify-center">
-            <Link href="/hub" className="text-2xl font-bold text-primary font-orbitron">
+        <aside className="w-64 glass border-r border-white/10 relative z-10 flex flex-col shadow-[0_0_15px_rgba(0,255,255,0.1)]">
+          <div className="h-20 flex items-center justify-center border-b border-white/10 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent animate-pulse" />
+            <Link href="/hub" className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent font-orbitron tracking-widest z-10 drop-shadow-[0_0_5px_rgba(255,0,204,0.5)]">
               GAY-I
             </Link>
           </div>
-          <nav className="flex-1 px-4 py-6 space-y-2">
-            <Link href="/hub" className="flex items-center px-4 py-2 text-lg font-medium rounded-md hover:bg-gray-800">
-              Hub
-            </Link>
-            <Link href="/events" className="flex items-center px-4 py-2 text-lg font-medium rounded-md hover:bg-gray-800">
-              Events
-            </Link>
-            <Link href="/resources" className="flex items-center px-4 py-2 text-lg font-medium rounded-md hover:bg-gray-800">
-              Resources
-            </Link>
-            <Link href="/community" className="flex items-center px-4 py-2 text-lg font-medium rounded-md hover:bg-gray-800">
-              Community
-            </Link>
-            <Link href="/profile" className="flex items-center px-4 py-2 text-lg font-medium rounded-md hover:bg-gray-800">
-              Profile
-            </Link>
+          <nav className="flex-1 px-4 py-6 space-y-4">
+            {[
+              { href: '/hub', label: 'HUB' },
+              { href: '/events', label: 'EVENTS' },
+              { href: '/resources', label: 'RESOURCES' },
+              { href: '/community', label: 'COMMUNITY' },
+              { href: '/profile', label: 'PROFILE' },
+            ].map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="flex items-center px-4 py-3 text-lg font-medium rounded-none border-l-2 border-transparent hover:border-primary hover:bg-white/5 hover:text-accent transition-all duration-300 font-orbitron tracking-wider group"
+              >
+                <span className="group-hover:translate-x-2 transition-transform duration-300">{link.label}</span>
+              </Link>
+            ))}
           </nav>
-          <div className="px-4 py-6">
+          <div className="px-4 py-6 border-t border-white/10">
             <AuthNav />
           </div>
         </aside>

@@ -283,20 +283,20 @@ export default function ChatWindow() {
   // Render onboarding or chat UI
   if (!hasOnboarded) {
     return (
-      <div className="w-full max-w-3xl mx-auto px-8 py-4 space-y-4">
-        <div className="p-4 bg-white rounded-lg shadow">
-          <p className="font-bold">
-            {onboardingStep === 0 && `Welcome! What's your name?`}
-            {onboardingStep === 1 && `Great! What's your email?`}
-            {onboardingStep === 2 && `Select your interests (choose all that apply):`}
-            {onboardingStep === 3 && `How much have you worked with AI so far?`}
+      <div className="w-full max-w-3xl mx-auto px-8 py-4 space-y-4 font-mono text-primary">
+        <div className="p-4 bg-black/40 border border-primary/30 rounded-lg shadow-[0_0_10px_rgba(255,0,204,0.2)]">
+          <p className="font-bold font-orbitron tracking-wide">
+            {onboardingStep === 0 && `> INITIALIZING... ENTER IDENTITY:`}
+            {onboardingStep === 1 && `> IDENTITY CONFIRMED. ENTER CONTACT FREQUENCY (EMAIL):`}
+            {onboardingStep === 2 && `> SELECT DATA MODULES (INTERESTS):`}
+            {onboardingStep === 3 && `> CALIBRATING EXPERIENCE LEVEL:`}
           </p>
         </div>
         {onboardingStep < 3 && (
           onboardingStep === 2 ? (
-            <div>
+            <div className="space-y-2">
               {interestsList.map((interest) => (
-                <label key={interest.id} className="block mb-1">
+                <label key={interest.id} className="flex items-center gap-2 cursor-pointer hover:text-accent transition-colors">
                   <input
                     type="checkbox"
                     checked={selectedInterests.some(i => i.id === interest.id)}
@@ -307,25 +307,27 @@ export default function ChatWindow() {
                         setSelectedInterests(prev => prev.filter(i => i.id !== interest.id));
                       }
                     }}
-                    className="mr-2"
+                    className="accent-primary"
                   />
                   {interest.name}
                 </label>
               ))}
-              <label className="block mt-2">
-                Other interest:
-                <input
-                  type="text"
-                  className="border ml-2 px-1"
-                  value={newInterest}
-                  onChange={e => setNewInterest(e.target.value)}
-                />
+              <label className="block mt-4">
+                <span className="text-sm opacity-70">ADDITIONAL_MODULE:</span>
+                <div className="flex gap-2 mt-1">
+                  <input
+                    type="text"
+                    className="bg-black/20 border border-primary/30 rounded px-2 py-1 text-white focus:border-primary outline-none flex-1"
+                    value={newInterest}
+                    onChange={e => setNewInterest(e.target.value)}
+                  />
+                </div>
               </label>
               <button
                 onClick={handleOnboardingNext}
-                className="mt-2 px-4 py-2 bg-blue-600 text-white rounded"
+                className="mt-4 px-6 py-2 bg-primary/20 border border-primary text-primary hover:bg-primary hover:text-black transition-all duration-300 font-orbitron rounded-sm w-full"
               >
-                Next
+                PROCEED
               </button>
             </div>
           ) : (
@@ -336,20 +338,20 @@ export default function ChatWindow() {
                 onKeyDown={e => {
                   if (e.key === 'Enter') handleOnboardingNext();
                 }}
-                className="flex-1 p-2 border rounded"
-                placeholder="Type your answer and press Enter..."
+                className="flex-1 p-3 bg-black/20 border border-primary/30 rounded text-white focus:border-primary outline-none font-mono"
+                placeholder="Input data..."
               />
               <button
                 onClick={handleOnboardingNext}
-                className="px-4 py-2 bg-blue-600 text-white rounded"
+                className="px-6 py-2 bg-primary/20 border border-primary text-primary hover:bg-primary hover:text-black transition-all duration-300 font-orbitron rounded-sm"
               >
-                Next
+                ENTER
               </button>
             </div>
           )
         )}
         {onboardingError && (
-          <p className="text-sm text-red-600">{onboardingError}</p>
+          <p className="text-sm text-red-500 font-bold animate-pulse">ERROR: {onboardingError}</p>
         )}
         {onboardingStep === 3 && (
           <div className="flex flex-col gap-2">
@@ -357,9 +359,9 @@ export default function ChatWindow() {
               <button
                 key={level}
                 onClick={() => handleExperienceSelect(level)}
-                className="px-4 py-2 bg-blue-600 text-white rounded"
+                className="px-4 py-3 bg-black/20 border border-primary/30 text-primary hover:bg-primary hover:text-black transition-all duration-300 font-orbitron rounded-sm text-left"
               >
-                {level.charAt(0).toUpperCase() + level.slice(1)}
+                {'> ' + level.toUpperCase()}
               </button>
             ))}
           </div>
@@ -370,54 +372,63 @@ export default function ChatWindow() {
   return (
     // Slightly narrower max width on desktop to keep
     // the text input and chat content from feeling too wide.
-    <div className="w-full max-w-2xl mx-auto px-8 py-4 space-y-4">
-      <div className="space-y-2 max-h-80 overflow-y-auto w-full">
+    <div className="w-full max-w-2xl mx-auto px-4 py-4 space-y-4 font-mono">
+      <div className="space-y-4 max-h-80 overflow-y-auto w-full pr-2 custom-scrollbar">
         {messages.map((msg, i) => (
           <div
             key={i}
-            className={`p-2 rounded max-w-full break-words text-sm leading-relaxed ${
-              msg.role === "user"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100"
-            }`}
+            className={`p-3 rounded-lg max-w-[90%] break-words text-sm leading-relaxed shadow-md ${msg.role === "user"
+                ? "bg-primary/20 text-white ml-auto border border-primary/50 rounded-br-none"
+                : "bg-secondary/20 text-accent mr-auto border border-accent/50 rounded-bl-none"
+              }`}
           >
+            <span className="block text-xs opacity-50 mb-1 font-orbitron tracking-wider">
+              {msg.role === "user" ? "USER_INPUT" : "AILEX_RESPONSE"}
+            </span>
             {msg.content}
           </div>
         ))}
+        {isLoading && (
+          <div className="p-3 rounded-lg max-w-[90%] mr-auto bg-secondary/20 border border-accent/50 text-accent animate-pulse">
+            <span className="block text-xs opacity-50 mb-1 font-orbitron tracking-wider">SYSTEM</span>
+            Processing data stream...
+          </div>
+        )}
       </div>
 
       {showRsvpPrompt && (
-        <div className="flex gap-2">
+        <div className="flex gap-2 justify-center">
           <button
             onClick={() => handleRsvpResponse('yes')}
-            className="px-4 py-2 bg-blue-600 text-white rounded"
+            className="px-6 py-2 bg-primary/20 border border-primary text-primary hover:bg-primary hover:text-black transition-all duration-300 font-orbitron rounded-sm"
           >
-            Yes
+            CONFIRM_RSVP
           </button>
           <button
             onClick={() => handleRsvpResponse('no')}
-            className="px-4 py-2 bg-gray-300 rounded"
+            className="px-6 py-2 bg-white/5 border border-white/20 text-gray-400 hover:bg-white/10 hover:text-white transition-all duration-300 font-orbitron rounded-sm"
           >
-            No thanks
+            DECLINE
           </button>
         </div>
       )}
 
-      <div className="flex gap-2">
+      <div className="flex gap-2 items-center bg-black/40 p-2 rounded border border-white/10">
+        <span className="text-accent font-bold pl-2">{'>'}</span>
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') sendMessage(); }}
           disabled={isLoading}
-          className="flex-1 p-2 border rounded"
-          placeholder="Ask the concierge..."
+          className="flex-1 p-2 bg-transparent border-none outline-none text-green-400 placeholder-green-400/30 font-mono"
+          placeholder="Enter command..."
         />
         <button
           onClick={sendMessage}
           disabled={isLoading}
-          className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
+          className="px-4 py-2 bg-primary/20 border border-primary/50 text-primary hover:bg-primary hover:text-black transition-all duration-300 font-orbitron text-sm rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Send
+          EXECUTE
         </button>
       </div>
     </div>

@@ -28,58 +28,47 @@ export default function BackgroundParticles() {
     },
     fpsLimit: 60,
     particles: {
-      color: { value: "#ff69b4" },
+      color: { value: ["#00ffff", "#ff00cc"] }, // Cyan and Retro Pink
       links: {
-        color: "#ff69b4",
-        distance: 150,
-        enable: true,
-        opacity: 0.5,
-        width: 1
+        enable: false, // Disable links for data stream look
       },
       move: {
-        direction: "none" as const,
+        direction: "right", // Move horizontally
         enable: true,
         outModes: {
-          default: "bounce" as const
+          default: "out"
         },
         random: false,
-        speed: 1,
-        straight: false
+        speed: 10, // Fast speed for "warp" effect
+        straight: true
       },
       number: {
-        value: 60
+        value: 150, // More particles
+        density: {
+          enable: true,
+        }
       },
       opacity: {
-        value: 0.5
+        value: { min: 0.1, max: 0.8 },
+        animation: {
+          enable: true,
+          speed: 1,
+          sync: false
+        }
       },
       shape: {
         type: "circle"
       },
       size: {
         value: { min: 1, max: 3 }
+      },
+      // Add trails for data stream effect
+      effect: {
+        fill: true,
+        close: true
       }
     },
     detectRetina: true,
-    responsive: [
-      {
-        maxWidth: 1024,
-        options: {
-          particles: {
-            number: { value: 40 }
-          },
-          fpsLimit: 45
-        }
-      },
-      {
-        maxWidth: 768,
-        options: {
-          particles: {
-            number: { value: 25 }
-          },
-          fpsLimit: 30
-        }
-      }
-    ]
   };
 
   return (
