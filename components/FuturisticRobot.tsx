@@ -66,6 +66,21 @@ export default function FuturisticRobot({ className = "" }: { className?: string
                     <stop offset="100%" stopColor="#ff0000" stopOpacity="0" />
                 </linearGradient>
 
+                {/* Pride Gradient */}
+                <linearGradient id="rainbow-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#ff0000" />
+                    <stop offset="20%" stopColor="#ff8800" />
+                    <stop offset="40%" stopColor="#ffff00" />
+                    <stop offset="60%" stopColor="#00ff00" />
+                    <stop offset="80%" stopColor="#0000ff" />
+                    <stop offset="100%" stopColor="#8800ff" />
+                </linearGradient>
+
+                {/* Patterns */}
+                <pattern id="hex-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <path d="M10 0 L20 5 L20 15 L10 20 L0 15 L0 5 Z" fill="none" stroke="#000" strokeOpacity="0.3" strokeWidth="1" />
+                </pattern>
+
                 {/* Filters */}
                 <filter id="glow-filter" x="-50%" y="-50%" width="200%" height="200%">
                     <feGaussianBlur stdDeviation="3" result="coloredBlur" />
@@ -86,7 +101,7 @@ export default function FuturisticRobot({ className = "" }: { className?: string
             {/* Holographic Platform */}
             <g transform="translate(400, 1100) scale(1, 0.3)">
                 <ellipse cx="0" cy="0" rx="300" ry="100" fill="none" stroke="#00ffff" strokeWidth="2" opacity="0.5" />
-                <ellipse cx="0" cy="0" rx="200" ry="60" fill="none" stroke="#ff00cc" strokeWidth="2" opacity="0.3" className="animate-spin-slow" />
+                <ellipse cx="0" cy="0" rx="200" ry="60" fill="none" stroke="url(#rainbow-gradient)" strokeWidth="2" opacity="0.3" className="animate-spin-slow" />
                 <path d="M-300 0 L300 0 M0 -100 L0 100" stroke="#00ffff" strokeWidth="1" opacity="0.3" />
             </g>
 
@@ -100,18 +115,28 @@ export default function FuturisticRobot({ className = "" }: { className?: string
                 <g transform="translate(0, 0)">
                     {/* Right Leg */}
                     <path d="M330 750 L280 900 L300 950 L350 950 L370 900 L370 750 Z" fill="url(#metal-gradient)" stroke="#333" strokeWidth="2" />
+                    <path d="M330 750 L280 900 L300 950 L350 950 L370 900 L370 750 Z" fill="url(#hex-pattern)" opacity="0.3" /> {/* Texture */}
+                    <path d="M300 800 L350 800 M290 850 L360 850" stroke="#000" strokeWidth="1" opacity="0.5" /> {/* Panel Lines */}
+
                     <circle cx="325" cy="925" r="20" fill="#111" stroke="#00ffff" strokeWidth="2" />
+                    <circle cx="325" cy="925" r="10" fill="none" stroke="url(#rainbow-gradient)" strokeWidth="2" opacity="0.8" /> {/* Gay Knee Detail */}
+
                     <path d="M290 950 L270 1100 L360 1100 L380 950 Z" fill="url(#dark-metal)" stroke="#333" strokeWidth="2" />
+                    <path d="M300 980 L350 980 L340 1080 L310 1080 Z" fill="#222" stroke="#333" strokeWidth="1" /> {/* Shin Plate */}
                     <path d="M270 1100 L240 1150 L320 1150 L300 1100 Z" fill="#222" stroke="#00ffff" strokeWidth="1" />
-                    {/* Thruster Flame */}
                     <path d="M280 1150 L300 1200 L320 1150" fill="#00ffff" opacity="0.6" filter="url(#intense-glow)" className="animate-pulse" />
 
                     {/* Left Leg */}
                     <path d="M470 750 L520 900 L500 950 L450 950 L430 900 L430 750 Z" fill="url(#metal-gradient)" stroke="#333" strokeWidth="2" />
+                    <path d="M470 750 L520 900 L500 950 L450 950 L430 900 L430 750 Z" fill="url(#hex-pattern)" opacity="0.3" /> {/* Texture */}
+                    <path d="M500 800 L450 800 M510 850 L440 850" stroke="#000" strokeWidth="1" opacity="0.5" /> {/* Panel Lines */}
+
                     <circle cx="475" cy="925" r="20" fill="#111" stroke="#00ffff" strokeWidth="2" />
+                    <circle cx="475" cy="925" r="10" fill="none" stroke="url(#rainbow-gradient)" strokeWidth="2" opacity="0.8" /> {/* Gay Knee Detail */}
+
                     <path d="M510 950 L530 1100 L440 1100 L420 950 Z" fill="url(#dark-metal)" stroke="#333" strokeWidth="2" />
+                    <path d="M500 980 L450 980 L460 1080 L490 1080 Z" fill="#222" stroke="#333" strokeWidth="1" /> {/* Shin Plate */}
                     <path d="M530 1100 L560 1150 L480 1150 L500 1100 Z" fill="#222" stroke="#00ffff" strokeWidth="1" />
-                    {/* Thruster Flame */}
                     <path d="M500 1150 L520 1200 L540 1150" fill="#00ffff" opacity="0.6" filter="url(#intense-glow)" className="animate-pulse" />
                 </g>
 
@@ -121,13 +146,22 @@ export default function FuturisticRobot({ className = "" }: { className?: string
                     <path d="M360 620 L440 620 M365 650 L435 650 M370 680 L430 680" stroke="#333" strokeWidth="1" />
                     <path d="M300 450 L500 450 L460 600 L340 600 Z" fill="url(#metal-gradient)" stroke="#333" strokeWidth="2" />
 
+                    {/* Shoulder Rainbow Stripes */}
+                    <path d="M310 460 L330 460 L340 500 L320 500 Z" fill="url(#rainbow-gradient)" opacity="0.8" />
+                    <path d="M490 460 L470 460 L460 500 L480 500 Z" fill="url(#rainbow-gradient)" opacity="0.8" />
+
                     {/* Core Reactor */}
                     <circle cx="400" cy="520" r="30" fill="#111" stroke="#333" strokeWidth="2" />
-                    <circle cx="400" cy="520" r="20" fill="#00ffff" filter="url(#intense-glow)" className="animate-pulse" />
+                    <circle cx="400" cy="520" r="25" fill="none" stroke="url(#rainbow-gradient)" strokeWidth="3" className="animate-spin-slow" />
+                    <circle cx="400" cy="520" r="15" fill="#00ffff" filter="url(#intense-glow)" className="animate-pulse" />
                     <path d="M400 500 L400 540 M380 520 L420 520" stroke="#fff" strokeWidth="2" opacity="0.5" />
 
                     {/* Chest Details */}
                     <path d="M320 470 L350 550 M480 470 L450 550" stroke="#ff00cc" strokeWidth="2" filter="url(#glow-filter)" />
+
+                    {/* Cables */}
+                    <path d="M370 600 C350 650, 300 650, 280 650" fill="none" stroke="#222" strokeWidth="4" />
+                    <path d="M430 600 C450 650, 500 650, 520 650" fill="none" stroke="#222" strokeWidth="4" />
                 </g>
 
                 {/* --- ARMS --- */}
@@ -136,6 +170,8 @@ export default function FuturisticRobot({ className = "" }: { className?: string
                     <circle cx="280" cy="480" r="50" fill="url(#metal-gradient)" stroke="#333" strokeWidth="2" />
                     <circle cx="280" cy="480" r="30" fill="none" stroke="#00ffff" strokeWidth="2" strokeDasharray="10 5" className="animate-spin-slow" />
                     <path d="M250 510 L230 650 L280 650 L290 510 Z" fill="url(#dark-metal)" stroke="#333" strokeWidth="2" />
+                    <path d="M250 530 L290 530 M245 560 L285 560 M240 590 L280 590" stroke="#333" strokeWidth="1" opacity="0.5" /> {/* Detail Lines */}
+
                     <circle cx="255" cy="650" r="15" fill="#222" stroke="#ff00cc" strokeWidth="1" />
                     <path d="M240 660 L200 800 L260 800 L270 660 Z" fill="url(#metal-gradient)" stroke="#333" strokeWidth="2" />
                     <rect x="210" y="800" width="40" height="40" rx="5" fill="#111" stroke="#333" />
@@ -145,6 +181,8 @@ export default function FuturisticRobot({ className = "" }: { className?: string
                     <circle cx="520" cy="480" r="50" fill="url(#metal-gradient)" stroke="#333" strokeWidth="2" />
                     <circle cx="520" cy="480" r="30" fill="none" stroke="#00ffff" strokeWidth="2" strokeDasharray="10 5" className="animate-spin-slow" style={{ animationDirection: 'reverse' }} />
                     <path d="M550 510 L570 650 L520 650 L510 510 Z" fill="url(#dark-metal)" stroke="#333" strokeWidth="2" />
+                    <path d="M550 530 L510 530 M555 560 L515 560 M560 590 L520 590" stroke="#333" strokeWidth="1" opacity="0.5" /> {/* Detail Lines */}
+
                     <circle cx="545" cy="650" r="15" fill="#222" stroke="#ff00cc" strokeWidth="1" />
                     <path d="M560 660 L600 800 L540 800 L530 660 Z" fill="url(#metal-gradient)" stroke="#333" strokeWidth="2" />
                     <rect x="550" y="800" width="40" height="40" rx="5" fill="#111" stroke="#333" />
