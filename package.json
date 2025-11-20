@@ -18,18 +18,19 @@
     "testTimeout": 20000
   },
   "dependencies": {
+    "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.49.9",
     "@tsparticles/engine": "^3.8.1",
     "@tsparticles/react": "^3.0.0",
     "@tsparticles/slim": "^3.8.1",
     "clsx": "^2.1.1",
+    "framer-motion": "^11.0.0",
     "lucide-react": "^0.511.0",
     "next": "15.5.4",
     "openai": "^5.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "tailwind-merge": "^3.3.0",
-    "framer-motion": "^11.0.0"
+    "tailwind-merge": "^3.3.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -41,7 +42,7 @@
     "eslint-config-next": "15.5.4",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "vitest": "^3.2.4",
-    "vite": "^6.1.6"
+    "vite": "^6.1.6",
+    "vitest": "^3.2.4"
   }
 }
