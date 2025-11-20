@@ -370,65 +370,63 @@ export default function ChatWindow() {
     );
   }
   return (
-    // Slightly narrower max width on desktop to keep
-    // the text input and chat content from feeling too wide.
-    <div className="w-full max-w-2xl mx-auto px-4 py-4 space-y-4 font-mono">
-      <div className="space-y-4 max-h-80 overflow-y-auto w-full pr-2 custom-scrollbar">
+    <div className="w-full h-full flex flex-col space-y-4 font-mono text-sm">
+      <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-4">
         {messages.map((msg, i) => (
           <div
             key={i}
-            className={`p-3 rounded-lg max-w-[90%] break-words text-sm leading-relaxed shadow-md ${msg.role === "user"
-                ? "bg-primary/20 text-white ml-auto border border-primary/50 rounded-br-none"
-                : "bg-secondary/20 text-accent mr-auto border border-accent/50 rounded-bl-none"
+            className={`p-3 rounded-lg max-w-[85%] break-words leading-relaxed shadow-md border ${msg.role === "user"
+              ? "bg-primary/10 text-white ml-auto border-primary/50 rounded-br-none"
+              : "bg-black/60 text-accent mr-auto border-accent/50 rounded-bl-none"
               }`}
           >
-            <span className="block text-xs opacity-50 mb-1 font-orbitron tracking-wider">
-              {msg.role === "user" ? "USER_INPUT" : "AILEX_RESPONSE"}
+            <span className="block text-[10px] opacity-70 mb-1 font-orbitron tracking-wider uppercase text-gray-400">
+              {msg.role === "user" ? "> USER_INPUT" : "> AILEX_RESPONSE"}
             </span>
-            {msg.content}
+            <div className="whitespace-pre-wrap">{msg.content}</div>
           </div>
         ))}
         {isLoading && (
-          <div className="p-3 rounded-lg max-w-[90%] mr-auto bg-secondary/20 border border-accent/50 text-accent animate-pulse">
-            <span className="block text-xs opacity-50 mb-1 font-orbitron tracking-wider">SYSTEM</span>
+          <div className="p-3 rounded-lg max-w-[85%] mr-auto bg-black/60 border border-accent/50 text-accent animate-pulse">
+            <span className="block text-[10px] opacity-70 mb-1 font-orbitron tracking-wider uppercase text-gray-400">&gt; SYSTEM</span>
             Processing data stream...
           </div>
         )}
       </div>
 
       {showRsvpPrompt && (
-        <div className="flex gap-2 justify-center">
+        <div className="flex gap-2 justify-center shrink-0">
           <button
             onClick={() => handleRsvpResponse('yes')}
-            className="px-6 py-2 bg-primary/20 border border-primary text-primary hover:bg-primary hover:text-black transition-all duration-300 font-orbitron rounded-sm"
+            className="px-4 py-2 bg-primary/20 border border-primary text-primary hover:bg-primary hover:text-black transition-all duration-300 font-orbitron rounded-sm text-xs"
           >
-            CONFIRM_RSVP
+            CONFIRM
           </button>
           <button
             onClick={() => handleRsvpResponse('no')}
-            className="px-6 py-2 bg-white/5 border border-white/20 text-gray-400 hover:bg-white/10 hover:text-white transition-all duration-300 font-orbitron rounded-sm"
+            className="px-4 py-2 bg-white/5 border border-white/20 text-gray-400 hover:bg-white/10 hover:text-white transition-all duration-300 font-orbitron rounded-sm text-xs"
           >
             DECLINE
           </button>
         </div>
       )}
 
-      <div className="flex gap-2 items-center bg-black/40 p-2 rounded border border-white/10">
+      <div className="flex gap-2 items-center bg-black/60 p-2 rounded border border-white/10 shrink-0">
         <span className="text-accent font-bold pl-2">{'>'}</span>
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') sendMessage(); }}
           disabled={isLoading}
-          className="flex-1 p-2 bg-transparent border-none outline-none text-green-400 placeholder-green-400/30 font-mono"
+          className="flex-1 p-1 bg-transparent border-none outline-none text-green-400 placeholder-green-400/30 font-mono text-sm"
           placeholder="Enter command..."
         />
         <button
           onClick={sendMessage}
           disabled={isLoading}
-          className="px-4 py-2 bg-primary/20 border border-primary/50 text-primary hover:bg-primary hover:text-black transition-all duration-300 font-orbitron text-sm rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-3 py-1 bg-primary/20 border border-primary/50 text-primary hover:bg-primary hover:text-black transition-all duration-300 font-orbitron text-xs rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          EXECUTE
+          EXEC
         </button>
       </div>
     </div>
