@@ -61,7 +61,7 @@ export default function RootLayout({
           </div>
         </aside>
         <div className="flex flex-col flex-1 min-w-0">
-          <main className="flex-1 p-8 relative z-10">{children}</main>
+          <main className="flex-1 p-8 relative z-10 max-w-7xl mx-auto w-full">{children}</main>
         </div>
         <ChatModalProvider />
       </body>
