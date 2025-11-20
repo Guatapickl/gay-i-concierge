@@ -4,6 +4,7 @@ import Link from 'next/link';
 import AuthNav from '@/components/AuthNav';
 import BackgroundParticles from '@/components/BackgroundParticles';
 import ChatModalProvider from "@/components/ChatModalProvider";
+import MobileNav from '@/components/MobileNav';
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -21,6 +22,7 @@ export const metadata: Metadata = {
 export const viewport = {
   width: "device-width",
   initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({
@@ -32,7 +34,9 @@ export default function RootLayout({
     <html lang="en" className={`${inter.className} ${orbitron.variable}`}>
       <body className="flex min-h-screen antialiased relative bg-background text-foreground">
         <BackgroundParticles />
-        <aside className="w-64 glass border-r border-white/10 relative z-40 flex flex-col shadow-[0_0_15px_rgba(0,255,255,0.1)]">
+
+        {/* Desktop Sidebar */}
+        <aside className="hidden md:flex w-64 glass border-r border-white/10 relative z-40 flex-col shadow-[0_0_15px_rgba(0,255,255,0.1)]">
           <div className="h-20 flex items-center justify-center border-b border-white/10 relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent animate-pulse" />
             <Link href="/hub" className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent font-orbitron tracking-widest z-10 drop-shadow-[0_0_5px_rgba(255,0,204,0.5)]">
@@ -60,11 +64,16 @@ export default function RootLayout({
             <AuthNav />
           </div>
         </aside>
+
+        {/* Mobile Navigation */}
+        <MobileNav />
+
         <div className="flex flex-col flex-1 min-w-0">
-          <main className="flex-1 p-8 relative z-10 max-w-7xl mx-auto w-full">{children}</main>
+          <main className="flex-1 p-4 pt-20 md:p-8 relative z-10 max-w-7xl mx-auto w-full">{children}</main>
         </div>
         <ChatModalProvider />
       </body>
     </html>
   );
 }
+
