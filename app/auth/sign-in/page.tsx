@@ -65,7 +65,7 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="max-w-sm mx-auto">
+    <div className="w-full max-w-[350px] mx-auto bg-black/40 p-6 rounded-lg border border-white/10 shadow-[0_0_20px_rgba(255,0,204,0.1)] backdrop-blur-sm">
       <h2 className="text-2xl font-bold mb-4">Sign In</h2>
       <form onSubmit={signInWithPassword} className="space-y-3">
         <FormInput
