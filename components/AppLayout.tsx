@@ -32,7 +32,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                             <img
                                 src="/logo.png"
                                 alt="Gay-I Logo"
-                                className="w-10 h-10 drop-shadow-[0_0_8px_rgba(255,0,204,0.6)] group-hover:drop-shadow-[0_0_15px_rgba(255,0,204,0.9)] transition-all"
+                                className="w-12 h-12 group-hover:scale-110 transition-transform duration-300"
                             />
                             <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent font-orbitron tracking-widest drop-shadow-[0_0_5px_rgba(255,0,204,0.5)]">
                                 GAY-I

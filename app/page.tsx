@@ -2,11 +2,11 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
       <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center z-10">
-        <div className="mb-8 animate-pulse">
+        <div className="mb-8">
           <img
             src="/logo.png"
             alt="Gay-I Club Logo"
-            className="w-48 h-48 mx-auto drop-shadow-[0_0_20px_rgba(255,0,204,0.8)]"
+            className="w-64 h-64 mx-auto"
           />
         </div>
         <div className="relative">
