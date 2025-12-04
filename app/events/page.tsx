@@ -54,46 +54,46 @@ export default function EventsPage() {
       {events.length === 0 ? (
         <div className="text-sm text-gray-400 italic">No upcoming events.</div>
       ) : (
-      <ul className="space-y-4">
-        {events.map(event => (
-          <EventListItem
-            key={event.id}
-            event={event}
-            isRsvped={rsvpedEvents.has(event.id)}
-            isAdmin={isAdmin}
-            onRsvp={async () => {
-              if (!userId) {
-                setRsvpMessage('Please sign in before RSVPing.');
-                return;
-              }
-              const success = await saveRsvp(userId, event.id);
-              if (success) {
-                setRsvpMessage(`✅ You have RSVPed for "${event.title}"!`);
-                setRsvpedEvents(prev => new Set(prev).add(event.id));
-              } else {
-                setRsvpMessage('❌ Failed to RSVP. Please try again.');
-              }
-            }}
-            onCancelRsvp={async () => {
-              if (!userId) {
-                setRsvpMessage('Please sign in first.');
-                return;
-              }
-              const ok = await deleteRsvp(userId, event.id);
-              if (ok) {
-                setRsvpedEvents(prev => {
-                  const n = new Set(prev);
-                  n.delete(event.id);
-                  return n;
-                });
-                setRsvpMessage(`You canceled your RSVP for "${event.title}".`);
-              } else {
-                setRsvpMessage('Failed to cancel RSVP.');
-              }
-            }}
-          />
-        ))}
-      </ul>
+        <ul className="space-y-4">
+          {events.map(event => (
+            <EventListItem
+              key={event.id}
+              event={event}
+              isRsvped={rsvpedEvents.has(event.id)}
+              isAdmin={isAdmin}
+              onRsvp={async () => {
+                if (!userId) {
+                  setRsvpMessage('Please sign in before RSVPing.');
+                  return;
+                }
+                const success = await saveRsvp(userId, event.id);
+                if (success) {
+                  setRsvpMessage(`✅ You have RSVPed for "${event.title}"!`);
+                  setRsvpedEvents(prev => new Set(prev).add(event.id));
+                } else {
+                  setRsvpMessage('❌ Failed to RSVP. Please try again.');
+                }
+              }}
+              onCancelRsvp={async () => {
+                if (!userId) {
+                  setRsvpMessage('Please sign in first.');
+                  return;
+                }
+                const ok = await deleteRsvp(userId, event.id);
+                if (ok) {
+                  setRsvpedEvents(prev => {
+                    const n = new Set(prev);
+                    n.delete(event.id);
+                    return n;
+                  });
+                  setRsvpMessage(`You canceled your RSVP for "${event.title}".`);
+                } else {
+                  setRsvpMessage('Failed to cancel RSVP.');
+                }
+              }}
+            />
+          ))}
+        </ul>
       )}
       {rsvpMessage && (
         <Alert
@@ -103,6 +103,19 @@ export default function EventsPage() {
           {rsvpMessage}
         </Alert>
       )}
+
+      {/* Debug Info */}
+      <div className="mt-8 p-4 bg-gray-900 rounded border border-gray-700 text-xs font-mono text-gray-400">
+        <p className="font-bold text-gray-300 mb-2">Debug Info (Temporary)</p>
+        <p>User ID: {userId || 'Not logged in'}</p>
+        <p>Is Admin: {isAdmin ? 'YES' : 'NO'}</p>
+        <p>
+          To fix admin status, run this SQL:<br />
+          <code className="block mt-1 p-2 bg-black rounded select-all">
+            INSERT INTO app_admins (user_id) VALUES ('{userId || 'YOUR_USER_ID'}');
+          </code>
+        </p>
+      </div>
     </div>
   );
 }
