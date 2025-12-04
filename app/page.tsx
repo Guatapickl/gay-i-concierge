@@ -2,6 +2,13 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
       <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center z-10">
+        <div className="mb-8 animate-pulse">
+          <img
+            src="/logo.png"
+            alt="Gay-I Club Logo"
+            className="w-48 h-48 mx-auto drop-shadow-[0_0_20px_rgba(255,0,204,0.8)]"
+          />
+        </div>
         <div className="relative">
           <h1 className="text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-purple-500 to-accent font-orbitron tracking-tighter drop-shadow-[0_0_10px_rgba(255,0,204,0.8)] animate-pulse">
             WELCOME TO THE <br />

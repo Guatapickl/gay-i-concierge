@@ -28,8 +28,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <aside className="hidden md:flex w-64 glass border-r border-white/10 relative z-40 flex-col shadow-[0_0_15px_rgba(0,255,255,0.1)] animate-fade-in">
                     <div className="h-20 flex items-center justify-between px-4 border-b border-white/10 relative overflow-hidden">
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent animate-pulse pointer-events-none" />
-                        <Link href="/hub" className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent font-orbitron tracking-widest z-10 drop-shadow-[0_0_5px_rgba(255,0,204,0.5)]">
-                            GAY-I
+                        <Link href="/hub" className="flex items-center gap-2 z-10 group">
+                            <img
+                                src="/logo.png"
+                                alt="Gay-I Logo"
+                                className="w-10 h-10 drop-shadow-[0_0_8px_rgba(255,0,204,0.6)] group-hover:drop-shadow-[0_0_15px_rgba(255,0,204,0.9)] transition-all"
+                            />
+                            <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent font-orbitron tracking-widest drop-shadow-[0_0_5px_rgba(255,0,204,0.5)]">
+                                GAY-I
+                            </span>
                         </Link>
                         <button
                             onClick={() => setIsSidebarOpen(false)}
