@@ -1,10 +1,5 @@
 import type { Metadata } from "next";
 import { Inter, Orbitron } from "next/font/google";
-import Link from 'next/link';
-import AuthNav from '@/components/AuthNav';
-import BackgroundParticles from '@/components/BackgroundParticles';
-import ChatModalProvider from "@/components/ChatModalProvider";
-import MobileNav from '@/components/MobileNav';
 import AppLayout from '@/components/AppLayout';
 import "./globals.css";
 

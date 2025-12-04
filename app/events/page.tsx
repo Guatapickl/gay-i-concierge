@@ -112,7 +112,7 @@ export default function EventsPage() {
         <p>
           To fix admin status, run this SQL:<br />
           <code className="block mt-1 p-2 bg-black rounded select-all">
-            INSERT INTO app_admins (user_id) VALUES ('{userId || 'YOUR_USER_ID'}');
+            INSERT INTO app_admins (user_id) VALUES (&apos;{userId || 'YOUR_USER_ID'}&apos;);
           </code>
         </p>
       </div>
