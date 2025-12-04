@@ -104,18 +104,7 @@ export default function EventsPage() {
         </Alert>
       )}
 
-      {/* Debug Info */}
-      <div className="mt-8 p-4 bg-gray-900 rounded border border-gray-700 text-xs font-mono text-gray-400">
-        <p className="font-bold text-gray-300 mb-2">Debug Info (Temporary)</p>
-        <p>User ID: {userId || 'Not logged in'}</p>
-        <p>Is Admin: {isAdmin ? 'YES' : 'NO'}</p>
-        <p>
-          To fix admin status, run this SQL:<br />
-          <code className="block mt-1 p-2 bg-black rounded select-all">
-            INSERT INTO app_admins (user_id) VALUES (&apos;{userId || 'YOUR_USER_ID'}&apos;);
-          </code>
-        </p>
-      </div>
+
     </div>
   );
 }
