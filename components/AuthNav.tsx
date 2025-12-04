@@ -39,9 +39,9 @@ export default function AuthNav() {
   }
 
   return (
-    <div className="flex gap-3">
-      <Link href="/profile" className={btnBase()}>PROFILE</Link>
-      <button onClick={signOut} className={btnBase('text-rose-300 border-rose-400/50 hover:border-rose-400/80')}>LOG OUT</button>
+    <div className="flex flex-col gap-2">
+      <Link href="/profile" className={btnBase('py-2 px-4 text-xs min-w-full')}>PROFILE</Link>
+      <button onClick={signOut} className={btnBase('py-2 px-4 text-xs min-w-full text-rose-300 border-rose-400/50 hover:border-rose-400/80')}>LOG OUT</button>
     </div>
   );
 }

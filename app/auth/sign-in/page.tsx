@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Button, FormInput, Alert } from '@/components/ui';
 
 export default function SignInPage() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -40,7 +42,10 @@ export default function SignInPage() {
         password,
       });
       if (error) setMessage(error.message);
-      else setMessage('Signed in!');
+      else {
+        setMessage('Signed in!');
+        router.push('/hub');
+      }
     } catch {
       setMessage('Failed to sign in.');
     } finally {
