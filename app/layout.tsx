@@ -11,22 +11,22 @@ const orbitron = Orbitron({
 });
 
 export const metadata: Metadata = {
-  title: "Gay-I Club Concierge",
-  description: "Gay-I Club Concierge App",
+  title: "The Gay I Club Hub",
+  description: "Official Hub for The Gay-I Club",
   icons: {
     icon: '/logo.png',
     shortcut: '/logo.png',
     apple: '/logo.png',
   },
   openGraph: {
-    title: "Gay-I Club Concierge",
-    description: "Gay-I Club Concierge App",
-    siteName: "Gay-I Club Concierge",
+    title: "The Gay I Club Hub",
+    description: "Official Hub for The Gay-I Club",
+    siteName: "The Gay I Club Hub",
     images: [{
       url: '/logo.png',
       width: 1200,
       height: 630,
-      alt: 'Gay-I Club Concierge',
+      alt: 'The Gay I Club Hub',
     }],
     locale: 'en_US',
     type: 'website',
