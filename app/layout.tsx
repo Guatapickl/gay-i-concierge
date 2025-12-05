@@ -13,6 +13,24 @@ const orbitron = Orbitron({
 export const metadata: Metadata = {
   title: "Gay-I Club Concierge",
   description: "Gay-I Club Concierge App",
+  icons: {
+    icon: '/logo.png',
+    shortcut: '/logo.png',
+    apple: '/logo.png',
+  },
+  openGraph: {
+    title: "Gay-I Club Concierge",
+    description: "Gay-I Club Concierge App",
+    siteName: "Gay-I Club Concierge",
+    images: [{
+      url: '/logo.png',
+      width: 1200,
+      height: 630,
+      alt: 'Gay-I Club Concierge',
+    }],
+    locale: 'en_US',
+    type: 'website',
+  },
 };
 
 export const viewport = {
