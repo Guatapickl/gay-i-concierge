@@ -33,13 +33,6 @@ export default function Hub() {
       icon: BookOpen,
       gradient: 'from-accent to-blue-500',
     },
-    {
-      href: '/community',
-      title: 'COMMUNITY',
-      description: 'Connect with other members',
-      icon: Users,
-      gradient: 'from-purple-500 to-pink-500',
-    },
   ];
 
   return (

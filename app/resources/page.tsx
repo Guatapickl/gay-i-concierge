@@ -82,25 +82,66 @@ export default function ResourcesPage() {
       ) : (
         <ul className="space-y-4">
           {filtered.map(r => (
-            <li key={r.id} className="border rounded p-4 bg-gray-900/40">
-              <div className="flex items-start gap-3">
-                <div className="flex-1">
-                  <a href={r.url} target="_blank" rel="noopener noreferrer" className="text-lg font-semibold underline">
-                    {r.title}
-                  </a>
-                  {r.category && (
-                    <div className="mt-1 text-xs text-gray-400">Category: {r.category}</div>
-                  )}
-                  {r.tags && r.tags.length > 0 && (
-                    <div className="mt-1 text-xs text-gray-400">Tags: {r.tags.join(', ')}</div>
-                  )}
-                  {r.description && (
-                    <p className="mt-2 text-sm whitespace-pre-line">{r.description}</p>
+            <li key={r.id} className="glass-card p-6 rounded-xl border border-white/10 hover:border-primary/30 transition-all duration-300 group hover:shadow-[0_0_30px_rgba(255,0,204,0.2)] relative overflow-hidden">
+              {/* Animated background glow on hover */}
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+              <div className="relative z-10">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-bold font-orbitron mb-3 group-hover:text-primary transition-colors">
+                      <a
+                        href={r.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-accent transition-colors inline-block"
+                      >
+                        {r.title}
+                      </a>
+                    </h3>
+
+                    <div className="space-y-2 mb-4 text-gray-300">
+                      {r.category && (
+                        <p className="flex items-center gap-2">
+                          <span className="text-accent font-orbitron text-sm">CATEGORY:</span>
+                          <span className="text-white">{r.category}</span>
+                        </p>
+                      )}
+                      {r.tags && r.tags.length > 0 && (
+                        <p className="flex items-center gap-2">
+                          <span className="text-accent font-orbitron text-sm">TAGS:</span>
+                          <span className="text-white text-sm opacity-80">{r.tags.join(', ')}</span>
+                        </p>
+                      )}
+                    </div>
+
+                    {r.description && (
+                      <p className="text-gray-400 mb-4 leading-relaxed whitespace-pre-line">
+                        {r.description}
+                      </p>
+                    )}
+                  </div>
+
+                  {(isAdmin || r.owner_user_id === userId) && (
+                    <Link
+                      href={`/resources/${r.id}/edit`}
+                      className="text-sm text-primary hover:text-accent underline font-orbitron tracking-wide transition-colors shrink-0"
+                    >
+                      EDIT
+                    </Link>
                   )}
                 </div>
-                {(isAdmin || r.owner_user_id === userId) && (
-                  <Link href={`/resources/${r.id}/edit`} className="text-sm text-blue-400 underline ml-auto">Edit</Link>
-                )}
+
+                <div className="mt-4 pt-4 border-t border-white/10 flex justify-end">
+                  <a
+                    href={r.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center px-6 py-2 text-sm font-bold uppercase tracking-wider text-center bg-primary/20 hover:bg-primary/30 text-primary border border-primary/50 rounded transition-all duration-300"
+                  >
+                    Visit Resource
+                  </a>
+                </div>
               </div>
             </li>
           ))}

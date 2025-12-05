@@ -15,7 +15,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         { href: '/hub', label: 'HUB', icon: Home },
         { href: '/events', label: 'EVENTS', icon: Calendar },
         { href: '/resources', label: 'RESOURCES', icon: BookOpen },
-        { href: '/community', label: 'COMMUNITY', icon: Users },
         { href: '/profile', label: 'PROFILE', icon: User },
     ];
 
