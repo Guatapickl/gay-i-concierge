@@ -13,24 +13,7 @@ const orbitron = Orbitron({
 export const metadata: Metadata = {
   title: "The Gay I Club Hub",
   description: "Official Hub for The Gay-I Club",
-  icons: {
-    icon: '/logo.png',
-    shortcut: '/logo.png',
-    apple: '/logo.png',
-  },
-  openGraph: {
-    title: "The Gay I Club Hub",
-    description: "Official Hub for The Gay-I Club",
-    siteName: "The Gay I Club Hub",
-    images: [{
-      url: '/logo.png',
-      width: 1200,
-      height: 630,
-      alt: 'The Gay I Club Hub',
-    }],
-    locale: 'en_US',
-    type: 'website',
-  },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://gayiclub.com'),
 };
 
 export const viewport = {
