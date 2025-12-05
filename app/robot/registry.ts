@@ -1,5 +1,6 @@
 import Gemini3Robot from '@/components/robots/Gemini3Robot';
 import Gpt51CodexMaxRobot from '@/components/robots/Gpt51CodexMaxRobot';
+import Opus45Robot from '@/components/robots/Opus45Robot';
 import React from 'react';
 
 export interface RobotEntry {
@@ -21,5 +22,11 @@ export const robots: RobotEntry[] = [
         name: 'Prismatic Pulse',
         model: 'GPT-5.1 Codex Max',
         component: Gpt51CodexMaxRobot,
+    },
+    {
+        id: 'claude-opus-4-5',
+        name: 'Coral Opus',
+        model: 'Claude Opus 4.5',
+        component: Opus45Robot,
     },
 ];
