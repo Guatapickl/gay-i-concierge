@@ -53,21 +53,7 @@ export default function SignInPage() {
     }
   };
 
-  const signInWithGoogle = async () => {
-    setLoading(true);
-    setMessage(null);
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined,
-        },
-      });
-      if (error) setMessage(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+
 
   return (
     <div className="w-full max-w-[350px] mx-auto bg-black/40 p-6 rounded-lg border border-white/10 shadow-[0_0_20px_rgba(255,0,204,0.1)] backdrop-blur-sm">
@@ -100,9 +86,7 @@ export default function SignInPage() {
           {loading ? 'Sending…' : 'Send Magic Link'}
         </Button>
       </form>
-      <Button onClick={signInWithGoogle} disabled={loading} variant="ghost" fullWidth>
-        Continue with Google
-      </Button>
+
       <div className="mt-4 text-sm text-gray-500 text-center">
         New here? <a href="/auth/sign-up" className="underline">Create an account</a>
       </div>

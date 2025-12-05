@@ -55,7 +55,7 @@ export default function Hub() {
             </h1>
           </div>
           <p className="text-xl text-gray-300 font-space max-w-3xl">
-            Your command center for the <span className="text-accent">GAY-I</span> community.
+            Your command center for the <span className="text-accent">GAY-I CLUB</span> community.
             Stay connected, discover events, and access resources all in one place.
           </p>
         </div>
