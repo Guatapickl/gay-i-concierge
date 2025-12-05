@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Calendar, BookOpen, Users, Zap } from 'lucide-react';
+import { Calendar, BookOpen, Users, Zap, Bot } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import MyRsvps from '@/components/MyRsvps';
 
@@ -32,6 +32,13 @@ export default function Hub() {
       description: 'Access community resources and guides',
       icon: BookOpen,
       gradient: 'from-accent to-blue-500',
+    },
+    {
+      href: '/robot',
+      title: 'ROBOTS!',
+      description: 'Explore the AI Robot Showcase',
+      icon: Bot,
+      gradient: 'from-cyan-400 to-blue-600',
     },
   ];
 
