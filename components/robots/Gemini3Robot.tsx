@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 
-export default function FuturisticRobot({ className = "" }: { className?: string }) {
+export default function Gemini3Robot({ className = "" }: { className?: string }) {
     const svgRef = useRef<SVGSVGElement>(null);
     const [eyePos, setEyePos] = useState({ x: 0, y: 0 });
 
