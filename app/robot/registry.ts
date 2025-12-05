@@ -1,4 +1,5 @@
 import Gemini3Robot from '@/components/robots/Gemini3Robot';
+import Gpt51CodexMaxRobot from '@/components/robots/Gpt51CodexMaxRobot';
 import React from 'react';
 
 export interface RobotEntry {
@@ -14,5 +15,11 @@ export const robots: RobotEntry[] = [
         name: 'GAY-I UNIT 01',
         model: 'Gemini 3',
         component: Gemini3Robot,
+    },
+    {
+        id: 'gpt-51-codex-max',
+        name: 'Prismatic Pulse',
+        model: 'GPT-5.1 Codex Max',
+        component: Gpt51CodexMaxRobot,
     },
 ];
