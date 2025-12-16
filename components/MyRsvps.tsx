@@ -25,7 +25,12 @@ export default function MyRsvps() {
       }
       const ids = await getRsvpedEventIds(uid);
       const data = await getEventsByIds(ids);
-      setEvents(data);
+      // Filter to only show future events
+      const now = new Date();
+      const futureEvents = data
+        .filter(event => new Date(event.event_datetime) >= now)
+        .sort((a, b) => new Date(a.event_datetime).getTime() - new Date(b.event_datetime).getTime());
+      setEvents(futureEvents);
       setLoading(false);
     })();
   }, []);
