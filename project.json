@@ -1,0 +1,21 @@
+{
+    "name": "My Awesome Project",
+    "type": "web-app",
+    "description": "A full-stack application for tracking daily habits",
+    "created": "2025-12-16",
+    "vibe": "immaculate",
+    "features": [
+        "User authentication",
+        "Real-time sync",
+        "Mobile-friendly UI"
+    ],
+    "stack": {
+        "backend": "Python/FastAPI",
+        "frontend": "React",
+        "database": "PostgreSQL"
+    },
+    "urls": {
+        "production": "https://example.com",
+        "repo": "https://github.com/user/repo"
+    }
+}
