@@ -1,21 +1,27 @@
 {
-    "name": "My Awesome Project",
+    "name": "Gay-I Club Concierge",
     "type": "web-app",
-    "description": "A full-stack application for tracking daily habits",
+    "description": "AI-powered community concierge platform for the Gay-I Club. Features event management, RSVPs, community resources, member profiles, and an AI chatbot assistant.",
     "created": "2025-12-16",
-    "vibe": "immaculate",
+    "vibe": "cyberpunk-futuristic",
     "features": [
-        "User authentication",
-        "Real-time sync",
-        "Mobile-friendly UI"
+        "User authentication (Email, Magic Link, Google OAuth)",
+        "Event management with RSVP system",
+        "Community resource library",
+        "Member profiles and interests",
+        "AI-powered chat assistant",
+        "Calendar integration (iCal, Google Calendar)",
+        "Event alerts and notifications"
     ],
     "stack": {
-        "backend": "Python/FastAPI",
-        "frontend": "React",
-        "database": "PostgreSQL"
+        "backend": "Next.js 16 (App Router)",
+        "frontend": "React 19 + TypeScript",
+        "database": "Supabase (PostgreSQL)",
+        "styling": "Tailwind CSS",
+        "ai": "OpenAI"
     },
     "urls": {
-        "production": "https://example.com",
-        "repo": "https://github.com/user/repo"
+        "production": "https://gayiclub.com",
+        "repo": "https://github.com/Guatapickl/gay-i-concierge"
     }
 }
