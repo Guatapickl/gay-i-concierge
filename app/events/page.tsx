@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { Plus } from 'lucide-react';
 import { getUpcomingEvents } from '@/lib/events';
 import { saveRsvp, deleteRsvp, getRsvpedEventIds } from '@/lib/rsvp';
 import { supabase } from '@/lib/supabase';
@@ -28,7 +29,6 @@ export default function EventsPage() {
       if (uid) {
         const ids = await getRsvpedEventIds(uid);
         setRsvpedEvents(new Set(ids));
-        // Minimal admin check: exists in app_admins
         const { count } = await supabase
           .from('app_admins')
           .select('user_id', { count: 'exact', head: true })
@@ -38,21 +38,44 @@ export default function EventsPage() {
     })();
   }, []);
 
-  if (loading) return <LoadingSpinner text="Loading events..." className="mt-8" />;
-  // Always render the page shell so the Add button is visible even when empty
+  if (loading) {
+    return (
+      <div className="animate-fade-in">
+        <LoadingSpinner text="Loading events..." className="py-12" />
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold mb-4">Upcoming Events</h2>
+    <div className="space-y-6 animate-fade-in">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-display-md font-display font-bold text-foreground">
+            Events
+          </h1>
+          <p className="text-foreground-muted mt-1">
+            Upcoming gatherings and meetups
+          </p>
+        </div>
         {isAdmin && (
           <Link href="/events/new">
-            <Button variant="success" size="md">+ Add New Event</Button>
+            <Button variant="primary" size="md">
+              <Plus className="w-4 h-4" />
+              New Event
+            </Button>
           </Link>
         )}
       </div>
+
+      {/* Events List */}
       {events.length === 0 ? (
-        <div className="text-sm text-gray-400 italic">No upcoming events.</div>
+        <div className="card p-12 text-center">
+          <p className="text-foreground-muted">No upcoming events</p>
+          <p className="text-sm text-foreground-subtle mt-1">
+            Check back soon for new events
+          </p>
+        </div>
       ) : (
         <ul className="space-y-4">
           {events.map(event => (
@@ -63,20 +86,20 @@ export default function EventsPage() {
               isAdmin={isAdmin}
               onRsvp={async () => {
                 if (!userId) {
-                  setRsvpMessage('Please sign in before RSVPing.');
+                  setRsvpMessage('Please sign in to RSVP');
                   return;
                 }
                 const success = await saveRsvp(userId, event.id);
                 if (success) {
-                  setRsvpMessage(`✅ You have RSVPed for "${event.title}"!`);
+                  setRsvpMessage(`RSVPed for "${event.title}"`);
                   setRsvpedEvents(prev => new Set(prev).add(event.id));
                 } else {
-                  setRsvpMessage('❌ Failed to RSVP. Please try again.');
+                  setRsvpMessage('Failed to RSVP. Please try again.');
                 }
               }}
               onCancelRsvp={async () => {
                 if (!userId) {
-                  setRsvpMessage('Please sign in first.');
+                  setRsvpMessage('Please sign in first');
                   return;
                 }
                 const ok = await deleteRsvp(userId, event.id);
@@ -86,25 +109,25 @@ export default function EventsPage() {
                     n.delete(event.id);
                     return n;
                   });
-                  setRsvpMessage(`You canceled your RSVP for "${event.title}".`);
+                  setRsvpMessage(`Canceled RSVP for "${event.title}"`);
                 } else {
-                  setRsvpMessage('Failed to cancel RSVP.');
+                  setRsvpMessage('Failed to cancel RSVP');
                 }
               }}
             />
           ))}
         </ul>
       )}
+
+      {/* Messages */}
       {rsvpMessage && (
         <Alert
-          variant={rsvpMessage.includes('✅') ? 'success' : rsvpMessage.includes('❌') || rsvpMessage.includes('Failed') || rsvpMessage.includes('canceled') ? 'error' : 'info'}
+          variant={rsvpMessage.includes('RSVPed') ? 'success' : rsvpMessage.includes('Failed') || rsvpMessage.includes('Canceled') ? 'error' : 'info'}
           onClose={() => setRsvpMessage(null)}
         >
           {rsvpMessage}
         </Alert>
       )}
-
-
     </div>
   );
 }

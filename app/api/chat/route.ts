@@ -48,7 +48,7 @@ export async function POST(req: Request) {
     const upcoming = await getUpcomingEvents();
     const top = upcoming.slice(0, 5).map(e => `- ${e.title} — ${new Date(e.event_datetime).toLocaleString()}${e.location ? ` @ ${e.location}` : ''}`);
     if (top.length) {
-      systemPrefix = `You are the Gay-I Club concierge. When helpful, recommend relevant upcoming events based on the user's interests. Upcoming events (top ${top.length}):\n${top.join('\n')}`;
+      systemPrefix = `You are the Gay I Club concierge. When helpful, recommend relevant upcoming events based on the user's interests. Upcoming events (top ${top.length}):\n${top.join('\n')}`;
     }
   } catch {
     // ignore failures to load events

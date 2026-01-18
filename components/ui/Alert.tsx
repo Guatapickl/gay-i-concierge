@@ -1,4 +1,5 @@
 import React from 'react';
+import { X, CheckCircle, XCircle, AlertTriangle, Info } from 'lucide-react';
 
 export type AlertVariant = 'success' | 'error' | 'warning' | 'info';
 
@@ -11,33 +12,36 @@ interface AlertProps {
 
 const Alert: React.FC<AlertProps> = ({ variant, children, className = '', onClose }) => {
   const variantClasses: Record<AlertVariant, string> = {
-    success: 'bg-green-100 dark:bg-green-900/30 border-green-500 text-green-800 dark:text-green-200',
-    error: 'bg-red-100 dark:bg-red-900/30 border-red-500 text-red-800 dark:text-red-200',
-    warning: 'bg-yellow-100 dark:bg-yellow-900/30 border-yellow-500 text-yellow-800 dark:text-yellow-200',
-    info: 'bg-blue-100 dark:bg-blue-900/30 border-blue-500 text-blue-800 dark:text-blue-200',
+    success: 'bg-success/10 border-success/30 text-success',
+    error: 'bg-danger/10 border-danger/30 text-danger',
+    warning: 'bg-warning/10 border-warning/30 text-warning',
+    info: 'bg-primary/10 border-primary/30 text-primary',
   };
 
-  const icons: Record<AlertVariant, string> = {
-    success: '✓',
-    error: '✕',
-    warning: '⚠',
-    info: 'ℹ',
+  const icons: Record<AlertVariant, React.ReactNode> = {
+    success: <CheckCircle className="w-4 h-4" />,
+    error: <XCircle className="w-4 h-4" />,
+    warning: <AlertTriangle className="w-4 h-4" />,
+    info: <Info className="w-4 h-4" />,
   };
 
   return (
-    <div className={`border-l-4 p-4 rounded ${variantClasses[variant]} ${className}`} role="alert">
-      <div className="flex items-start justify-between">
+    <div
+      className={`border rounded-lg p-4 ${variantClasses[variant]} ${className}`}
+      role="alert"
+    >
+      <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3">
-          <span className="font-bold text-lg" aria-hidden="true">{icons[variant]}</span>
-          <div className="flex-1">{children}</div>
+          <span className="shrink-0 mt-0.5">{icons[variant]}</span>
+          <div className="text-sm">{children}</div>
         </div>
         {onClose && (
           <button
             onClick={onClose}
-            className="ml-4 text-current opacity-70 hover:opacity-100 transition-opacity"
+            className="shrink-0 opacity-70 hover:opacity-100 transition-opacity"
             aria-label="Close alert"
           >
-            ✕
+            <X className="w-4 h-4" />
           </button>
         )}
       </div>

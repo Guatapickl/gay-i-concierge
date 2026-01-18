@@ -23,7 +23,7 @@ export function buildICS(event: Event) {
   const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Gay-I Club//Concierge//EN',
+    'PRODID:-//Gay I Club//Concierge//EN',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     'BEGIN:VEVENT',

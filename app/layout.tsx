@@ -1,18 +1,25 @@
 import type { Metadata } from "next";
-import { Inter, Orbitron } from "next/font/google";
+import { Outfit, DM_Sans } from "next/font/google";
 import AppLayout from '@/components/AppLayout';
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const orbitron = Orbitron({
+const outfit = Outfit({
   subsets: ["latin"],
-  weight: ["400", "700"],
-  variable: "--font-orbitron",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-outfit",
+  display: "swap",
+});
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-dm-sans",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "The Gay I Club Hub",
-  description: "Official Hub for The Gay-I Club",
+  title: "Gay I Club",
+  description: "Your AI-powered community hub",
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://gayiclub.com'),
 };
 
@@ -28,8 +35,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.className} ${orbitron.variable}`}>
-      <body className="min-h-screen antialiased bg-background text-foreground">
+    <html lang="en" className={`${outfit.variable} ${dmSans.variable}`}>
+      <body className="min-h-screen antialiased bg-background text-foreground font-body">
         <AppLayout>{children}</AppLayout>
       </body>
     </html>

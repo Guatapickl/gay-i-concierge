@@ -25,7 +25,6 @@ export default function MyRsvps() {
       }
       const ids = await getRsvpedEventIds(uid);
       const data = await getEventsByIds(ids);
-      // Filter to only show future events
       const now = new Date();
       const futureEvents = data
         .filter(event => new Date(event.event_datetime) >= now)
@@ -37,26 +36,30 @@ export default function MyRsvps() {
 
   if (!userId) {
     return (
-      <Alert variant="info">
-        Please sign in to view your RSVPs.
-      </Alert>
+      <div className="text-center py-8">
+        <p className="text-foreground-muted">Sign in to view your RSVPs</p>
+      </div>
     );
   }
-  if (loading) return <LoadingSpinner text="Loading your RSVPs..." className="mt-8" />;
+
+  if (loading) {
+    return <LoadingSpinner text="Loading your RSVPs..." className="py-8" />;
+  }
+
   if (!events.length) {
     return (
-      <div className="text-sm text-gray-400 italic">
-        You have no RSVPs yet.
+      <div className="text-center py-8">
+        <p className="text-foreground-muted">No upcoming events</p>
+        <p className="text-sm text-foreground-subtle mt-1">
+          Browse events to find something interesting
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">My RSVPs</h2>
-      </div>
-      <ul className="space-y-4">
+    <div className="space-y-4">
+      <ul className="space-y-3">
         {events.map((event) => (
           <EventListItem
             key={event.id}
@@ -68,9 +71,9 @@ export default function MyRsvps() {
               const ok = await deleteRsvp(userId, event.id);
               if (ok) {
                 setEvents(prev => prev.filter(e => e.id !== event.id));
-                setMessage(`Canceled RSVP for "${event.title}".`);
+                setMessage(`Canceled RSVP for "${event.title}"`);
               } else {
-                setMessage('Failed to cancel RSVP.');
+                setMessage('Failed to cancel RSVP');
               }
             }}
           />

@@ -1,57 +1,92 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { ArrowRight, Sparkles } from "lucide-react";
+import Link from "next/link";
+
 export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2">
-      <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center z-10">
-        <div className="mb-8">
+    <div className="flex flex-col items-center justify-center min-h-screen py-12 px-6">
+      <main className="flex flex-col items-center justify-center w-full max-w-4xl mx-auto text-center">
+        {/* Logo */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="mb-10"
+        >
           <img
             src="/logo.png"
-            alt="Gay-I Club Logo"
-            className="w-64 h-64 mx-auto"
+            alt="Gay I Club Logo"
+            className="w-40 h-40 mx-auto"
           />
-        </div>
-        <div className="relative">
-          <h1 className="text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-purple-500 to-accent font-orbitron tracking-tighter drop-shadow-[0_0_10px_rgba(255,0,204,0.8)] animate-pulse">
-            WELCOME TO THE <br />
-            <span className="text-8xl">GAY-I CLUB</span>
+        </motion.div>
+
+        {/* Headline */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
+          className="space-y-4 mb-8"
+        >
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <span className="badge badge-primary">
+              <Sparkles className="w-3 h-3 mr-1.5" />
+              AI-Powered
+            </span>
+          </div>
+          <h1 className="text-display-xl md:text-[5rem] font-display font-bold text-foreground tracking-tight">
+            Welcome to the
+            <br />
+            <span className="gradient-text">Gay I Club</span>
           </h1>
-          <div className="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-lg blur opacity-20 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
-        </div>
+        </motion.div>
 
-        <p className="mt-6 text-2xl text-gray-300 font-space tracking-wide max-w-2xl">
-          Your <span className="text-accent">AI-powered</span> club concierge.
-          <br />
-          Experience the future of community.
-        </p>
+        {/* Tagline */}
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+          className="text-xl md:text-2xl text-foreground-muted font-body max-w-2xl mb-12 leading-relaxed"
+        >
+          Your community concierge for events, resources, and connections.
+          <br className="hidden md:block" />
+          Built for the curious minds of NYC.
+        </motion.p>
 
-        <div className="flex flex-wrap items-center justify-center gap-8 mt-12 sm:w-full">
-          <a
+        {/* CTA Buttons */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
+          className="flex flex-col sm:flex-row items-center gap-4 w-full max-w-md"
+        >
+          <Link
             href="/auth/sign-in"
-            className="group relative w-96 p-8 text-left rounded-xl overflow-hidden transition-all duration-300 hover:scale-105"
+            className="group relative w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-primary text-background font-display font-semibold rounded-xl transition-all duration-200 hover:bg-primary-muted hover:shadow-medium"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md border border-white/10 group-hover:border-primary/50 transition-colors duration-300"></div>
-            <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"></div>
-            <div className="relative z-10">
-              <h3 className="text-3xl font-bold font-orbitron text-white group-hover:text-primary transition-colors">Sign In &rarr;</h3>
-              <p className="mt-4 text-xl text-gray-300 group-hover:text-white transition-colors">
-                Already a member? Jack in to access your account.
-              </p>
-            </div>
-          </a>
-
-          <a
+            Sign In
+            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+          </Link>
+          <Link
             href="/auth/sign-up"
-            className="group relative w-96 p-8 text-left rounded-xl overflow-hidden transition-all duration-300 hover:scale-105"
+            className="group w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-surface border border-border text-foreground font-display font-semibold rounded-xl transition-all duration-200 hover:bg-surface-elevated hover:border-primary/30"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md border border-white/10 group-hover:border-accent/50 transition-colors duration-300"></div>
-            <div className="absolute inset-0 bg-accent/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"></div>
-            <div className="relative z-10">
-              <h3 className="text-3xl font-bold font-orbitron text-white group-hover:text-accent transition-colors">Sign Up &rarr;</h3>
-              <p className="mt-4 text-xl text-gray-300 group-hover:text-white transition-colors">
-                Not a member yet? Initialize your profile sequence.
-              </p>
-            </div>
-          </a>
-        </div>
+            Create Account
+          </Link>
+        </motion.div>
+
+        {/* Decorative Element */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 0.5 }}
+          className="mt-20 flex items-center gap-3 text-foreground-subtle text-sm"
+        >
+          <div className="w-12 h-px bg-border" />
+          <span>A community for AI enthusiasts</span>
+          <div className="w-12 h-px bg-border" />
+        </motion.div>
       </main>
     </div>
   );

@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { Calendar, MapPin, Clock, Check, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui';
 import CalendarExportButtons from '@/components/CalendarExportButtons';
 import type { Event } from '@/types/supabase';
@@ -21,80 +22,106 @@ const EventListItem: React.FC<EventListItemProps> = ({
   onCancelRsvp,
   showViewAgenda = true,
 }) => {
+  const eventDate = new Date(event.event_datetime);
+  const formattedDate = eventDate.toLocaleDateString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+  });
+  const formattedTime = eventDate.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+
   return (
-    <li className="glass-card p-6 rounded-xl border border-white/10 hover:border-primary/30 transition-all duration-300 group hover:shadow-[0_0_30px_rgba(255,0,204,0.2)] relative overflow-hidden">
-      {/* Animated background glow on hover */}
-      <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-
-      <div className="relative z-10">
-        <h3 className="text-2xl font-bold font-orbitron mb-3 group-hover:text-primary transition-colors">
-          <a
-            className="hover:text-accent transition-colors inline-block"
-            href={`/events/${event.id}`}
-          >
-            {event.title}
-          </a>
-        </h3>
-
-        <div className="space-y-2 mb-4 text-gray-300">
-          <p className="flex items-center gap-2">
-            <span className="text-accent font-orbitron text-sm">DATE:</span>
-            <span className="text-white">{new Date(event.event_datetime).toLocaleString()}</span>
-          </p>
-          {event.location && (
-            <p className="flex items-center gap-2">
-              <span className="text-accent font-orbitron text-sm">LOCATION:</span>
-              <span className="text-white">{event.location}</span>
-            </p>
-          )}
+    <li className="card p-5 hover:border-primary/30 transition-all duration-200">
+      <div className="flex flex-col md:flex-row md:items-start gap-4">
+        {/* Date Badge */}
+        <div className="hidden md:flex flex-col items-center justify-center w-16 h-16 bg-surface-elevated border border-border rounded-lg shrink-0">
+          <span className="text-xs font-medium text-foreground-muted uppercase">
+            {eventDate.toLocaleDateString('en-US', { month: 'short' })}
+          </span>
+          <span className="text-xl font-bold text-foreground">
+            {eventDate.getDate()}
+          </span>
         </div>
 
-        {event.description && (
-          <p className="text-gray-400 mb-4 leading-relaxed">{event.description}</p>
-        )}
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          <Link href={`/events/${event.id}`}>
+            <h3 className="text-lg font-semibold text-foreground hover:text-primary transition-colors mb-2">
+              {event.title}
+            </h3>
+          </Link>
 
-        <div className="mt-4 flex flex-wrap items-center gap-3 pt-4 border-t border-white/10">
-          {/* RSVP Actions */}
-          {isRsvped ? (
-            <div className="flex items-center gap-2">
-              <span className="text-accent font-semibold font-orbitron flex items-center gap-1">
-                <span className="text-lg">✓</span> RSVPed
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-foreground-muted mb-3">
+            <span className="flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5" />
+              {formattedDate}
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5" />
+              {formattedTime}
+            </span>
+            {event.location && (
+              <span className="flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5" />
+                {event.location}
               </span>
-              {onCancelRsvp && (
-                <Button variant="ghost" size="sm" onClick={onCancelRsvp}>
-                  Cancel
+            )}
+          </div>
+
+          {event.description && (
+            <p className="text-sm text-foreground-muted line-clamp-2 mb-4">
+              {event.description}
+            </p>
+          )}
+
+          <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-border">
+            {/* RSVP Actions */}
+            {isRsvped ? (
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-success">
+                  <Check className="w-4 h-4" />
+                  RSVPed
+                </span>
+                {onCancelRsvp && (
+                  <Button variant="ghost" size="sm" onClick={onCancelRsvp}>
+                    Cancel
+                  </Button>
+                )}
+              </div>
+            ) : (
+              onRsvp && (
+                <Button variant="primary" size="sm" onClick={onRsvp}>
+                  RSVP
                 </Button>
-              )}
-            </div>
-          ) : (
-            onRsvp && (
-              <Button variant="primary" size="md" onClick={onRsvp}>
-                RSVP
-              </Button>
-            )
-          )}
+              )
+            )}
 
-          {/* Calendar Export Buttons */}
-          <CalendarExportButtons event={event} />
+            {/* Calendar Export */}
+            <CalendarExportButtons event={event} />
 
-          {/* View Agenda Button */}
-          {showViewAgenda && Array.isArray(event.agenda) && event.agenda.length > 0 && (
-            <Link href={`/events/${event.id}/agenda`}>
-              <Button variant="outline" size="sm">
-                View Agenda
-              </Button>
-            </Link>
-          )}
+            {/* View Agenda */}
+            {showViewAgenda && Array.isArray(event.agenda) && event.agenda.length > 0 && (
+              <Link href={`/events/${event.id}/agenda`}>
+                <Button variant="outline" size="sm">
+                  View Agenda
+                </Button>
+              </Link>
+            )}
 
-          {/* Admin Edit Link */}
-          {isAdmin && (
-            <a
-              href={`/events/${event.id}/edit`}
-              className="text-sm text-primary hover:text-accent underline ml-auto font-orbitron tracking-wide transition-colors"
-            >
-              EDIT
-            </a>
-          )}
+            {/* Admin Edit */}
+            {isAdmin && (
+              <Link
+                href={`/events/${event.id}/edit`}
+                className="ml-auto flex items-center gap-1.5 text-sm text-foreground-muted hover:text-primary transition-colors"
+              >
+                <Pencil className="w-3.5 h-3.5" />
+                Edit
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     </li>
