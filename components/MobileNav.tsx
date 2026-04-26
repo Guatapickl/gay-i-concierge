@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Home, Calendar, BookOpen, User, Users } from "lucide-react";
+import { Menu, X, Home, Newspaper, Calendar, BookOpen, User } from "lucide-react";
 import AuthNav from "@/components/AuthNav";
 
 export default function MobileNav() {
@@ -12,9 +12,9 @@ export default function MobileNav() {
 
   const links = [
     { href: '/hub', label: 'Hub', icon: Home },
+    { href: '/feed', label: 'Newsfeed', icon: Newspaper },
     { href: '/events', label: 'Events', icon: Calendar },
     { href: '/resources', label: 'Resources', icon: BookOpen },
-    { href: '/community', label: 'Community', icon: Users },
     { href: '/profile', label: 'Profile', icon: User },
   ];
 

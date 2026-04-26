@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronLeft, Menu, Home, Calendar, BookOpen, User } from "lucide-react";
+import { ChevronLeft, Menu, Home, Newspaper, Calendar, BookOpen, User } from "lucide-react";
 import AuthNav from "@/components/AuthNav";
 import MobileNav from "@/components/MobileNav";
 import ChatModalProvider from "@/components/ChatModalProvider";
@@ -14,6 +14,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   const navLinks = [
     { href: '/hub', label: 'Hub', icon: Home },
+    { href: '/feed', label: 'Newsfeed', icon: Newspaper },
     { href: '/events', label: 'Events', icon: Calendar },
     { href: '/resources', label: 'Resources', icon: BookOpen },
     { href: '/profile', label: 'Profile', icon: User },

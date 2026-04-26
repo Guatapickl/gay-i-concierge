@@ -1,0 +1,17 @@
+# Netlify configuration for Gay I Club.
+#
+# The @netlify/plugin-nextjs plugin (auto-applied for Next.js sites) handles
+# the build and route mapping for everything in /app. This file only declares
+# the functions directory and the Node version so scheduled functions work
+# alongside the Next.js routes.
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+[build.environment]
+  NODE_VERSION = "20"
