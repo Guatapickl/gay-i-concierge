@@ -45,7 +45,7 @@ export default function SignInPage() {
       if (error) setMessage(error.message);
       else {
         setMessage('Signed in!');
-        router.push('/hub');
+        router.push('/');
       }
     } catch {
       setMessage('Failed to sign in.');

@@ -1,17 +1,32 @@
 import { supabase } from './supabase';
-import type { Post, PostComment, FeedPost } from '@/types/supabase';
+import type { Post, PostComment, FeedPost, ChatChannel } from '@/types/supabase';
 
 /**
  * Fetch the newsfeed: posts ordered with pinned first then newest,
  * hydrated with author name, comment counts, reactions, and linked event preview.
+ *
+ * Pass `channel` to filter to a single Communication Hub channel; pass
+ * `nullChannelOnly=true` for legacy member-feed posts that predate channels.
  */
-export async function getFeed(currentUserId: string | null, limit = 50): Promise<FeedPost[]> {
-  const { data: posts, error } = await supabase
+export async function getFeed(
+  currentUserId: string | null,
+  limit = 50,
+  options: { channel?: string; nullChannelOnly?: boolean } = {},
+): Promise<FeedPost[]> {
+  let query = supabase
     .from('posts')
     .select('*, events(id, title, event_datetime)')
     .order('is_pinned', { ascending: false })
     .order('created_at', { ascending: false })
     .limit(limit);
+
+  if (options.channel) {
+    query = query.eq('channel', options.channel);
+  } else if (options.nullChannelOnly) {
+    query = query.is('channel', null);
+  }
+
+  const { data: posts, error } = await query;
 
   if (error) {
     console.error('Failed to fetch feed:', error.message);
@@ -86,6 +101,7 @@ export async function createPost(args: {
   title?: string | null;
   body: string;
   eventId?: string | null;
+  channel?: string | null;
   isAnnouncement?: boolean;
   isPinned?: boolean;
 }): Promise<Post | null> {
@@ -96,6 +112,7 @@ export async function createPost(args: {
       title: args.title?.trim() || null,
       body: args.body.trim(),
       event_id: args.eventId || null,
+      channel: args.channel || null,
       is_announcement: args.isAnnouncement || false,
       is_pinned: args.isPinned || false,
     })
@@ -106,6 +123,74 @@ export async function createPost(args: {
     return null;
   }
   return data as Post;
+}
+
+export async function getChatChannels(): Promise<ChatChannel[]> {
+  const { data, error } = await supabase
+    .from('chat_channels')
+    .select('*')
+    .eq('is_archived', false)
+    .order('sort_order', { ascending: true });
+  if (error) {
+    console.error('Failed to load channels:', error.message);
+    return [];
+  }
+  return (data || []) as ChatChannel[];
+}
+
+export async function getChannelUnreadCounts(
+  userId: string,
+  sinceIso: string,
+): Promise<Record<string, number>> {
+  // Tally posts per channel created after `sinceIso` and not authored by the user.
+  const { data, error } = await supabase
+    .from('posts')
+    .select('channel')
+    .gt('created_at', sinceIso)
+    .neq('author_user_id', userId)
+    .not('channel', 'is', null);
+  if (error || !data) return {};
+  const counts: Record<string, number> = {};
+  for (const row of data) {
+    const ch = (row.channel as string | null) ?? '';
+    if (!ch) continue;
+    counts[ch] = (counts[ch] || 0) + 1;
+  }
+  return counts;
+}
+
+export async function getRecentlyActiveAuthors(
+  channel: string,
+  withinHours = 24 * 7,
+  limit = 5,
+): Promise<{ user_id: string; full_name: string | null }[]> {
+  const sinceIso = new Date(Date.now() - withinHours * 3600 * 1000).toISOString();
+  const { data: rows } = await supabase
+    .from('posts')
+    .select('author_user_id, created_at')
+    .eq('channel', channel)
+    .gt('created_at', sinceIso)
+    .order('created_at', { ascending: false })
+    .limit(50);
+  const seen = new Set<string>();
+  const ordered: string[] = [];
+  for (const r of rows || []) {
+    const id = r.author_user_id as string;
+    if (!seen.has(id)) {
+      seen.add(id);
+      ordered.push(id);
+      if (ordered.length >= limit) break;
+    }
+  }
+  if (ordered.length === 0) return [];
+  const { data: profiles } = await supabase
+    .from('user_profiles')
+    .select('id, full_name')
+    .in('id', ordered);
+  const nameById = new Map<string, string | null>(
+    (profiles || []).map(p => [p.id as string, (p.full_name as string | null) ?? null]),
+  );
+  return ordered.map(id => ({ user_id: id, full_name: nameById.get(id) ?? null }));
 }
 
 export async function deletePost(postId: string): Promise<boolean> {

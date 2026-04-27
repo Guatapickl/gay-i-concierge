@@ -3,96 +3,155 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronLeft, Menu, Home, Newspaper, Calendar, BookOpen, User } from "lucide-react";
-import AuthNav from "@/components/AuthNav";
-import MobileNav from "@/components/MobileNav";
+import { Menu, X } from "lucide-react";
+import AvatarMenu from "@/components/AvatarMenu";
+import BrandLogo from "@/components/BrandLogo";
 import ChatModalProvider from "@/components/ChatModalProvider";
 
+type NavItem = { href: string; label: string; icon: string; description: string };
+
+const NAV_ITEMS: NavItem[] = [
+  { href: '/chat',     label: 'Communication Hub', icon: '💬', description: 'Chat with club members across channels' },
+  { href: '/news',     label: 'News Feed',         icon: '📡', description: 'The latest in AI — curated for the community' },
+  { href: '/calendar', label: 'Meeting Calendar',  icon: '📅', description: 'Upcoming events, meetups & workshops' },
+  { href: '/agenda',   label: 'Agenda Maker',      icon: '📋', description: 'Plan and export meeting agendas' },
+  { href: '/robot',    label: 'Robot Benchmark',   icon: '🤖', description: 'Benchmark SOTA models on SVG robot generation' },
+];
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
 
-  const navLinks = [
-    { href: '/hub', label: 'Hub', icon: Home },
-    { href: '/feed', label: 'Newsfeed', icon: Newspaper },
-    { href: '/events', label: 'Events', icon: Calendar },
-    { href: '/resources', label: 'Resources', icon: BookOpen },
-    { href: '/profile', label: 'Profile', icon: User },
-  ];
-
+  // Treat exact and nested matches as active (e.g. /events/123 highlights Calendar later)
   const isActive = (href: string) => pathname === href || pathname?.startsWith(href + '/');
+  const current = NAV_ITEMS.find(n => isActive(n.href));
+
+  // Routes that should render OUTSIDE the chrome (auth pages only).
+  // The home route `/` now uses chrome and switches landing/dashboard server-side.
+  const isChromeless = pathname?.startsWith('/auth');
+
+  if (isChromeless) {
+    return (
+      <div className="min-h-screen bg-background text-foreground font-body">
+        {children}
+      </div>
+    );
+  }
 
   return (
-    <div className="flex min-h-screen antialiased relative bg-background text-foreground">
-      {/* Desktop Sidebar */}
-      {isSidebarOpen && (
-        <aside className="hidden md:flex w-64 bg-surface border-r border-border relative z-40 flex-col animate-fade-in">
-          {/* Logo Header */}
-          <div className="h-16 flex items-center justify-between px-5 border-b border-border">
-            <Link href="/hub" className="flex items-center gap-3 group">
-              <img
-                src="/logo.png"
-                alt="Gay I Club Logo"
-                className="w-12 h-12 transition-transform duration-200 group-hover:scale-105"
-              />
-              <span className="text-xl font-display font-bold text-foreground tracking-tight">
-                Gay I Club
-              </span>
-            </Link>
-            <button
-              onClick={() => setIsSidebarOpen(false)}
-              className="p-1.5 text-foreground-subtle hover:text-foreground hover:bg-surface-hover rounded-lg transition-all"
-              aria-label="Collapse sidebar"
-            >
-              <ChevronLeft size={18} />
-            </button>
+    <div className="min-h-screen flex flex-col bg-background text-foreground font-body">
+      {/* Top bar */}
+      <header className="sticky top-0 z-40 bg-surface border-b border-border h-16 px-4 md:px-8 flex items-center justify-between" style={{ boxShadow: '0 2px 20px rgba(200,150,255,0.1)' }}>
+        <Link href="/calendar" className="flex items-center gap-3 shrink-0 group">
+          <BrandLogo size={32} />
+          <div className="hidden sm:block">
+            <div className="font-display font-bold text-foreground text-base leading-tight tracking-tight">
+              Gay I Club
+            </div>
+            <div className="text-[10px] text-foreground-faint tracking-[0.06em] font-mono">
+              New York City · Est. 2024
+            </div>
           </div>
+        </Link>
 
-          {/* Navigation */}
-          <nav className="flex-1 px-3 py-4 space-y-1">
-            {navLinks.map((link) => (
+        {/* Desktop nav */}
+        <nav className="hidden lg:flex items-center gap-1">
+          {NAV_ITEMS.map(item => {
+            const active = isActive(item.href);
+            return (
               <Link
-                key={link.href}
-                href={link.href}
-                className={`flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-150 ${
-                  isActive(link.href)
-                    ? 'bg-primary-subtle text-primary'
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[13px] font-medium transition-colors whitespace-nowrap ${
+                  active
+                    ? 'bg-surface-soft text-primary-muted font-bold'
+                    : 'text-foreground-muted hover:text-foreground hover:bg-surface-hover'
+                }`}
+                style={active ? { boxShadow: 'inset 0 0 0 1.5px rgba(255,45,155,0.27)' } : undefined}
+              >
+                <span className="text-sm">{item.icon}</span>
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="hidden md:block ml-3">
+          <AvatarMenu />
+        </div>
+
+        {/* Mobile menu button */}
+        <button
+          onClick={() => setMobileOpen(o => !o)}
+          className="lg:hidden p-2 rounded-md text-foreground-muted hover:bg-surface-hover transition-colors"
+          aria-label="Open menu"
+        >
+          {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
+      </header>
+
+      {/* Mobile dropdown */}
+      {mobileOpen && (
+        <div className="lg:hidden bg-surface border-b border-border px-4 py-2 flex flex-col gap-1 animate-fade-in">
+          {NAV_ITEMS.map(item => {
+            const active = isActive(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setMobileOpen(false)}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                  active
+                    ? 'bg-surface-soft text-primary-muted font-bold'
                     : 'text-foreground-muted hover:text-foreground hover:bg-surface-hover'
                 }`}
               >
-                <link.icon size={18} className={isActive(link.href) ? 'text-primary' : ''} />
-                <span>{link.label}</span>
+                <span>{item.icon}</span>
+                <span>{item.label}</span>
               </Link>
-            ))}
-          </nav>
-
-          {/* Auth Section */}
-          <div className="px-3 py-4 border-t border-border">
-            <AuthNav />
+            );
+          })}
+          <div className="pt-2 border-t border-border mt-1">
+            <AvatarMenu />
           </div>
-        </aside>
+        </div>
       )}
 
-      {/* Mobile Navigation */}
-      <MobileNav />
+      {/* Animated shimmer accent bar */}
+      <div className="shimmer-bar" />
 
-      {/* Main Content */}
-      <div className="flex flex-col flex-1 min-w-0 relative">
-        {/* Desktop Expand Button */}
-        {!isSidebarOpen && (
-          <button
-            onClick={() => setIsSidebarOpen(true)}
-            className="hidden md:flex absolute top-4 left-4 z-50 p-2.5 bg-surface border border-border rounded-lg text-foreground-muted hover:text-foreground hover:bg-surface-elevated transition-all shadow-soft"
-            aria-label="Expand sidebar"
-          >
-            <Menu size={18} />
-          </button>
-        )}
+      {/* Page header */}
+      {current && (
+        <div className="bg-surface border-b border-border px-4 md:px-8 py-5">
+          <div className="max-w-7xl mx-auto flex items-center gap-4">
+            <span className="text-[36px] leading-none shrink-0" aria-hidden>
+              {current.icon}
+            </span>
+            <div>
+              <h1 className="text-display-md font-display text-foreground">
+                {current.label}
+              </h1>
+              <p className="text-sm text-foreground-subtle mt-0.5">
+                {current.description}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
-        <main className="flex-1 p-4 pt-20 md:p-8 relative z-10 max-w-6xl mx-auto w-full">
+      {/* Content */}
+      <main className="flex-1 px-4 md:px-8 py-7">
+        <div className="max-w-7xl mx-auto w-full">
           {children}
-        </main>
-      </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-surface border-t border-border py-4 px-4 md:px-8 flex flex-wrap items-center justify-center gap-3 text-[13px]">
+        <span className="text-foreground-faint">© 2026 Gay I Club NYC</span>
+        <span className="text-base" aria-hidden>🏳️‍🌈</span>
+        <span className="text-foreground-faint">Queer people exploring the AI frontier</span>
+      </footer>
 
       <ChatModalProvider />
     </div>

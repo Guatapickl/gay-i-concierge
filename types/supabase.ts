@@ -77,8 +77,36 @@ export type Post = {
   event_id: string | null;
   is_announcement: boolean;
   is_pinned: boolean;
+  /** Communication Hub channel id (general/models/events/papers/random/…). Null = legacy member feed post. */
+  channel?: string | null;
   created_at: string;
   updated_at: string;
+};
+
+export type ChatChannel = {
+  id: string;
+  name: string;
+  description: string | null;
+  sort_order: number;
+  is_archived: boolean;
+  created_at: string;
+};
+
+/**
+ * AI-summarized news item ingested by The Cortex sensorium.
+ */
+export type NewsItem = {
+  id: string;
+  title: string;
+  summary: string;
+  source_url: string;
+  source_name: string | null;
+  tag: string | null;
+  tag_color: string | null;
+  published_at: string | null;
+  ingested_at: string;
+  is_hot: boolean;
+  relevance_score: number | null;
 };
 
 export type PostComment = {

@@ -184,7 +184,88 @@ order by e.event_datetime asc;
 grant select on v_upcoming_events to anon, authenticated;
 
 -- =====================================================================
--- 5) Notes
+-- 5) Communication Hub channels (async discussions)
+-- =====================================================================
+-- Reuse existing `posts` table; add a channel tag so /chat can filter.
+alter table posts add column if not exists channel text;
+create index if not exists posts_channel_idx on posts (channel, created_at desc);
+
+-- Optional canonical channel list (purely for UI dropdown — posts.channel is
+-- free text so historical posts don't break if a channel is renamed/removed).
+create table if not exists chat_channels (
+  id text primary key,
+  name text not null,
+  description text,
+  sort_order int not null default 0,
+  is_archived boolean not null default false,
+  created_at timestamptz default now()
+);
+
+alter table chat_channels enable row level security;
+drop policy if exists "chat_channels select" on chat_channels;
+create policy "chat_channels select" on chat_channels for select to authenticated using (true);
+drop policy if exists "chat_channels admin write" on chat_channels;
+create policy "chat_channels admin write" on chat_channels for all to authenticated
+  using (is_admin()) with check (is_admin());
+
+insert into chat_channels (id, name, description, sort_order) values
+  ('general',  '# general',         'Anything goes', 1),
+  ('models',   '# model-releases',  'New models, weights, evals', 2),
+  ('events',   '# events',          'Coordinating meetups & RSVPs', 3),
+  ('papers',   '# paper-club',      'This week''s reading', 4),
+  ('random',   '# off-topic',       'Banter & memes', 5)
+on conflict (id) do nothing;
+
+-- =====================================================================
+-- 6) News Feed — AI-curated items from The Cortex
+-- =====================================================================
+-- The Cortex sensorium pipeline pushes summarized items here via the
+-- service role. Public reads, no public writes.
+create table if not exists news_items (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  summary text not null,
+  source_url text not null,
+  source_name text,
+  tag text,             -- "Model Release" | "Research" | "Policy" | "Open Source" | "NYC Local" | "Safety" | …
+  tag_color text,       -- optional hex; UI falls back to a default per tag
+  published_at timestamptz,
+  ingested_at timestamptz default now(),
+  is_hot boolean not null default false,
+  relevance_score real, -- 0..1, from Cortex's SemanticScorer
+  unique (source_url)
+);
+
+create index if not exists news_items_published_at_idx on news_items (published_at desc nulls last);
+create index if not exists news_items_tag_idx on news_items (tag);
+
+alter table news_items enable row level security;
+
+drop policy if exists "news_items public read" on news_items;
+create policy "news_items public read" on news_items for select using (true);
+-- Writes happen via service role only (Cortex publisher).
+
+-- Member-saved news (separate from posts; lightweight join)
+create table if not exists news_saves (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  news_id uuid not null references news_items(id) on delete cascade,
+  created_at timestamptz default now(),
+  primary key (user_id, news_id)
+);
+
+alter table news_saves enable row level security;
+
+drop policy if exists "news_saves self select" on news_saves;
+create policy "news_saves self select" on news_saves for select to authenticated using (user_id = auth.uid());
+
+drop policy if exists "news_saves self insert" on news_saves;
+create policy "news_saves self insert" on news_saves for insert to authenticated with check (user_id = auth.uid());
+
+drop policy if exists "news_saves self delete" on news_saves;
+create policy "news_saves self delete" on news_saves for delete to authenticated using (user_id = auth.uid());
+
+-- =====================================================================
+-- 7) Notes
 -- =====================================================================
 -- - Recurring meeting creation: app generates N concrete events sharing a new
 --   series_id; recurrence_rule is stored on each instance for context only.
