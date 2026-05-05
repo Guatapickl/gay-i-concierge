@@ -11,11 +11,14 @@ import ChatModalProvider from "@/components/ChatModalProvider";
 type NavItem = { href: string; label: string; icon: string; description: string };
 
 const NAV_ITEMS: NavItem[] = [
-  { href: '/chat',     label: 'Communication Hub', icon: '💬', description: 'Chat with club members across channels' },
-  { href: '/news',     label: 'News Feed',         icon: '📡', description: 'The latest in AI — curated for the community' },
-  { href: '/calendar', label: 'Meeting Calendar',  icon: '📅', description: 'Upcoming events, meetups & workshops' },
-  { href: '/agenda',   label: 'Agenda Maker',      icon: '📋', description: 'Plan and export meeting agendas' },
-  { href: '/robot',    label: 'Robot Benchmark',   icon: '🤖', description: 'Benchmark SOTA models on SVG robot generation' },
+  { href: '/chat',      label: 'Communication Hub', icon: '💬', description: 'Chat with club members across channels' },
+  { href: '/news',      label: 'News Feed',         icon: '📡', description: 'The latest in AI — curated for the community' },
+  { href: '/events',    label: 'Events',            icon: '🎟️', description: 'Upcoming gatherings, meetups & RSVP' },
+  { href: '/feed',      label: 'Community Feed',    icon: '📰', description: 'Updates, recaps & announcements from the club' },
+  { href: '/calendar',  label: 'Meeting Calendar',  icon: '📅', description: 'Upcoming events, meetups & workshops' },
+  { href: '/resources', label: 'Resources',         icon: '📚', description: 'Community guides, tools & learning materials' },
+  { href: '/agenda',    label: 'Agenda Maker',      icon: '📋', description: 'Plan and export meeting agendas' },
+  { href: '/robot',     label: 'Robot Benchmark',   icon: '🤖', description: 'Benchmark SOTA models on SVG robot generation' },
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
