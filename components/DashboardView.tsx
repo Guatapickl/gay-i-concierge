@@ -11,6 +11,7 @@ import {
   MessageSquare,
   ListChecks,
   Bot,
+  Users,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getUpcomingEvents } from '@/lib/events';
@@ -83,6 +84,12 @@ export default function DashboardView() {
       description: 'Compare frontier models',
       icon: Bot,
     },
+    {
+      href: '/community',
+      title: 'Community',
+      description: 'Browse members',
+      icon: Users,
+    },
   ];
 
   if (loading) return <LoadingSpinner text="Loading your hub..." className="py-12" />;
@@ -107,7 +114,7 @@ export default function DashboardView() {
         <h2 className="text-xs font-bold text-foreground-faint tracking-[0.12em] uppercase mb-3 font-mono">
           Quick actions
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {quickActions.map(action => (
             <Link
               key={action.href}
