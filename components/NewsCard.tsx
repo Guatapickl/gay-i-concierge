@@ -30,13 +30,13 @@ export default function NewsCard({ item, isSaved, userId, onToggleSave }: NewsCa
     <motion.article
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ scale: 1.02, y: -4, transition: { duration: 0.2, ease: 'easeOut' } }}
-      className="relative flex flex-col gap-4 p-6 rounded-2xl border border-white/10 bg-black/50 backdrop-blur-xl overflow-hidden group transition-all shadow-[0_4px_24px_rgba(0,0,0,0.4)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.6)]"
+      whileHover={{ scale: 1.01, y: -2, transition: { duration: 0.2, ease: 'easeOut' } }}
+      className="relative flex flex-col gap-4 p-6 rounded-2xl border border-border bg-surface overflow-hidden group transition-all shadow-soft hover:shadow-medium hover:border-border-strong duration-300"
     >
       {/* Dynamic ambient glow effect */}
       <div 
-        className="absolute inset-0 opacity-0 group-hover:opacity-15 transition-opacity duration-700 pointer-events-none"
-        style={{ background: `radial-gradient(circle at 50% -20%, ${color}, transparent 80%)` }}
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+        style={{ background: `radial-gradient(circle at 50% -20%, ${color}0b, transparent 65%)` }}
       />
       
       {/* Top Meta Row */}
@@ -44,18 +44,17 @@ export default function NewsCard({ item, isSaved, userId, onToggleSave }: NewsCa
         <div className="flex items-center gap-3">
           {item.tag ? (
             <span
-              className="text-[11px] font-bold uppercase tracking-widest px-3 py-1 rounded-sm font-mono border backdrop-blur-md"
+              className="text-[11px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full font-mono border"
               style={{
-                borderColor: `${color}60`,
+                borderColor: `${color}40`,
                 color,
-                background: `${color}15`,
-                boxShadow: `0 0 10px ${color}20`
+                background: `${color}0b`,
               }}
             >
               {item.tag}
             </span>
           ) : (
-            <span className="text-[11px] font-bold uppercase tracking-widest px-3 py-1 rounded-sm font-mono border border-white/10 text-gray-400 bg-white/5">
+            <span className="badge">
               Uncategorized
             </span>
           )}
@@ -64,7 +63,7 @@ export default function NewsCard({ item, isSaved, userId, onToggleSave }: NewsCa
           <motion.div 
             animate={{ opacity: [1, 0.6, 1] }} 
             transition={{ duration: 2, repeat: Infinity }}
-            className="flex items-center gap-1.5 text-[12px] text-[#ff3366] font-bold uppercase tracking-widest bg-[#ff3366]/10 px-2 py-0.5 rounded-full border border-[#ff3366]/30"
+            className="flex items-center gap-1.5 text-[10px] text-primary-muted font-bold uppercase tracking-widest bg-primary/10 px-2.5 py-0.5 rounded-full border border-primary/20"
           >
             <Sparkles className="w-3.5 h-3.5" />
             Hot
@@ -78,13 +77,13 @@ export default function NewsCard({ item, isSaved, userId, onToggleSave }: NewsCa
           href={item.source_url}
           target="_blank"
           rel="noopener noreferrer"
-          className="font-bold text-lg text-gray-100 leading-tight group-hover:text-white transition-colors"
+          className="font-bold text-lg text-foreground leading-tight group-hover:text-primary-muted transition-colors"
           title={item.title}
         >
           {item.title}
         </a>
         
-        <p className="text-[14px] text-gray-400 leading-relaxed flex-1 line-clamp-4">
+        <p className="text-sm text-foreground-muted leading-relaxed flex-1 line-clamp-4">
           {item.summary}
         </p>
       </div>
@@ -92,26 +91,26 @@ export default function NewsCard({ item, isSaved, userId, onToggleSave }: NewsCa
       {/* Relevance Score (Optional visual element if score exists) */}
       {item.relevance_score !== null && item.relevance_score > 0.8 && (
         <div className="z-10 flex items-center gap-2 mt-2">
-          <div className="h-1 flex-1 bg-white/10 rounded-full overflow-hidden">
+          <div className="h-1 flex-1 bg-border rounded-full overflow-hidden">
             <div 
               className="h-full rounded-full" 
               style={{ width: `${item.relevance_score * 100}%`, background: color }} 
             />
           </div>
-          <span className="text-[10px] font-mono text-gray-500 uppercase">
+          <span className="text-[10px] font-mono text-foreground-faint uppercase">
             Match {Math.round(item.relevance_score * 100)}%
           </span>
         </div>
       )}
 
       {/* Footer Meta Row */}
-      <div className="flex items-center justify-between pt-4 mt-auto border-t border-white/10 z-10">
+      <div className="flex items-center justify-between pt-4 mt-auto border-t border-border z-10">
         <div className="flex flex-col gap-1">
-          <span className="flex items-center gap-1.5 text-[12px] text-gray-400 font-medium">
+          <span className="flex items-center gap-1.5 text-xs text-foreground-muted font-medium">
             <ShieldAlert className="w-3.5 h-3.5 opacity-50" />
             {getSourceDisplay()}
           </span>
-          <span className="flex items-center gap-1.5 text-[11px] text-gray-500 font-mono">
+          <span className="flex items-center gap-1.5 text-[11px] text-foreground-faint font-mono">
             <Clock className="w-3 h-3 opacity-50" />
             {relativeTime(item.published_at || item.ingested_at)}
           </span>
@@ -122,7 +121,7 @@ export default function NewsCard({ item, isSaved, userId, onToggleSave }: NewsCa
             href={item.source_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-all border border-white/5 hover:border-white/20"
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-surface-elevated hover:bg-surface-hover text-foreground-muted hover:text-foreground transition-all border border-border-subtle hover:border-border-strong"
             aria-label="Read full article"
             title="Read full article"
           >
@@ -137,8 +136,8 @@ export default function NewsCard({ item, isSaved, userId, onToggleSave }: NewsCa
               }}
               className={`flex items-center justify-center w-8 h-8 rounded-full transition-all border ${
                 isSaved
-                  ? 'bg-[#00ffcc]/10 border-[#00ffcc]/50 text-[#00ffcc] shadow-[0_0_12px_rgba(0,255,204,0.25)]'
-                  : 'bg-white/5 border-white/5 text-gray-400 hover:text-white hover:border-white/20 hover:bg-white/10'
+                  ? 'bg-cyan/10 border-cyan/40 text-cyan shadow-[0_0_12px_rgba(0,153,204,0.15)]'
+                  : 'bg-surface-elevated border-border-subtle text-foreground-muted hover:text-foreground hover:border-border-strong hover:bg-surface-hover'
               }`}
               aria-label={isSaved ? "Remove from saved" : "Save article"}
               title={isSaved ? "Saved" : "Save"}
