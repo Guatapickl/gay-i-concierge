@@ -1,6 +1,6 @@
 # Architecture — Gay-I Club Concierge
 
-> **Version**: 2026-05-09  
+> **Version**: 2026-05-21  
 > **Stack**: Next.js 16 (App Router) · React 19 · TypeScript · Supabase · OpenAI · Tailwind CSS v4  
 > **Deployment**: Netlify (via `@netlify/plugin-nextjs`)  
 > **Production**: [gayiclub.com](https://gayiclub.com) · Repo: [Guatapickl/gay-i-concierge](https://github.com/Guatapickl/gay-i-concierge)
@@ -14,22 +14,12 @@
 3. [Directory Layout](#directory-layout)
 4. [Authentication & Authorization](#authentication--authorization)
 5. [API Reference](#api-reference)
-   - [Chat API](#chat-api)
-   - [Event RSVP API (Full CRUD)](#event-rsvp-api-full-crud)
-   - [Legacy RSVP API](#legacy-rsvp-api)
-   - [Alerts API](#alerts-api)
-   - [Other APIs](#other-apis)
 6. [Club Concierge Chatbot](#club-concierge-chatbot)
-   - [Backend (SSE Streaming)](#backend-sse-streaming)
-   - [Frontend (ChatWindow)](#frontend-chatwindow)
-   - [Onboarding Flow](#onboarding-flow)
 7. [Event Management Pipeline](#event-management-pipeline)
-   - [RSVP Lifecycle](#rsvp-lifecycle)
-   - [Recurring Events](#recurring-events)
-   - [Email Reminders](#email-reminders)
-8. [Database Schema Summary](#database-schema-summary)
-9. [Deployment & Infrastructure](#deployment--infrastructure)
-10. [Design System](#design-system)
+8. [Curated News Feed Pipeline](#curated-news-feed-pipeline)
+9. [Database Schema Summary](#database-schema-summary)
+10. [Deployment & Infrastructure](#deployment--infrastructure)
+11. [Design System](#design-system)
 
 ---
 
@@ -50,7 +40,8 @@ flowchart TD
         CHAT_API["/api/chat (Edge)"]
         RSVP_API["/api/events/rsvp (Node)"]
         ALERT_API["/api/alerts/* (Node)"]
-        NEWS_API["/api/news/ingest (Node)"]
+        NEWS_FEED_API["/api/news (Node)"]
+        NEWS_INGEST_API["/api/news/ingest (Node)"]
         CRON["/api/cron/reminders (Node)"]
         INVITE_API["/api/invite"]
     end
@@ -59,6 +50,7 @@ flowchart TD
         OAI["OpenAI (GPT-4o)"]
         SB["Supabase (PostgreSQL + Auth)"]
         MAIL["Email Provider"]
+        CORTEX["The Cortex Sensorium"]
     end
 
     CW -->|SSE stream| CHAT_API
@@ -71,8 +63,12 @@ flowchart TD
 
     PROF -->|auth flows| SB
     HUB -->|posts CRUD| SB
-    FEED -->|news queries| SB
-    NEWS_API -->|service-role writes| SB
+    
+    FEED -->|news queries| NEWS_FEED_API
+    NEWS_FEED_API -->|read/write news & saves| SB
+    
+    CORTEX -->|bulk ingest + bearer secret| NEWS_INGEST_API
+    NEWS_INGEST_API -->|service-role writes| SB
 
     ALERT_API -->|subscribe/confirm| SB
     CRON -->|send pending emails| MAIL
@@ -111,14 +107,15 @@ gay-i-concierge/
 │   │   ├── agenda/draft/route.ts   # AI agenda generation
 │   │   ├── cron/reminders/route.ts # Email reminder processor
 │   │   ├── invite/route.ts         # Invite link generator
-│   │   ├── news/ingest/route.ts    # AI news ingestion pipeline
+│   │   ├── news/route.ts           # News feed CRUD (GET/POST)
+│   │   ├── news/ingest/route.ts    # AI news ingestion pipeline (Cortex)
 │   │   └── robot/generate/route.ts # Robot avatar generator
 │   ├── auth/                   # Sign-in, sign-up, forgot, reset, callback
 │   ├── events/                 # Event listing, detail, edit, new
 │   ├── chat/page.tsx           # Full-page chat
 │   ├── hub/page.tsx            # Communication Hub
 │   ├── feed/page.tsx           # Social feed
-│   ├── news/page.tsx           # AI-curated news
+│   ├── news/page.tsx           # AI-curated news feed
 │   ├── calendar/page.tsx       # Calendar view
 │   ├── community/page.tsx      # Community directory
 │   ├── profile/page.tsx        # User profile management
@@ -135,6 +132,7 @@ gay-i-concierge/
 │   ├── LandingHero.tsx         # Landing page hero
 │   ├── MyRsvps.tsx             # User's RSVP list
 │   ├── EventListItem.tsx       # Event card component
+│   ├── NewsCard.tsx            # News card component
 │   ├── feed/                   # PostCard, PostComposer
 │   ├── robots/                 # AI robot avatar components
 │   └── ui/                     # Shared: Button, Alert, FormField, etc.
@@ -328,6 +326,115 @@ All alerts routes use the service-role Supabase client server-side to bypass RLS
 
 ---
 
+### News Feed & Ingestion API
+
+**`/api/news`** — Paginated retrieval and creation of curated news items (Node.js runtime).
+
+#### GET — Query News Feed
+Retrieves paginated news items, ordered chronologically by publication and ingestion date.
+
+| Param | Required | Type | Default | Description |
+|-------|----------|------|---------|-------------|
+| `limit` | No | `number` | `20` | Max number of news items to return |
+| `page` | No | `number` | `1` | Page number for offsets |
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "id": "uuid",
+      "title": "New Model Release: Llama 4",
+      "summary": "Meta releases the Llama 4 open weight model series...",
+      "source_url": "https://example.com/llama4",
+      "source_name": "Meta AI",
+      "tag": "Model Release",
+      "tag_color": "#e0007a",
+      "published_at": "2026-05-20T...",
+      "ingested_at": "2026-05-21T...",
+      "is_hot": true,
+      "relevance_score": 0.95
+    }
+  ],
+  "meta": {
+    "total": 124,
+    "page": 1,
+    "limit": 20,
+    "totalPages": 7
+  }
+}
+```
+
+#### POST — Create News Item
+Creates a single news item.
+
+**Auth:** Bearer JWT required (authenticated member).
+
+**Request Body:**
+```json
+{
+  "title": "AI in NYC Meetup Recap",
+  "summary": "Highlights from the community gathering...",
+  "source_url": "https://example.com/nyc-meetup",
+  "source_name": "Gay-I Club Blog",
+  "tag": "NYC Local",
+  "tag_color": "#c05200",
+  "published_at": "2026-05-21T...",
+  "is_hot": false,
+  "relevance_score": 0.88
+}
+```
+
+**Response:**
+```json
+{
+  "data": { "id": "uuid", "title": "AI in NYC Meetup Recap" }
+}
+```
+
+---
+
+**`POST /api/news/ingest`** — Bulk ingestion of news items for The Cortex sensorium publisher (Node.js runtime).
+
+**Auth:** Authorization header with a custom bearer token matching the server-side `NEWS_INGEST_SECRET` environment variable (`Authorization: Bearer <secret>`).
+
+**Request Body:**
+```json
+{
+  "items": [
+    {
+      "title": "DeepSeek-V3 Open Source Release",
+      "summary": "DeepSeek releases their latest mixture-of-experts model...",
+      "source_url": "https://github.com/deepseek-ai/DeepSeek-V3",
+      "source_name": "GitHub",
+      "tag": "Open Source",
+      "tag_color": "#007a4a",
+      "published_at": "2026-05-20T...",
+      "is_hot": true,
+      "relevance_score": 0.98
+    }
+  ]
+}
+```
+
+**Behavior:**
+1. Validates and normalizes fields (e.g. trims whitespace, truncates titles to 300 characters, truncates summaries to 2000 characters, and clamps `relevance_score` to the range `0..1`).
+2. Queries existing `source_url`s in a single query to count inserts vs updates.
+3. Performs a bulk database `upsert` targeting the unique constraint on `source_url`.
+4. Returns counts of inserted, updated, and skipped items.
+
+**Response:**
+```json
+{
+  "ok": true,
+  "inserted": 1,
+  "updated": 0,
+  "skipped": 0
+}
+```
+
+---
+
 ### Other APIs
 
 | Endpoint | Method | Runtime | Description |
@@ -335,7 +442,6 @@ All alerts routes use the service-role Supabase client server-side to bypass RLS
 | `/api/agenda/draft` | POST | Node | AI-generated meeting agenda via OpenAI |
 | `/api/cron/reminders` | POST/GET | Node | Processes pending `email_reminders` queue |
 | `/api/invite` | POST | Edge | Generates short invite text for sharing |
-| `/api/news/ingest` | POST | Node | Ingests AI-curated news articles |
 | `/api/robot/generate` | POST | Node | Generates AI robot benchmark avatars |
 
 ---
@@ -491,6 +597,26 @@ The `email_reminders` table acts as an async email queue:
 2. **Event reminders** — 24h and 1h before event start
 3. **Cron processor** — `/api/cron/reminders` picks up `status = 'pending'` rows where `send_at ≤ now()`
 4. **Retry logic** — failed sends increment `attempts` and are retried on next cron run
+---
+
+## Curated News Feed Pipeline
+
+### Cortex Ingestion
+The news feed aggregates content pushed from **The Cortex Sensorium**, an external publisher system.
+- **Authorization**: Access to the bulk ingestion endpoint `/api/news/ingest` requires a Bearer token matching the `NEWS_INGEST_SECRET` environment variable.
+- **Validation & Cleaning**: Inputs are validated and sanitized upon receipt. Text fields are trimmed, titles are truncated to 300 characters, summaries are truncated to 2000 characters, and `relevance_score` values are clamped to the range `0..1`.
+- **Conflict Handling**: The ingestion performs a bulk database upsert targeting the unique constraint on `source_url`. This allows updating existing entries dynamically (such as updating relevance scores or marking articles as hot) rather than failing on duplicates.
+
+### UI & Saved Articles
+The news UI is split into high-level features for discovery and personalization:
+- **Components**: The user interface is driven by `NewsFeedPage` (`app/news/page.tsx`) and the reusable `NewsCard` (`components/NewsCard.tsx`) component.
+- **Signal Filtering**: News items can be filtered on the client side using categorizations defined in `TAG_COLORS` (such as `Model Release`, `Research`, `Policy`, `Open Source`, `NYC Local`, `Safety`, `Tooling`, and `Industry`), each styled with a distinct signature color border and text badge.
+- **Interaction and Save Flow**: Authenticated users can toggle bookmarks via `toggleSavedNews` in `lib/news.ts`, which persists selections in the `news_saves` database table. The UI updates instantly via local React state to reflect saved states with a neon cyan glow and icon indicator.
+- **Cyberpunk Styling Details**:
+  - **Dynamic Ambient Glow**: A custom radial gradient using the tag's signature color with very low opacity (`0b` / ~4%) glows at the top of a card on hover.
+  - **Relevance Match Bar**: Items displaying high relevance scores (>80%) show a custom horizontal progress bar colored according to the tag, showing the match percentage.
+  - **Hot Tag Indicator**: High-priority stories (`is_hot` flag set to true) display a pulsing "Hot" badge with a sparkles icon.
+  - **Relative Time Format**: Relative timestamps (e.g., "just now", "15 min ago", "2 hours ago", "3 days ago") are formatted on-the-fly via a lightweight relative time utility in `lib/news.ts`, falling back to standard local dates for older entries.
 
 ---
 

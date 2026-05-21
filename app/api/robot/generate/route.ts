@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { rateLimit, getClientId } from '@/lib/rateLimit';
+import { createClient } from '@/utils/supabase/server';
 import {
   generate,
   PROVIDER_MODELS,
@@ -34,6 +35,29 @@ export async function POST(req: Request) {
     );
   }
 
+  // Authentication check
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+  }
+
+  // Admin authorization check
+  const { count } = await supabase
+    .from('app_admins')
+    .select('user_id', { count: 'exact', head: true })
+    .eq('user_id', user.id);
+
+  if (!count || count === 0) {
+    return NextResponse.json(
+      { ok: false, error: 'Unauthorized: Only administrators can edit prompts and generate new robots.' },
+      { status: 403 }
+    );
+  }
+
   let body: { provider?: ProviderId; prompt?: string };
   try {
     body = await req.json();
@@ -59,15 +83,34 @@ export async function POST(req: Request) {
   }
 
   const scores = scoreSvg(result.svg);
+  const average = averageScore(scores);
+  const prompt_used = prompt === ROBOT_PROMPT ? 'default' : 'custom';
+
+  // Save successful run to database
+  const { error: dbErr } = await supabase.from('robot_benchmarks').insert({
+    provider,
+    model_id: result.modelUsed,
+    svg: result.svg,
+    latency_ms,
+    scores,
+    average,
+    prompt_used,
+    user_id: user.id,
+  });
+
+  if (dbErr) {
+    console.error('Failed to save benchmark run to Supabase:', dbErr);
+  }
+
   return NextResponse.json({
     ok: true,
     provider,
     model_id: result.modelUsed,
     svg: result.svg,
     scores,
-    average: averageScore(scores),
+    average,
     latency_ms,
-    prompt_used: prompt === ROBOT_PROMPT ? 'default' : 'custom',
+    prompt_used,
   });
 }
 
