@@ -1,0 +1,146 @@
+<h2>Select a Visual Approach for the Dashboard</h2>
+<p class="subtitle">Here are the visual representations of the three design paths for the dashboard card and container layouts:</p>
+
+<style>
+  .comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+  }
+
+  /* OPTION A: Neon-on-Cream */
+  .preview-a {
+    background-color: #f7f4fc;
+    border: 1.5px solid #f0e0f8;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(255, 45, 155, 0.1);
+    color: #1a0830;
+  }
+  .glow-border-a {
+    border: 1.5px solid #ff2d9b;
+    box-shadow: 0 0 10px rgba(255, 45, 155, 0.2);
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+  .svg-box-dark-a {
+    background-color: #120b24;
+    aspect-ratio: 1;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ff2d9b;
+    font-family: monospace;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+
+  /* OPTION B: Pure Retro-Terminal */
+  .preview-b {
+    background-color: #0b0713;
+    border: 2px solid #00ff66;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 0 20px rgba(0, 255, 102, 0.15);
+    color: #00ff66;
+    font-family: monospace;
+  }
+  .svg-box-dark-b {
+    background-color: #000000;
+    border: 1px solid #00ff66;
+    aspect-ratio: 1;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #00ff66;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+
+  /* OPTION C: Minimalist Technical */
+  .preview-c {
+    background-color: #ffffff;
+    border: 1px solid #d1d1d6;
+    border-radius: 12px;
+    padding: 1.5rem;
+    color: #1c1c1e;
+  }
+  .svg-box-light-c {
+    background-color: #f2f2f7;
+    border: 1px solid #e5e5ea;
+    aspect-ratio: 1;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #8e8e93;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+</style>
+
+<div class="comparison-grid">
+  <!-- Option A -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)" style="padding: 0;">
+    <div style="padding: 1.25rem; border-bottom: 1px solid var(--border); font-weight: bold;">
+      Option A: Neon-on-Cream
+    </div>
+    <div style="padding: 1.5rem;">
+      <div class="preview-a">
+        <h4 style="font-weight:800; font-family:var(--font-display); margin-bottom: 0.5rem;">Gay-I Club Dashboard</h4>
+        <p style="font-size: 11px; color: #7a6090; margin-bottom: 1rem;">Aggregated stats & SOTA metrics</p>
+        <div class="glow-border-a">
+          <div class="svg-box-dark-a">🤖</div>
+          <span style="font-size: 11px; font-weight: bold; color: #7c2fff;">Coral Opus (4.5)</span>
+        </div>
+      </div>
+      <p style="font-size: 12px; color: var(--text-secondary); margin-top: 1rem; line-height: 1.4;">
+        Matches the main site. Uses cream backgrounds, pink-to-purple glow effects, and contrasting dark frames only for the actual robot SVGs.
+      </p>
+    </div>
+  </div>
+
+  <!-- Option B -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)" style="padding: 0;">
+    <div style="padding: 1.25rem; border-bottom: 1px solid var(--border); font-weight: bold;">
+      Option B: Retro-Terminal
+    </div>
+    <div style="padding: 1.5rem;">
+      <div class="preview-b">
+        <h4 style="margin-bottom: 0.5rem;">GAY_I_CLUB_RUNNER:~$</h4>
+        <p style="font-size: 10px; color: #00aa44; margin-bottom: 1rem;">STATUS: ONLINE | LATENCY: 215ms</p>
+        <div class="svg-box-dark-b">🤖</div>
+        <span style="font-size: 10px; font-weight: bold; color: #00ff66;">[UNIT_01_GEMINI_3]</span>
+      </div>
+      <p style="font-size: 12px; color: var(--text-secondary); margin-top: 1rem; line-height: 1.4;">
+        A high-contrast neon-green/pink cyberpunk dark theme console that overrides the page. Looks like a command terminal.
+      </p>
+    </div>
+  </div>
+
+  <!-- Option C -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)" style="padding: 0;">
+    <div style="padding: 1.25rem; border-bottom: 1px solid var(--border); font-weight: bold;">
+      Option C: Minimalist Technical
+    </div>
+    <div style="padding: 1.5rem;">
+      <div class="preview-c">
+        <h4 style="font-weight: 600; margin-bottom: 0.5rem;">AI Benchmarks</h4>
+        <p style="font-size: 11px; color: #8e8e93; margin-bottom: 1rem;">SOTA Comparison metrics</p>
+        <div class="svg-box-light-c">🤖</div>
+        <span style="font-size: 11px; font-weight: 500; color: #1c1c1e;">GPT 5.5</span>
+      </div>
+      <p style="font-size: 12px; color: var(--text-secondary); margin-top: 1rem; line-height: 1.4;">
+        Clean SaaS layout. Standard white background, light gray borders, flat details. Very clean but less "cyberpunk/gay-i club" vibe.
+      </p>
+    </div>
+  </div>
+</div>
