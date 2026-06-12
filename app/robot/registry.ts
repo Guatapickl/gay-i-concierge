@@ -1,3 +1,4 @@
+import Fable5Robot from '@/components/robots/Fable5Robot';
 import Gemini3Robot from '@/components/robots/Gemini3Robot';
 import Gpt51CodexMaxRobot from '@/components/robots/Gpt51CodexMaxRobot';
 import Opus45Robot from '@/components/robots/Opus45Robot';
@@ -28,5 +29,11 @@ export const robots: RobotEntry[] = [
         name: 'Coral Opus',
         model: 'Claude Opus 4.5',
         component: Opus45Robot,
+    },
+    {
+        id: 'claude-fable-5',
+        name: 'The Storyweaver',
+        model: 'Fable 5',
+        component: Fable5Robot,
     },
 ];

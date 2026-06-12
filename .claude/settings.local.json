@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Skill(frontend-design)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(npx tsc *)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/robot)",
+      "Bash(ps -p 62281 -o command=)"
     ]
   }
 }
