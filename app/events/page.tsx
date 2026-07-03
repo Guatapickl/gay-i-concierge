@@ -13,27 +13,35 @@ import EventListItem from '@/components/EventListItem';
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
-  const [rsvpMessage, setRsvpMessage] = useState<string | null>(null);
+  const [rsvpMessage, setRsvpMessage] = useState<{ text: string; variant: 'success' | 'error' | 'info' } | null>(null);
   const [rsvpedEvents, setRsvpedEvents] = useState<Set<string>>(new Set());
   const [userId, setUserId] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [pendingRsvpEventId, setPendingRsvpEventId] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
-      const data = await getUpcomingEvents();
-      setEvents(data);
-      setLoading(false);
-      const { data: authData } = await supabase.auth.getUser();
-      const uid = authData.user?.id || null;
-      setUserId(uid);
-      if (uid) {
-        const ids = await getRsvpedEventIds(uid);
-        setRsvpedEvents(new Set(ids));
-        const { count } = await supabase
-          .from('app_admins')
-          .select('user_id', { count: 'exact', head: true })
-          .eq('user_id', uid);
-        setIsAdmin(!!count && count > 0);
+      try {
+        const [data, authData] = await Promise.all([
+          getUpcomingEvents(),
+          supabase.auth.getUser(),
+        ]);
+        setEvents(data);
+        const uid = authData.data.user?.id || null;
+        setUserId(uid);
+        if (uid) {
+          const [ids, adminResult] = await Promise.all([
+            getRsvpedEventIds(uid),
+            supabase
+              .from('app_admins')
+              .select('user_id', { count: 'exact', head: true })
+              .eq('user_id', uid),
+          ]);
+          setRsvpedEvents(new Set(ids));
+          setIsAdmin(!!adminResult.count && adminResult.count > 0);
+        }
+      } finally {
+        setLoading(false);
       }
     })();
   }, []);
@@ -84,34 +92,45 @@ export default function EventsPage() {
               event={event}
               isRsvped={rsvpedEvents.has(event.id)}
               isAdmin={isAdmin}
+              isRsvpPending={pendingRsvpEventId === event.id}
               onRsvp={async () => {
                 if (!userId) {
-                  setRsvpMessage('Please sign in to RSVP');
+                  setRsvpMessage({ text: 'Please sign in to RSVP', variant: 'info' });
                   return;
                 }
-                const success = await saveRsvp(userId, event.id);
-                if (success) {
-                  setRsvpMessage(`RSVPed for "${event.title}"`);
-                  setRsvpedEvents(prev => new Set(prev).add(event.id));
-                } else {
-                  setRsvpMessage('Failed to RSVP. Please try again.');
+                setPendingRsvpEventId(event.id);
+                try {
+                  const success = await saveRsvp(userId, event.id);
+                  if (success) {
+                    setRsvpMessage({ text: `RSVPed for "${event.title}"`, variant: 'success' });
+                    setRsvpedEvents(prev => new Set(prev).add(event.id));
+                  } else {
+                    setRsvpMessage({ text: 'Failed to RSVP. Please try again.', variant: 'error' });
+                  }
+                } finally {
+                  setPendingRsvpEventId(null);
                 }
               }}
               onCancelRsvp={async () => {
                 if (!userId) {
-                  setRsvpMessage('Please sign in first');
+                  setRsvpMessage({ text: 'Please sign in first', variant: 'info' });
                   return;
                 }
-                const ok = await deleteRsvp(userId, event.id);
-                if (ok) {
-                  setRsvpedEvents(prev => {
-                    const n = new Set(prev);
-                    n.delete(event.id);
-                    return n;
-                  });
-                  setRsvpMessage(`Canceled RSVP for "${event.title}"`);
-                } else {
-                  setRsvpMessage('Failed to cancel RSVP');
+                setPendingRsvpEventId(event.id);
+                try {
+                  const ok = await deleteRsvp(userId, event.id);
+                  if (ok) {
+                    setRsvpedEvents(prev => {
+                      const n = new Set(prev);
+                      n.delete(event.id);
+                      return n;
+                    });
+                    setRsvpMessage({ text: `Canceled RSVP for "${event.title}"`, variant: 'success' });
+                  } else {
+                    setRsvpMessage({ text: 'Failed to cancel RSVP', variant: 'error' });
+                  }
+                } finally {
+                  setPendingRsvpEventId(null);
                 }
               }}
             />
@@ -122,10 +141,10 @@ export default function EventsPage() {
       {/* Messages */}
       {rsvpMessage && (
         <Alert
-          variant={rsvpMessage.includes('RSVPed') ? 'success' : rsvpMessage.includes('Failed') || rsvpMessage.includes('Canceled') ? 'error' : 'info'}
+          variant={rsvpMessage.variant}
           onClose={() => setRsvpMessage(null)}
         >
-          {rsvpMessage}
+          {rsvpMessage.text}
         </Alert>
       )}
     </div>

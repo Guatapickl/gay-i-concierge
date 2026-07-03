@@ -9,6 +9,7 @@ interface EventListItemProps {
   event: Event;
   isRsvped?: boolean;
   isAdmin?: boolean;
+  isRsvpPending?: boolean;
   onRsvp?: () => void;
   onCancelRsvp?: () => void;
   showViewAgenda?: boolean;
@@ -18,6 +19,7 @@ const EventListItem: React.FC<EventListItemProps> = ({
   event,
   isRsvped = false,
   isAdmin = false,
+  isRsvpPending = false,
   onRsvp,
   onCancelRsvp,
   showViewAgenda = true,
@@ -86,15 +88,25 @@ const EventListItem: React.FC<EventListItemProps> = ({
                   RSVPed
                 </span>
                 {onCancelRsvp && (
-                  <Button variant="ghost" size="sm" onClick={onCancelRsvp}>
-                    Cancel
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onCancelRsvp}
+                    disabled={isRsvpPending}
+                  >
+                    {isRsvpPending ? 'Canceling...' : 'Cancel'}
                   </Button>
                 )}
               </div>
             ) : (
               onRsvp && (
-                <Button variant="primary" size="sm" onClick={onRsvp}>
-                  RSVP
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={onRsvp}
+                  disabled={isRsvpPending}
+                >
+                  {isRsvpPending ? 'Saving...' : 'RSVP'}
                 </Button>
               )
             )}
