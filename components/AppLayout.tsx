@@ -12,6 +12,7 @@ type NavItem = { href: string; label: string; icon: string; description: string 
 
 const NAV_ITEMS: NavItem[] = [
   { href: '/chat',      label: 'Communication Hub', icon: '💬', description: 'Chat with club members across channels' },
+  { href: '/announcements', label: 'Announcements', icon: '📣', description: 'Official club-wide updates from admins' },
   { href: '/news',      label: 'News Feed',         icon: '📡', description: 'The latest in AI — curated for the community' },
   { href: '/community', label: 'Community',         icon: '👥', description: 'Browse member profiles & connect with others' },
   { href: '/events',    label: 'Events',            icon: '🎟️', description: 'Upcoming gatherings, meetups & RSVP' },

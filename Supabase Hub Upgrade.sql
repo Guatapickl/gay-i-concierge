@@ -128,7 +128,45 @@ create policy "post_reactions delete" on post_reactions for delete to authentica
   using (user_id = auth.uid());
 
 -- =====================================================================
--- 3) Email reminder queue (server processes via cron)
+-- 3) Official announcements
+-- =====================================================================
+-- Formal one-to-many club updates. Members can read; admins write.
+create table if not exists announcements (
+  id uuid primary key default gen_random_uuid(),
+  author_user_id uuid not null references auth.users(id) on delete cascade,
+  title text not null,
+  body text not null,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create index if not exists announcements_created_at_idx on announcements (created_at desc);
+
+drop trigger if exists trg_announcements_updated_at on announcements;
+create trigger trg_announcements_updated_at
+before update on announcements
+for each row execute function set_updated_at();
+
+alter table announcements enable row level security;
+
+drop policy if exists "announcements select" on announcements;
+create policy "announcements select" on announcements for select to authenticated using (true);
+
+drop policy if exists "announcements admin insert" on announcements;
+create policy "announcements admin insert" on announcements for insert to authenticated
+  with check (author_user_id = auth.uid() and is_admin());
+
+drop policy if exists "announcements admin update" on announcements;
+create policy "announcements admin update" on announcements for update to authenticated
+  using (is_admin())
+  with check (is_admin());
+
+drop policy if exists "announcements admin delete" on announcements;
+create policy "announcements admin delete" on announcements for delete to authenticated
+  using (is_admin());
+
+-- =====================================================================
+-- 4) Email reminder queue (server processes via cron)
 -- =====================================================================
 -- One row per scheduled email send. Cron job pulls due rows, sends, marks sent.
 create table if not exists email_reminders (
@@ -160,7 +198,7 @@ create policy "email_reminders self-select" on email_reminders for select to aut
   using (recipient_user_id = auth.uid());
 
 -- =====================================================================
--- 4) Helper view: upcoming meetings with RSVP & series context
+-- 5) Helper view: upcoming meetings with RSVP & series context
 -- =====================================================================
 create or replace view v_upcoming_events as
 select
@@ -184,7 +222,7 @@ order by e.event_datetime asc;
 grant select on v_upcoming_events to anon, authenticated;
 
 -- =====================================================================
--- 5) Communication Hub channels (async discussions)
+-- 6) Communication Hub channels (async discussions)
 -- =====================================================================
 -- Reuse existing `posts` table; add a channel tag so /chat can filter.
 alter table posts add column if not exists channel text;
@@ -217,7 +255,7 @@ insert into chat_channels (id, name, description, sort_order) values
 on conflict (id) do nothing;
 
 -- =====================================================================
--- 6) News Feed — AI-curated items from The Cortex
+-- 7) News Feed — AI-curated items from The Cortex
 -- =====================================================================
 -- The Cortex sensorium pipeline pushes summarized items here via the
 -- service role. Public reads, no public writes.

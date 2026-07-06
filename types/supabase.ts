@@ -93,6 +93,18 @@ export type ChatChannel = {
 };
 
 /**
+ * Official club-wide updates. Members can read these; admins author and manage them.
+ */
+export type Announcement = {
+  id: string;
+  author_user_id: string;
+  title: string;
+  body: string;
+  created_at: string;
+  updated_at: string;
+};
+
+/**
  * AI-summarized news item ingested by The Cortex sensorium.
  */
 export type NewsItem = {

@@ -1,7 +1,7 @@
 # Database Schema — Gay-I Club Concierge
 
 > **Stack**: Supabase (PostgreSQL) · RLS-enforced · UUID primary keys  
-> **Last updated**: 2026-05-21
+> **Last updated**: 2026-07-06
 
 
 ---
@@ -18,6 +18,7 @@
    - [rsvps](#rsvps)
 4. [Newsfeed & Communication](#newsfeed--communication)
    - [posts](#posts)
+   - [announcements](#announcements)
    - [post_comments](#post_comments)
    - [post_reactions](#post_reactions)
    - [chat_channels](#chat_channels)
@@ -98,6 +99,15 @@ erDiagram
         boolean is_announcement
         boolean is_pinned
         text channel
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    announcements {
+        uuid id PK
+        uuid author_user_id FK
+        text title
+        text body
         timestamptz created_at
         timestamptz updated_at
     }
@@ -204,6 +214,7 @@ erDiagram
     auth_users ||--o| app_admins : "id → user_id"
     auth_users ||--o{ rsvps : "id → profile_id"
     auth_users ||--o{ posts : "id → author_user_id"
+    auth_users ||--o{ announcements : "id → author_user_id"
     auth_users ||--o{ post_comments : "id → author_user_id"
     auth_users ||--o{ post_reactions : "id → user_id"
     auth_users ||--o{ news_saves : "id → user_id"
@@ -311,7 +322,7 @@ Tracks member RSVPs to events. One RSVP per user per event (enforced by unique c
 
 ### posts
 
-Member-authored content — announcements, recaps, general discussion, and communication hub messages.
+Member-authored content: recaps, general discussion, and communication hub messages.
 
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
@@ -320,10 +331,23 @@ Member-authored content — announcements, recaps, general discussion, and commu
 | `title` | `text` | nullable | Post title |
 | `body` | `text` | NOT NULL | Post body text |
 | `event_id` | `uuid` | FK → `events(id)` ON DELETE SET NULL | Optional linked event |
-| `is_announcement` | `boolean` | NOT NULL, default `false` | Admin-only flag |
+| `is_announcement` | `boolean` | NOT NULL, default `false` | Legacy/admin-only feed flag |
 | `is_pinned` | `boolean` | NOT NULL, default `false` | Admin-only flag |
 | `channel` | `text` | nullable | Communication Hub channel (e.g. `general`, `events`) |
 | `created_at` | `timestamptz` | default `now()` | |
+| `updated_at` | `timestamptz` | default `now()`, auto-trigger | |
+
+### announcements
+
+Official club-wide updates. Authenticated members can read the chronological feed; admins create, edit, and delete rows.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | `uuid` | **PK**, default `gen_random_uuid()` | |
+| `author_user_id` | `uuid` | NOT NULL, FK → `auth.users(id)` ON DELETE CASCADE | Admin author |
+| `title` | `text` | NOT NULL | Announcement headline |
+| `body` | `text` | NOT NULL | Announcement body text |
+| `created_at` | `timestamptz` | default `now()` | Feed ordering timestamp |
 | `updated_at` | `timestamptz` | default `now()`, auto-trigger | |
 
 ### post_comments
@@ -518,7 +542,7 @@ Security-definer function. Creates a double-opt-in/out confirmation token. Retur
 Security-definer function. Validates and consumes a confirmation token, toggling the subscriber's opt-in flag.
 
 ### `set_updated_at() → trigger`
-Generic trigger function. Sets `NEW.updated_at = now()` on any UPDATE. Applied to: `alerts_subscribers`, `events`, `posts`.
+Generic trigger function. Sets `NEW.updated_at = now()` on any UPDATE. Applied to: `alerts_subscribers`, `events`, `posts`, `announcements`.
 
 ---
 
@@ -534,6 +558,7 @@ All tables have RLS enabled. Policies follow a tiered model:
 | `events` | Public | Admin only | Admin only | Admin only |
 | `rsvps` | Self only | Self (future events only) | — | Self only |
 | `posts` | Authenticated | Author (pin/announce = admin) | Author or admin | Author or admin |
+| `announcements` | Authenticated | Admin only | Admin only | Admin only |
 | `post_comments` | Authenticated | Author only | Author or admin | Author or admin |
 | `post_reactions` | Authenticated | Self only | — | Self only |
 | `chat_channels` | Authenticated | Admin only | Admin only | Admin only |
@@ -561,6 +586,7 @@ All tables have RLS enabled. Policies follow a tiered model:
 | `posts` | `posts_created_at_idx` | `created_at DESC` | Feed ordering |
 | `posts` | `posts_event_id_idx` | `event_id` | Event-linked posts |
 | `posts` | `posts_channel_idx` | `channel, created_at DESC` | Channel filtering |
+| `announcements` | `announcements_created_at_idx` | `created_at DESC` | Official update feed ordering |
 | `post_comments` | `post_comments_post_id_idx` | `post_id, created_at` | Comment threads |
 | `post_reactions` | `post_reactions_post_id_idx` | `post_id` | Reaction aggregation |
 | `news_items` | `news_items_published_at_idx` | `published_at DESC NULLS LAST` | Feed ordering |
@@ -579,7 +605,7 @@ The schema is built incrementally from these files, applied in order:
 |-------|------|----------|
 | 1 | `Supabase Requirements.txt` | Baseline schema: `user_profiles`, `interests`, `events`, `rsvps`, `alerts_subscribers`, `alerts_confirmations`, `resources` |
 | 2 | `Supabase Production.sql` | Production hardening: `app_admins`, `is_admin()`, admin-only RLS policies, consent metadata, security-definer RPCs |
-| 3 | `Supabase Hub Upgrade.sql` | Feature additions: recurring meetings, `posts`, `post_comments`, `post_reactions`, `email_reminders`, `chat_channels`, `news_items`, `news_saves`, `v_upcoming_events` view |
+| 3 | `Supabase Hub Upgrade.sql` | Feature additions: recurring meetings, `posts`, `announcements`, `post_comments`, `post_reactions`, `email_reminders`, `chat_channels`, `news_items`, `news_saves`, `v_upcoming_events` view |
 
 **TypeScript types**: `types/supabase.ts` — mirrors all table schemas as exported TypeScript types.
 
@@ -589,6 +615,7 @@ The schema is built incrementally from these files, applied in order:
 - `recurrence.ts` — Series row generation from recurrence config
 - `reminders.ts` — Email reminder queue management
 - `posts.ts` — Newsfeed CRUD + hydrated feed queries
+- `announcements.ts` — Official announcement CRUD
 - `news.ts` — News item queries
 - `resources.ts` — Resource library CRUD
 - `profile.ts` — Profile upsert/fetch
