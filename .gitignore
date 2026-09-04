@@ -53,3 +53,5 @@ ui-debug.log
 functions/lib/
 functions/node_modules/
 service-account*.json
+users.csv
+users.json
