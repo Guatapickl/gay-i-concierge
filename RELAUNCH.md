@@ -1,7 +1,7 @@
 # Relaunch checklist (Sept 2026)
 
-Hosting is **Netlify** (auto-deploys `main` of `Guatapickl/gay-i-concierge`) with **Supabase** for auth + data.
-There is no Firebase anywhere in this project.
+Hosting is **Firebase App Hosting** with **Firebase Auth + Firestore** as of 2026-09-04 (see MIGRATION_FIREBASE.md §7).
+Sections 0–2 below describe the old Netlify/Supabase setup and are kept for history only; §3 still applies.
 
 ## 0. Blocker — restore the Supabase project
 `fnmtrgsdbkjlmeqesefu.supabase.co` no longer resolves (NXDOMAIN). Free-tier projects are paused after

@@ -1,6 +1,8 @@
 # Porting gayiclub.com from Netlify + Supabase to Firebase
 
-Status: **code port complete (all 73 files), not yet cut over.** The app now builds against Firebase only;
+Status: **CUT OVER 2026-09-04.** gayiclub.com serves App Hosting (us-east4) via Cloudflare DNS; users and data migrated; reminders scheduler live.
+
+Original plan status: The app now builds against Firebase only;
 `@supabase/*`, `netlify/` and `netlify.toml` are gone. Remaining work is console setup (§2), data/user
 migration (§4), and the App Hosting deploy + DNS move (§3). gayiclub.com keeps serving the old Netlify build until then.
 
@@ -95,3 +97,16 @@ against the emulators (`firebase emulators:start`). Remove `@supabase/*`, `netli
   `connectAuthEmulator` / `connectFirestoreEmulator` in `lib/firebase/client.ts` when it's set.
 - `firebase emulators:exec --only firestore "npx vitest run"` to run the unit suite with rules enforced.
 - Walk the smoke test in `RELAUNCH.md §3` on the App Hosting preview URL before moving DNS.
+
+## 7. As-built (2026-09-04)
+
+- DNS: Cloudflare zone `gayiclub.com` (account vibeshiftai), records unproxied. Token at `~/.cloudflare/dns-token`.
+- Hosting: App Hosting backend `gayiclub-web`, **us-east4**, deployed from local source with
+  `firebase deploy --only apphosting` (no GitHub connection). Custom domains gayiclub.com + www.
+- Secrets (Secret Manager): OPENAI_API_KEY, ANTHROPIC_API_KEY, GOOGLE_API_KEY, CRON_SECRET, RESEND_API_KEY, NEWS_INGEST_SECRET.
+  Change one with `printf '%s' VALUE | firebase apphosting:secrets:set NAME --data-file - --force`, then redeploy.
+- Reminders: Cloud Function `remindersTick` (us-east4) every 10 min → `https://gayiclub.com/api/cron/reminders`.
+  `functions/.env` holds `SITE_URL` (gitignored; recreate as `SITE_URL=https://gayiclub.com` on a fresh clone).
+- Email: Resend domain `gayiclub.com` — DKIM/SPF/MX on the `send` subdomain + DMARC are in Cloudflare.
+- Auth: 8 users imported with bcrypt hashes (localId = Supabase uuid). Praxis admin key: `service-account.json` (praxis-admin, roles/firebase.admin).
+- Cortex news bridge: repoint `GAYICLUB_INGEST_URL` to `https://gayiclub.com/api/news/ingest` with the new NEWS_INGEST_SECRET.
