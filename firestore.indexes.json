@@ -1,0 +1,24 @@
+{
+  "indexes": [
+    { "collectionGroup": "events", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "series_id", "order": "ASCENDING" }, { "fieldPath": "event_datetime", "order": "ASCENDING" } ] },
+    { "collectionGroup": "email_reminders", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" }, { "fieldPath": "send_at", "order": "ASCENDING" } ] },
+    { "collectionGroup": "email_reminders", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "event_id", "order": "ASCENDING" }, { "fieldPath": "recipient_email", "order": "ASCENDING" },
+      { "fieldPath": "kind", "order": "ASCENDING" }, { "fieldPath": "send_at", "order": "ASCENDING" } ] },
+    { "collectionGroup": "posts", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "channel", "order": "ASCENDING" }, { "fieldPath": "created_at", "order": "DESCENDING" } ] },
+    { "collectionGroup": "news_items", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "tag", "order": "ASCENDING" }, { "fieldPath": "published_at", "order": "DESCENDING" } ] },
+    { "collectionGroup": "meeting_polls", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" }, { "fieldPath": "created_at", "order": "DESCENDING" } ] },
+    { "collectionGroup": "meeting_poll_options", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "poll_id", "order": "ASCENDING" }, { "fieldPath": "sort_order", "order": "ASCENDING" } ] },
+    { "collectionGroup": "agenda_suggestions", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "event_id", "order": "ASCENDING" }, { "fieldPath": "created_at", "order": "ASCENDING" } ] },
+    { "collectionGroup": "rsvps", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "profile_id", "order": "ASCENDING" }, { "fieldPath": "created_at", "order": "DESCENDING" } ] }
+  ],
+  "fieldOverrides": []
+}

@@ -1,0 +1,134 @@
+rules_version = '2';
+
+// Mirrors the Supabase RLS policies in Supabase Production.sql / Hub Upgrade.sql /
+// Meeting Vote.sql. Collections keep their Postgres table names and column names
+// so the migration script and the app's types stay 1:1.
+//
+// Server-only collections (email_reminders, alerts_confirmations, robot_benchmarks
+// writes, news_items writes) are touched exclusively through the Admin SDK, which
+// bypasses these rules — so they get no client access here.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function uid() { return request.auth.uid; }
+    function isAdmin() { return signedIn() && exists(/databases/$(database)/documents/app_admins/$(uid())); }
+    function owns(field) { return signedIn() && resource.data[field] == uid(); }
+    function willOwn(field) { return signedIn() && request.resource.data[field] == uid(); }
+
+    // ---- admin roster (read-only for clients; managed in console/Admin SDK)
+    match /app_admins/{userId} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    // ---- profiles: self-only, as in Supabase
+    match /user_profiles/{userId} {
+      allow read: if signedIn() && (userId == uid() || isAdmin());
+      allow create, update: if signedIn() && userId == uid();
+      allow delete: if false;
+    }
+
+    // ---- public directory bits (community page) - keep readable to members
+    match /profiles/{id} { allow read: if signedIn(); allow write: if false; }
+    match /interests/{id} { allow read: if true; allow write: if isAdmin(); }
+    match /user_interests/{id} { allow read: if signedIn(); allow write: if willOwn('user_id') || owns('user_id'); }
+
+    // ---- events: public read, admin write
+    match /events/{eventId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ---- rsvps: doc id = `${event_id}_${profile_id}`
+    match /rsvps/{id} {
+      allow read: if owns('profile_id') || isAdmin();
+      allow create: if willOwn('profile_id');
+      allow delete: if owns('profile_id');
+      allow update: if false;
+    }
+
+    // ---- alerts: subscription state is edited only through API routes (Admin SDK)
+    match /alerts_subscribers/{id} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+    match /alerts_confirmations/{id} { allow read, write: if false; }
+
+    // ---- announcements / resources
+    match /announcements/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /resources/{id} {
+      allow read: if signedIn();
+      allow create: if willOwn('owner_user_id') || isAdmin();
+      allow update, delete: if owns('owner_user_id') || isAdmin();
+    }
+
+    // ---- communication hub
+    match /chat_channels/{id} { allow read: if signedIn(); allow write: if isAdmin(); }
+    match /posts/{id} {
+      allow read: if signedIn();
+      allow create: if willOwn('author_user_id');
+      allow update, delete: if owns('author_user_id') || isAdmin();
+    }
+    match /post_comments/{id} {
+      allow read: if signedIn();
+      allow create: if willOwn('author_user_id');
+      allow update, delete: if owns('author_user_id') || isAdmin();
+    }
+    match /post_reactions/{id} {          // doc id = `${post_id}_${user_id}_${emoji}`
+      allow read: if signedIn();
+      allow create: if willOwn('user_id');
+      allow delete: if owns('user_id');
+      allow update: if false;
+    }
+
+    // ---- news feed: ingest is server-side; members can save
+    match /news_items/{id} { allow read: if signedIn(); allow write: if false; }
+    match /news_saves/{id} {              // doc id = `${news_id}_${user_id}`
+      allow read: if signedIn();
+      allow create: if willOwn('user_id');
+      allow delete: if owns('user_id');
+      allow update: if false;
+    }
+
+    // ---- robot benchmark: results written by the API route
+    match /robot_benchmarks/{id} { allow read: if signedIn(); allow write: if false; }
+
+    // ---- meeting date polls
+    match /meeting_polls/{id} {
+      allow read: if signedIn();
+      allow create, update, delete: if isAdmin();
+    }
+    match /meeting_poll_options/{id} {
+      allow read: if signedIn();
+      allow create, delete: if isAdmin();
+      allow update: if false;
+    }
+    match /meeting_poll_votes/{id} {      // doc id = `${poll_id}_${user_id}_${option_id}`
+      allow read: if signedIn();
+      allow create: if willOwn('user_id')
+        && get(/databases/$(database)/documents/meeting_polls/$(request.resource.data.poll_id)).data.status == 'open';
+      allow delete: if owns('user_id');
+      allow update: if false;
+    }
+
+    // ---- member agenda suggestions
+    match /agenda_suggestions/{id} {
+      allow read: if signedIn();
+      allow create: if willOwn('user_id');
+      allow update, delete: if owns('user_id') || isAdmin();
+    }
+    match /agenda_suggestion_votes/{id} { // doc id = `${suggestion_id}_${user_id}`
+      allow read: if signedIn();
+      allow create: if willOwn('user_id');
+      allow delete: if owns('user_id');
+      allow update: if false;
+    }
+
+    // ---- email queue: server only
+    match /email_reminders/{id} { allow read, write: if false; }
+  }
+}

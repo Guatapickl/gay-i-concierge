@@ -1,0 +1,25 @@
+{
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "reminders",
+      "runtime": "nodejs20",
+      "predeploy": ["npm --prefix \"$RESOURCE_DIR\" run build"]
+    }
+  ],
+  "apphosting": {
+    "backendId": "gayiclub-web",
+    "rootDir": "/",
+    "ignore": ["node_modules", ".git", "functions", "netlify", "*.sql", "Internal Communications"]
+  },
+  "emulators": {
+    "auth": { "port": 9099 },
+    "firestore": { "port": 8080 },
+    "functions": { "port": 5001 },
+    "ui": { "enabled": true }
+  }
+}

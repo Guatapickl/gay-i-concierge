@@ -1,0 +1,39 @@
+# Firebase App Hosting config for the Next.js 16 app (replaces netlify.toml).
+# Secrets are created with: firebase apphosting:secrets:set <NAME>
+runConfig:
+  minInstances: 0
+  maxInstances: 4
+  concurrency: 80
+  cpu: 1
+  memoryMiB: 512
+
+env:
+  - variable: NEXT_PUBLIC_SITE_URL
+    value: https://gayiclub.com
+    availability: [BUILD, RUNTIME]
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    value: REPLACE_ME
+    availability: [BUILD, RUNTIME]
+  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    value: gayiclub.firebaseapp.com
+    availability: [BUILD, RUNTIME]
+  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    value: gayiclub
+    availability: [BUILD, RUNTIME]
+  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    value: REPLACE_ME
+    availability: [BUILD, RUNTIME]
+  - variable: EMAIL_FROM
+    value: "Gay I Club <noreply@gayiclub.com>"
+  - variable: RESEND_API_KEY
+    secret: RESEND_API_KEY
+  - variable: CRON_SECRET
+    secret: CRON_SECRET
+  - variable: NEWS_INGEST_SECRET
+    secret: NEWS_INGEST_SECRET
+  - variable: OPENAI_API_KEY
+    secret: OPENAI_API_KEY
+  - variable: ANTHROPIC_API_KEY
+    secret: ANTHROPIC_API_KEY
+  - variable: GOOGLE_API_KEY
+    secret: GOOGLE_API_KEY

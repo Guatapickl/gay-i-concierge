@@ -36,7 +36,8 @@
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules",
-    "netlify/functions"
+    "functions",
+    "netlify/functions",
+    "node_modules"
   ]
 }
