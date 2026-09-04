@@ -12,7 +12,7 @@ const CRON_SECRET = defineSecret('CRON_SECRET');
 const SITE_URL = defineString('SITE_URL', { default: 'https://gayiclub.com' });
 
 export const remindersTick = onSchedule(
-  { schedule: 'every 10 minutes', timeZone: 'America/New_York', secrets: [CRON_SECRET], region: 'us-east1' },
+  { schedule: 'every 10 minutes', timeZone: 'America/New_York', secrets: [CRON_SECRET], region: 'us-east4' },
   async () => {
     const target = `${SITE_URL.value().replace(/\/$/, '')}/api/cron/reminders?limit=50`;
     const res = await fetch(target, {
