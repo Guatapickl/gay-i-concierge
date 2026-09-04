@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Download, FileText, Sparkles, Save } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getUpcomingEvents, updateEvent } from '@/lib/events';
+import { getSuggestions } from '@/lib/agendaSuggestions';
 import type { Event } from '@/types/supabase';
 import { Alert, FormInput } from '@/components/ui';
 
@@ -70,6 +71,35 @@ export default function AgendaMakerPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState<string | null>(null);
+  const [importing, setImporting] = useState(false);
+
+  const importSuggestions = async () => {
+    setImporting(true);
+    setSaveMsg(null);
+    const [forEvent, general] = await Promise.all([
+      linkedEventId ? getSuggestions(linkedEventId) : Promise.resolve([]),
+      getSuggestions(null),
+    ]);
+    const pool = [...forEvent, ...general].filter(s => s.status !== 'declined');
+    const existing = new Set(items.map(i => i.text.trim().toLowerCase()));
+    const fresh = pool.filter(s => !existing.has(s.title.trim().toLowerCase()));
+    if (fresh.length === 0) {
+      setSaveMsg('No new member suggestions to import.');
+    } else {
+      setItems(prev => [
+        ...prev,
+        ...fresh.map(s => ({
+          id: newId(),
+          text: s.title,
+          duration: 10,
+          owner: s.author_name || '',
+          note: `${s.vote_count || 0} upvote${s.vote_count === 1 ? '' : 's'}${s.notes ? ` — ${s.notes}` : ''}`,
+        })),
+      ]);
+      setSaveMsg(`Imported ${fresh.length} member suggestion${fresh.length === 1 ? '' : 's'}.`);
+    }
+    setImporting(false);
+  };
 
   useEffect(() => {
     (async () => {
@@ -232,15 +262,26 @@ export default function AgendaMakerPage() {
             </button>
           ))}
           <button
+            onClick={importSuggestions}
+            disabled={importing}
+            className="ml-auto bg-surface-elevated border-[1.5px] border-border-subtle rounded-full px-3 py-1.5 text-xs font-bold text-foreground-muted hover:border-border-strong hover:text-foreground transition-colors disabled:opacity-50"
+            title="Pull in topics members have suggested"
+          >
+            {importing ? 'Importing…' : '↓ Member suggestions'}
+          </button>
+          <button
             onClick={generateAi}
             disabled={drafting}
-            className="ml-auto bg-surface-soft border-[1.5px] border-primary text-primary-muted rounded-full px-3 py-1.5 text-xs font-bold hover:bg-primary-subtle transition-colors disabled:opacity-50 inline-flex items-center gap-1.5"
+            className=" bg-surface-soft border-[1.5px] border-primary text-primary-muted rounded-full px-3 py-1.5 text-xs font-bold hover:bg-primary-subtle transition-colors disabled:opacity-50 inline-flex items-center gap-1.5"
           >
             <Sparkles className="w-3.5 h-3.5" />
             {drafting ? 'Drafting…' : 'AI draft'}
           </button>
         </div>
 
+        {saveMsg && !isAdmin && (
+          <p className="text-xs text-foreground-muted">{saveMsg}</p>
+        )}
         {draftError && (
           <Alert variant="error" onClose={() => setDraftError(null)}>
             {draftError}

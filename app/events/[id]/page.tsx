@@ -19,6 +19,7 @@ import { getRsvpedEventIds, saveRsvp, deleteRsvp, getEventAttendees } from '@/li
 import { supabase } from '@/lib/supabase';
 import { describeRecurrence } from '@/lib/recurrence';
 import CalendarExportButtons from '@/components/CalendarExportButtons';
+import AgendaSuggestions from '@/components/AgendaSuggestions';
 import { Button, Alert } from '@/components/ui';
 
 export default function EventDetailsPage() {
@@ -299,6 +300,9 @@ export default function EventDetailsPage() {
           </div>
         </div>
       )}
+
+      {/* Member topic suggestions */}
+      {!isPast && <AgendaSuggestions eventId={event.id} />}
 
       {/* Notes */}
       {event.notes && (

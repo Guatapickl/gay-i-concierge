@@ -27,6 +27,13 @@ export default function ProfilePage() {
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [newInterest, setNewInterest] = useState('');
 
+  // Security
+  const [providers, setProviders] = useState<string[]>([]);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [pwSaving, setPwSaving] = useState(false);
+  const [pwMessage, setPwMessage] = useState<{ text: string; ok: boolean } | null>(null);
+
   // Alerts
   const [emailOptIn, setEmailOptIn] = useState(false);
   const [smsOptIn, setSmsOptIn] = useState(false);
@@ -40,6 +47,8 @@ export default function ProfilePage() {
       if (!user) { router.replace('/auth/sign-in'); return; }
       setUserId(user.id);
       setUserEmail(user.email ?? null);
+      const provs = (user.identities || []).map(i => i.provider).filter(Boolean) as string[];
+      setProviders(provs.length ? provs : [(user.app_metadata?.provider as string) || 'email']);
 
       // Load profile (auth-coupled user profile)
       const { data: profileRow } = await supabase
@@ -143,6 +152,30 @@ export default function ProfilePage() {
       }
   };
 
+  const savePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPwMessage(null);
+    if (newPassword.length < 8) {
+      setPwMessage({ text: 'Password must be at least 8 characters.', ok: false });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPwMessage({ text: 'Passwords do not match.', ok: false });
+      return;
+    }
+    setPwSaving(true);
+    const { error: pwErr } = await supabase.auth.updateUser({ password: newPassword });
+    setPwSaving(false);
+    if (pwErr) {
+      setPwMessage({ text: pwErr.message, ok: false });
+      return;
+    }
+    setNewPassword('');
+    setConfirmPassword('');
+    setProviders(prev => (prev.includes('email') ? prev : [...prev, 'email']));
+    setPwMessage({ text: 'Password saved. You can now sign in with your email and password.', ok: true });
+  };
+
   if (loading) {
     return <LoadingSpinner text="Loading profile..." className="mt-8" />;
   }
@@ -223,6 +256,40 @@ export default function ProfilePage() {
           {saving ? 'Saving…' : 'Save Profile'}
         </Button>
       </form>
+
+      <section className="mt-8 card p-5 space-y-3">
+        <h3 className="font-semibold">Sign-in &amp; password</h3>
+        <p className="text-xs text-foreground-muted">
+          You currently sign in with: {providers.map(pv => (pv === 'email' ? 'email + password / magic link' : pv)).join(', ')}.
+          {!providers.includes('email') && ' Set a password below to also sign in without Google or a magic link.'}
+        </p>
+        <form onSubmit={savePassword} className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <FormInput
+            type="password"
+            value={newPassword}
+            onChange={e => setNewPassword(e.target.value)}
+            placeholder="New password (8+ characters)"
+            minLength={8}
+            autoComplete="new-password"
+          />
+          <FormInput
+            type="password"
+            value={confirmPassword}
+            onChange={e => setConfirmPassword(e.target.value)}
+            placeholder="Confirm new password"
+            minLength={8}
+            autoComplete="new-password"
+          />
+          <div className="md:col-span-2 flex items-center gap-3">
+            <Button type="submit" variant="outline" disabled={pwSaving || !newPassword}>
+              {pwSaving ? 'Saving…' : providers.includes('email') ? 'Change password' : 'Set password'}
+            </Button>
+            {pwMessage && (
+              <span className={`text-sm ${pwMessage.ok ? 'text-success' : 'text-danger'}`}>{pwMessage.text}</span>
+            )}
+          </div>
+        </form>
+      </section>
 
       <div className="mt-8">
         <MyRsvps />

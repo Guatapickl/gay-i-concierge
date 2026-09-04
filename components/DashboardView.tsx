@@ -12,12 +12,14 @@ import {
   ListChecks,
   Bot,
   Users,
+  Vote,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getUpcomingEvents } from '@/lib/events';
 import { getNewsItems, relativeTime, colorForTag } from '@/lib/news';
+import { getOpenPolls } from '@/lib/polls';
 import { describeRecurrence } from '@/lib/recurrence';
-import type { Event, NewsItem } from '@/types/supabase';
+import type { Event, NewsItem, MeetingPoll } from '@/types/supabase';
 import MyRsvps from '@/components/MyRsvps';
 import { LoadingSpinner } from '@/components/ui';
 
@@ -34,6 +36,7 @@ export default function DashboardView() {
   const [userName, setUserName] = useState<string | null>(null);
   const [nextEvent, setNextEvent] = useState<Event | null>(null);
   const [recentNews, setRecentNews] = useState<NewsItem[]>([]);
+  const [openPoll, setOpenPoll] = useState<MeetingPoll | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -41,10 +44,12 @@ export default function DashboardView() {
       const { data } = await supabase.auth.getUser();
       const uid = data.user?.id || null;
       if (data.user?.email) setUserName(data.user.email.split('@')[0]);
-      const [events, news] = await Promise.all([
+      const [events, news, polls] = await Promise.all([
         getUpcomingEvents(),
         getNewsItems(3),
+        getOpenPolls(),
       ]);
+      setOpenPoll(polls[0] || null);
       setNextEvent(events[0] || null);
       setRecentNews(news);
       setLoading(false);
@@ -85,6 +90,12 @@ export default function DashboardView() {
       icon: Bot,
     },
     {
+      href: '/vote',
+      title: 'Date Votes',
+      description: 'Pick the next meeting',
+      icon: Vote,
+    },
+    {
       href: '/community',
       title: 'Community',
       description: 'Browse members',
@@ -107,6 +118,23 @@ export default function DashboardView() {
           Meetings, recaps, and the latest from the AI frontier — all in one place.
         </p>
       </div>
+
+      {openPoll && (
+        <Link
+          href={`/vote/${openPoll.id}`}
+          className="card-tinted p-5 flex items-center gap-4 hover:border-border-strong transition-colors"
+        >
+          <div className="w-10 h-10 rounded-full bg-primary-muted text-white flex items-center justify-center shrink-0">
+            <Vote className="w-5 h-5" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-[11px] font-mono font-bold text-primary-muted tracking-wider">VOTE OPEN</div>
+            <div className="font-display font-bold text-foreground truncate">{openPoll.title}</div>
+            <div className="text-sm text-foreground-muted">Rank the dates for our next meeting.</div>
+          </div>
+          <ArrowRight className="w-5 h-5 text-foreground-subtle shrink-0" />
+        </Link>
+      )}
 
       {nextEvent && <NextMeetingCard event={nextEvent} />}
 

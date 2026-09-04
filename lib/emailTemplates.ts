@@ -182,3 +182,86 @@ function escapeHtml(s: string): string {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
+
+// ---------------------------------------------------------------------
+// Meeting date polls
+// ---------------------------------------------------------------------
+
+type PollForEmail = { id: string; title: string; description: string | null; closes_at: string | null };
+type PollOptionForEmail = { option_datetime: string; label: string | null };
+
+function formatOptionForEmail(o: PollOptionForEmail) {
+  return (
+    o.label ||
+    new Date(o.option_datetime).toLocaleString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      timeZone: 'America/New_York',
+    })
+  );
+}
+
+/** Ask members to rank candidate meeting dates. */
+export function pollInviteEmail(poll: PollForEmail, options: PollOptionForEmail[]) {
+  const voteUrl = `${SITE_URL}/vote/${poll.id}`;
+  const subject = `Vote: ${poll.title}`;
+  const list = options.map(o => `<li style="margin:4px 0;">${escapeHtml(formatOptionForEmail(o))}</li>`).join('');
+  const closes = poll.closes_at
+    ? `<p style="margin:0 0 16px;color:${PALETTE.muted};font-size:14px;">Voting closes ${escapeHtml(
+        new Date(poll.closes_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
+      )}.</p>`
+    : '';
+  const body = `
+<h1 style="margin:0 0 12px;font-size:22px;">${escapeHtml(poll.title)}</h1>
+${poll.description ? `<p style="margin:0 0 16px;line-height:1.5;">${escapeHtml(poll.description)}</p>` : ''}
+<p style="margin:0 0 8px;">Candidate dates:</p>
+<ul style="margin:0 0 20px;padding-left:20px;line-height:1.6;">${list}</ul>
+${closes}
+${button('Rank the dates', voteUrl)}
+<p style="margin:20px 0 0;color:${PALETTE.muted};font-size:13px;">Rank every date from best to worst — we book whichever comes out on top. You can change your ranking any time before voting closes.</p>`;
+  const text = [
+    poll.title,
+    '',
+    poll.description || '',
+    '',
+    'Candidate dates:',
+    ...options.map(o => `- ${formatOptionForEmail(o)}`),
+    '',
+    `Rank the dates: ${voteUrl}`,
+  ].join('\n');
+  return { subject, html: shell({ title: subject, preheader: 'Rank the dates for our next meeting', body }), text };
+}
+
+/** Announce the booked meeting after a poll closes. */
+export function pollResultEmail(poll: PollForEmail, event: Event) {
+  const when = new Date(event.event_datetime).toLocaleString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZone: 'America/New_York',
+  });
+  const eventUrl = `${SITE_URL}/events/${event.id}`;
+  const subject = `It's booked: ${event.title} — ${when}`;
+  const body = `
+<h1 style="margin:0 0 12px;font-size:22px;">${escapeHtml(event.title)}</h1>
+<p style="margin:0 0 6px;line-height:1.5;">Thanks for voting on “${escapeHtml(poll.title)}”. The winning date is:</p>
+<p style="margin:0 0 16px;font-size:18px;font-weight:700;">${escapeHtml(when)}</p>
+${event.location ? `<p style="margin:0 0 16px;color:${PALETTE.muted};">${escapeHtml(event.location)}</p>` : ''}
+${event.description ? `<p style="margin:0 0 20px;line-height:1.5;">${escapeHtml(event.description)}</p>` : ''}
+${button('RSVP & add to calendar', eventUrl)}
+<p style="margin:20px 0 0;color:${PALETTE.muted};font-size:13px;">RSVP on the site to get a reminder the day before and an hour before. Have a topic you want covered? Suggest it on the event page.</p>`;
+  const text = [
+    event.title,
+    '',
+    `Winning date: ${when}`,
+    event.location || '',
+    '',
+    `RSVP: ${eventUrl}`,
+  ].join('\n');
+  return { subject, html: shell({ title: subject, preheader: `Next meeting: ${when}`, body }), text };
+}

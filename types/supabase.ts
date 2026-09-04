@@ -182,3 +182,52 @@ export type Resource = {
   created_at: string;
   updated_at: string | null;
 };
+
+/**
+ * Meeting date poll (ranked-choice vote on candidate dates).
+ */
+export type MeetingPoll = {
+  id: string;
+  title: string;
+  description: string | null;
+  status: 'open' | 'closed';
+  created_by: string | null;
+  event_id: string | null;
+  closes_at: string | null;
+  created_at: string;
+  updated_at?: string | null;
+};
+
+export type MeetingPollOption = {
+  id: string;
+  poll_id: string;
+  option_datetime: string;
+  label: string | null;
+  sort_order: number;
+};
+
+export type MeetingPollVote = {
+  id: string;
+  poll_id: string;
+  option_id: string;
+  user_id: string;
+  rank: number;
+  created_at: string;
+};
+
+/**
+ * A topic a member wants on a meeting agenda.
+ */
+export type AgendaSuggestion = {
+  id: string;
+  event_id: string | null;
+  user_id: string;
+  author_name: string | null;
+  title: string;
+  notes: string | null;
+  status: 'proposed' | 'accepted' | 'declined';
+  created_at: string;
+  /** Derived client-side */
+  vote_count?: number;
+  voted_by_me?: boolean;
+};

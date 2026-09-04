@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { User, BookOpen, Bell, LogOut, ChevronDown } from 'lucide-react';
+import { User, BookOpen, Bell, LogOut, ChevronDown, Vote } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 /**
@@ -123,6 +123,7 @@ export default function AvatarMenu() {
             <MenuLink href="/profile" icon={User} label="Profile" onClick={() => setOpen(false)} />
             <MenuLink href="/resources" icon={BookOpen} label="Resources" onClick={() => setOpen(false)} />
             <MenuLink href="/alerts" icon={Bell} label="Alerts" onClick={() => setOpen(false)} />
+            <MenuLink href="/vote" icon={Vote} label="Date votes" onClick={() => setOpen(false)} />
           </nav>
           <div className="border-t border-border py-1.5">
             <button
