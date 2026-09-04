@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 
-// tallyPoll is pure; stub the supabase client so importing lib/polls needs no env.
-vi.mock('@/lib/supabase', () => ({ supabase: {} }));
+// tallyPoll is pure; stub the Firebase client so importing lib/polls needs no env.
+vi.mock('@/lib/firebase/client', () => ({ db: {}, firebaseAuth: {} }));
+vi.mock('@/lib/firebase/authClient', () => ({ currentUser: async () => null }));
 import { tallyPoll } from '@/lib/polls';
 import type { MeetingPollOption, MeetingPollVote } from '@/types/supabase';
 

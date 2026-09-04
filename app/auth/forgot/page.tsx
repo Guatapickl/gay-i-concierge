@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { requestPasswordReset } from '@/lib/firebase/authClient';
 import { Button, FormInput, Alert } from '@/components/ui';
 
 export default function ForgotPasswordPage() {
@@ -14,14 +14,11 @@ export default function ForgotPasswordPage() {
     setLoading(true);
     setMessage(null);
     try {
-      const redirectTo = typeof window !== 'undefined' ? `${window.location.origin}/auth/reset` : undefined;
-      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo,
-      });
-      if (error) setMessage(error.message);
-      else setMessage('If that email exists, a reset link is on its way.');
+      await requestPasswordReset(email.trim());
+      setMessage('If that email exists, a reset link is on its way.');
     } catch {
-      setMessage('Failed to send reset email.');
+      // Don't leak whether the address exists.
+      setMessage('If that email exists, a reset link is on its way.');
     } finally {
       setLoading(false);
     }

@@ -1,4 +1,6 @@
-import { supabase } from './supabase';
+import { deleteDoc, setDoc, where } from 'firebase/firestore';
+import { authHeader } from './firebase/authClient';
+import { listRows, nowIso, payloadOf, ref } from './firebase/db';
 
 /* ─── Types ──────────────────────────────────────────────────────── */
 
@@ -17,13 +19,17 @@ export type AttendeeListResponse = {
 
 /* ─── Helpers ────────────────────────────────────────────────────── */
 
+/** rsvps doc id — mirrors the Postgres (event_id, profile_id) unique key. */
+export function rsvpDocId(eventId: string, profileId: string) {
+  return `${eventId}_${profileId}`;
+}
+
 async function authHeaders(): Promise<Record<string, string> | null> {
-  const { data } = await supabase.auth.getSession();
-  const token = data.session?.access_token;
-  if (!token) return null;
+  const h = await authHeader();
+  if (!h.Authorization) return null;
   return {
     'Content-Type': 'application/json',
-    Authorization: `Bearer ${token}`,
+    Authorization: h.Authorization,
   };
 }
 
@@ -32,7 +38,7 @@ async function authHeaders(): Promise<Record<string, string> | null> {
 /**
  * Save an RSVP. Posts through `/api/events/rsvp` so the server can also
  * enqueue the confirmation email and any reminder rows. Falls back to a
- * direct insert if the API path errors (e.g. dev without service-role key).
+ * direct write if the API path errors (e.g. dev without admin credentials).
  */
 export async function saveRsvp(profileId: string, eventId: string): Promise<boolean> {
   try {
@@ -50,16 +56,16 @@ export async function saveRsvp(profileId: string, eventId: string): Promise<bool
     console.warn('RSVP API path failed, falling back to direct insert:', err);
   }
 
-  const { error } = await supabase
-    .from('rsvps')
-    .insert([{ profile_id: profileId, event_id: eventId }]);
-
-  if (error) {
-    console.error('Failed to save RSVP:', error.message);
+  try {
+    await setDoc(
+      ref('rsvps', rsvpDocId(eventId, profileId)),
+      payloadOf({ profile_id: profileId, event_id: eventId, created_at: nowIso() }),
+    );
+    return true;
+  } catch (err) {
+    console.error('Failed to save RSVP:', (err as Error).message);
     return false;
   }
-
-  return true;
 }
 
 /**
@@ -79,31 +85,26 @@ export async function deleteRsvp(profileId: string, eventId: string): Promise<bo
     console.warn('RSVP DELETE API failed, falling back to direct delete:', err);
   }
 
-  const { error } = await supabase
-    .from('rsvps')
-    .delete()
-    .eq('profile_id', profileId)
-    .eq('event_id', eventId);
-  if (error) {
-    console.error('Failed to delete RSVP:', error.message);
+  try {
+    await deleteDoc(ref('rsvps', rsvpDocId(eventId, profileId)));
+    return true;
+  } catch (err) {
+    console.error('Failed to delete RSVP:', (err as Error).message);
     return false;
   }
-  return true;
 }
 
 /**
  * Get event IDs that the profile has RSVPed for.
  */
 export async function getRsvpedEventIds(profileId: string): Promise<string[]> {
-  const { data, error } = await supabase
-    .from('rsvps')
-    .select('event_id')
-    .eq('profile_id', profileId);
-  if (error) {
-    console.error('Failed to load RSVPs:', error.message);
+  try {
+    const rows = await listRows<{ event_id: string }>('rsvps', where('profile_id', '==', profileId));
+    return rows.map(r => r.event_id);
+  } catch (err) {
+    console.error('Failed to load RSVPs:', (err as Error).message);
     return [];
   }
-  return (data || []).map(r => r.event_id);
 }
 
 /**
@@ -128,7 +129,7 @@ export async function checkRsvpStatus(eventId: string): Promise<boolean | null> 
 
 /**
  * Fetch the full attendee list for an event. Does not require authentication
- * (visibility is controlled by Supabase RLS on the rsvps table).
+ * (visibility is controlled server-side by the API route).
  */
 export async function getEventAttendees(eventId: string): Promise<AttendeeListResponse> {
   try {

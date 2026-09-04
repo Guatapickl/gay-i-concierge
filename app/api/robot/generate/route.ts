@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { rateLimit, getClientId } from '@/lib/rateLimit';
-import { createClient } from '@/utils/supabase/server';
+import { adminDb, isAdminUid } from '@/lib/firebase/admin';
+import { adminPayloadOf } from '@/lib/firebase/adminDb';
+import { callerFromRequest } from '../../_lib/caller';
 import {
   generate,
   PROVIDER_MODELS,
@@ -35,23 +37,15 @@ export async function POST(req: Request) {
     );
   }
 
-  // Authentication check
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Authentication check (Bearer ID token or __session cookie)
+  const user = await callerFromRequest(req);
 
   if (!user) {
     return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
   }
 
   // Admin authorization check
-  const { count } = await supabase
-    .from('app_admins')
-    .select('user_id', { count: 'exact', head: true })
-    .eq('user_id', user.id);
-
-  if (!count || count === 0) {
+  if (!(await isAdminUid(user.uid))) {
     return NextResponse.json(
       { ok: false, error: 'Unauthorized: Only administrators can edit prompts and generate new robots.' },
       { status: 403 }
@@ -87,19 +81,22 @@ export async function POST(req: Request) {
   const prompt_used = prompt === ROBOT_PROMPT ? 'default' : 'custom';
 
   // Save successful run to database
-  const { error: dbErr } = await supabase.from('robot_benchmarks').insert({
-    provider,
-    model_id: result.modelUsed,
-    svg: result.svg,
-    latency_ms,
-    scores,
-    average,
-    prompt_used,
-    user_id: user.id,
-  });
-
-  if (dbErr) {
-    console.error('Failed to save benchmark run to Supabase:', dbErr);
+  try {
+    await adminDb().collection('robot_benchmarks').doc().set(
+      adminPayloadOf({
+        provider,
+        model_id: result.modelUsed,
+        svg: result.svg,
+        latency_ms,
+        scores,
+        average,
+        prompt_used,
+        user_id: user.uid,
+        created_at: new Date().toISOString(),
+      }),
+    );
+  } catch (dbErr) {
+    console.error('Failed to save benchmark run to Firestore:', dbErr);
   }
 
   return NextResponse.json({

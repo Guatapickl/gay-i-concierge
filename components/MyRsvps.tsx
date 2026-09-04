@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { getEventsByIds } from '@/lib/events';
 import { getRsvpedEventIds, deleteRsvp } from '@/lib/rsvp';
-import { supabase } from '@/lib/supabase';
+import { currentUser } from '@/lib/firebase/authClient';
 import type { Event } from '@/types/supabase';
 import { Alert, LoadingSpinner } from '@/components/ui';
 import EventListItem from '@/components/EventListItem';
@@ -16,8 +16,8 @@ export default function MyRsvps() {
 
   useEffect(() => {
     (async () => {
-      const { data: authData } = await supabase.auth.getUser();
-      const uid = authData.user?.id || null;
+      const user = await currentUser();
+      const uid = user?.uid || null;
       setUserId(uid);
       if (!uid) {
         setLoading(false);

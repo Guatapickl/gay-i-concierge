@@ -14,7 +14,7 @@ import {
   Users,
   Vote,
 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { currentUser } from '@/lib/firebase/authClient';
 import { getUpcomingEvents } from '@/lib/events';
 import { getNewsItems, relativeTime, colorForTag } from '@/lib/news';
 import { getOpenPolls } from '@/lib/polls';
@@ -41,9 +41,9 @@ export default function DashboardView() {
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase.auth.getUser();
-      const uid = data.user?.id || null;
-      if (data.user?.email) setUserName(data.user.email.split('@')[0]);
+      const user = await currentUser();
+      const uid = user?.uid || null;
+      if (user?.email) setUserName(user.email.split('@')[0]);
       const [events, news, polls] = await Promise.all([
         getUpcomingEvents(),
         getNewsItems(3),

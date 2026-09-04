@@ -3,7 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase';
+import {
+  sendMagicLink as sendMagicLinkEmail,
+  signInWithPassword as signInWithPasswordFb,
+  signInWithGoogle as signInWithGoogleFb,
+} from '@/lib/firebase/authClient';
 import { Button, FormInput, Alert } from '@/components/ui';
 
 export default function SignInPage() {
@@ -18,16 +22,10 @@ export default function SignInPage() {
     setLoading(true);
     setMessage(null);
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email: email.trim(),
-        options: {
-          emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined,
-        },
-      });
-      if (error) setMessage(error.message);
-      else setMessage('Check your email for a sign-in link.');
-    } catch {
-      setMessage('Failed to send magic link.');
+      await sendMagicLinkEmail(email.trim());
+      setMessage('Check your email for a sign-in link.');
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : 'Failed to send magic link.');
     } finally {
       setLoading(false);
     }
@@ -38,17 +36,12 @@ export default function SignInPage() {
     setLoading(true);
     setMessage(null);
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      });
-      if (error) setMessage(error.message);
-      else {
-        setMessage('Signed in!');
-        router.push('/');
-      }
-    } catch {
-      setMessage('Failed to sign in.');
+      await signInWithPasswordFb(email.trim(), password);
+      setMessage('Signed in!');
+      router.push('/');
+      router.refresh();
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : 'Failed to sign in.');
     } finally {
       setLoading(false);
     }
@@ -58,15 +51,12 @@ export default function SignInPage() {
     setLoading(true);
     setMessage(null);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined,
-        },
-      });
-      if (error) setMessage(error.message);
-    } catch {
-      setMessage('Failed to sign in with Google.');
+      await signInWithGoogleFb();
+      setMessage('Signed in!');
+      router.push('/');
+      router.refresh();
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : 'Failed to sign in with Google.');
     } finally {
       setLoading(false);
     }

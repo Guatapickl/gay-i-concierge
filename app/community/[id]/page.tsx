@@ -11,7 +11,8 @@ import {
   User,
   Clock,
 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { currentUser } from '@/lib/firebase/authClient';
+import { getRow } from '@/lib/firebase/db';
 import { LoadingSpinner } from '@/components/ui';
 import type { DirectoryMember } from '@/lib/directory';
 
@@ -85,26 +86,23 @@ export default function MemberProfilePage() {
 
     (async () => {
       // Check auth
-      const { data: authData } = await supabase.auth.getUser();
-      if (!authData.user) {
+      const user = await currentUser();
+      if (!user) {
         router.replace('/auth/sign-in');
         return;
       }
 
-      setIsOwnProfile(authData.user.id === memberId);
+      setIsOwnProfile(user.uid === memberId);
 
       // Fetch member profile
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .select('id, full_name, experience_level, interests, created_at')
-        .eq('id', memberId)
-        .maybeSingle();
-
-      if (error) {
-        console.error('Error fetching member:', error.message);
+      let data: DirectoryMember | null = null;
+      try {
+        data = await getRow<DirectoryMember>('user_profiles', memberId);
+      } catch (error) {
+        console.error('Error fetching member:', error instanceof Error ? error.message : String(error));
       }
 
-      setMember(data as DirectoryMember | null);
+      setMember(data);
       setLoading(false);
     })();
   }, [memberId, router]);

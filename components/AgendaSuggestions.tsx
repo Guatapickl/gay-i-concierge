@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { ThumbsUp, Lightbulb, Trash2, Check, X } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { currentUser } from '@/lib/firebase/authClient';
 import {
   getSuggestions,
   addSuggestion,
@@ -38,8 +38,8 @@ export default function AgendaSuggestions({
   const [loaded, setLoaded] = useState(false);
 
   const load = useCallback(async () => {
-    const [{ data }, list] = await Promise.all([supabase.auth.getUser(), getSuggestions(eventId)]);
-    const uid = data.user?.id ?? null;
+    const [user, list] = await Promise.all([currentUser(), getSuggestions(eventId)]);
+    const uid = user?.uid ?? null;
     setUserId(uid);
     setItems(list);
     if (uid) setIsAdmin(await isCurrentUserAdmin(uid));

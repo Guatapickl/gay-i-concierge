@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getClientId, rateLimit } from '@/lib/rateLimit';
-import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
-import { generateToken, expiresIn } from '@/lib/tokens';
+import { createAlertToken, upsertSubscriber } from '../_lib';
 
 export const runtime = 'nodejs';
 
@@ -53,36 +52,34 @@ export async function POST(req: Request) {
   // Create confirmation tokens (2h expiry) instead of immediate opt-out
   const tokens: { channel: 'email' | 'sms'; token: string }[] = [];
   if (wantsEmail && email) {
-    const token = generateToken();
-    const { error } = await getSupabaseAdmin().from('alerts_confirmations').insert([
-      { token, action: 'unsubscribe', channel: 'email', email, expires_at: expiresIn(2) },
-    ]);
-    if (error) {
-      console.error('Create token failed:', error.message);
+    try {
+      const token = await createAlertToken({ action: 'unsubscribe', channel: 'email', email, ttlHours: 2 });
+      tokens.push({ channel: 'email', token });
+    } catch (e) {
+      console.error('Create token failed:', e instanceof Error ? e.message : e);
       return NextResponse.json({ error: 'Failed to create unsubscribe token.' }, { status: 500 });
     }
-    tokens.push({ channel: 'email', token });
   }
   if (wantsSms && phone) {
-    const token = generateToken();
-    const { error } = await getSupabaseAdmin().from('alerts_confirmations').insert([
-      { token, action: 'unsubscribe', channel: 'sms', phone, expires_at: expiresIn(2) },
-    ]);
-    if (error) {
-      console.error('Create token failed:', error.message);
+    try {
+      const token = await createAlertToken({ action: 'unsubscribe', channel: 'sms', phone, ttlHours: 2 });
+      tokens.push({ channel: 'sms', token });
+    } catch (e) {
+      console.error('Create token failed:', e instanceof Error ? e.message : e);
       return NextResponse.json({ error: 'Failed to create unsubscribe token.' }, { status: 500 });
     }
-    tokens.push({ channel: 'sms', token });
   }
 
-  // Optionally record intent (not final consent) on subscriber record
-  if (wantsEmail && email) {
-    await getSupabaseAdmin().from('alerts_subscribers')
-      .upsert({ email, user_id: user_id || null, consent_source, consent_ip }, { onConflict: 'email' });
-  }
-  if (wantsSms && phone) {
-    await getSupabaseAdmin().from('alerts_subscribers')
-      .upsert({ phone, user_id: user_id || null, consent_source, consent_ip }, { onConflict: 'phone' });
+  // Optionally record intent (not final consent) on subscriber record — best-effort
+  try {
+    if (wantsEmail && email) {
+      await upsertSubscriber({ email }, { user_id: user_id || null, consent_source, consent_ip });
+    }
+    if (wantsSms && phone) {
+      await upsertSubscriber({ phone }, { user_id: user_id || null, consent_source, consent_ip });
+    }
+  } catch (e) {
+    console.warn('Recording unsubscribe intent failed:', e instanceof Error ? e.message : e);
   }
 
   const debug = process.env.NODE_ENV !== 'production' ? { tokens } : undefined;

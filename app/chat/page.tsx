@@ -9,7 +9,8 @@ import {
   getChannelUnreadCounts,
   getRecentlyActiveAuthors,
 } from '@/lib/posts';
-import { supabase } from '@/lib/supabase';
+import { currentUser } from '@/lib/firebase/authClient';
+import { getRow } from '@/lib/firebase/db';
 import type { ChatChannel, FeedPost } from '@/types/supabase';
 import PostCard from '@/components/feed/PostCard';
 import { Alert, FormTextarea, LoadingSpinner } from '@/components/ui';
@@ -53,15 +54,11 @@ export default function CommunicationHubPage() {
   // Bootstrap: auth, channels, unread tallies
   useEffect(() => {
     (async () => {
-      const { data: authData } = await supabase.auth.getUser();
-      const uid = authData.user?.id || null;
+      const user = await currentUser();
+      const uid = user?.uid || null;
       setUserId(uid);
       if (uid) {
-        const { count } = await supabase
-          .from('app_admins')
-          .select('user_id', { count: 'exact', head: true })
-          .eq('user_id', uid);
-        setIsAdmin(!!count && count > 0);
+        setIsAdmin((await getRow('app_admins', uid)) !== null);
         const counts = await getChannelUnreadCounts(uid, lastVisited);
         setUnread(counts);
       }

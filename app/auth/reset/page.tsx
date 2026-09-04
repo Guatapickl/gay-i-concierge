@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { completePasswordReset } from '@/lib/firebase/authClient';
 import { Button, FormInput, Alert } from '@/components/ui';
 
 export default function ResetPasswordPage() {
@@ -12,83 +12,25 @@ export default function ResetPasswordPage() {
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [loading, setLoading] = useState(false);
+  const [oobCode, setOobCode] = useState<string | null>(null);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const href = window.location.href;
-        const url = new URL(href);
-        const error_description = url.searchParams.get('error_description');
-        if (error_description) {
-          setMessage(`Reset failed: ${error_description}`);
-          setPhase('error');
-          return;
-        }
-
-        // 1) Try code-based exchange (recovery can also use code)
-        const code = url.searchParams.get('code');
-        if (code) {
-          const { data, error } = await supabase.auth.exchangeCodeForSession(href);
-          if (error) {
-            setMessage(`Reset failed: ${error.message}`);
-            setPhase('error');
-            return;
-          }
-          if (data?.session) {
-            setPhase('ready');
-            setMessage('');
-            return;
-          }
-        }
-
-        // 2) Try token_hash verifyOtp for recovery
-        const token_hash = url.searchParams.get('token_hash');
-        const type = url.searchParams.get('type') as
-          | 'signup'
-          | 'magiclink'
-          | 'recovery'
-          | 'email_change'
-          | null;
-        if (token_hash && type === 'recovery') {
-          const { error } = await supabase.auth.verifyOtp({ type, token_hash });
-          if (error) {
-            setMessage(`Reset failed: ${error.message}`);
-            setPhase('error');
-            return;
-          }
-          setPhase('ready');
-          setMessage('');
-          return;
-        }
-
-        // 3) Try implicit hash flow
-        if (window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token')) {
-          const hash = window.location.hash.replace(/^#/, '');
-          const params = new URLSearchParams(hash);
-          const access_token = params.get('access_token') ?? undefined;
-          const refresh_token = params.get('refresh_token') ?? undefined;
-          if (access_token && refresh_token) {
-            const { data, error } = await supabase.auth.setSession({ access_token, refresh_token });
-            if (error) {
-              setMessage(`Reset failed: ${error.message}`);
-              setPhase('error');
-              return;
-            }
-            if (data?.session) {
-              setPhase('ready');
-              setMessage('');
-              return;
-            }
-          }
-        }
-
+    try {
+      const url = new URL(window.location.href);
+      const mode = url.searchParams.get('mode');
+      const code = url.searchParams.get('oobCode');
+      if (!code || (mode && mode !== 'resetPassword')) {
         setMessage('Invalid reset URL.');
         setPhase('error');
-      } catch {
-        setMessage('Reset failed.');
-        setPhase('error');
+        return;
       }
-    })();
+      setOobCode(code);
+      setPhase('ready');
+      setMessage('');
+    } catch {
+      setMessage('Reset failed.');
+      setPhase('error');
+    }
   }, [router]);
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -101,19 +43,20 @@ export default function ResetPasswordPage() {
       setMessage('Passwords do not match.');
       return;
     }
+    if (!oobCode) {
+      setMessage('Invalid reset URL.');
+      setPhase('error');
+      return;
+    }
     setLoading(true);
     setMessage('');
     try {
-      const { error } = await supabase.auth.updateUser({ password });
-      if (error) {
-        setMessage(`Could not update password: ${error.message}`);
-        return;
-      }
+      await completePasswordReset(oobCode, password);
       setPhase('done');
       setMessage('Password updated. Redirecting…');
-      setTimeout(() => router.replace('/'), 800);
-    } catch {
-      setMessage('Could not update password.');
+      setTimeout(() => router.replace('/auth/sign-in'), 800);
+    } catch (err) {
+      setMessage(`Could not update password: ${err instanceof Error ? err.message : 'unknown error'}`);
     } finally {
       setLoading(false);
     }
@@ -146,6 +89,7 @@ export default function ResetPasswordPage() {
           <Button type="submit" disabled={loading} variant="primary" fullWidth>
             {loading ? 'Updating…' : 'Update password'}
           </Button>
+          {message && <Alert variant="error">{message}</Alert>}
         </form>
       )}
       {phase === 'error' && (

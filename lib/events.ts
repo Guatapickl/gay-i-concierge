@@ -1,19 +1,24 @@
-import { supabase } from './supabase';
+import { addDoc, deleteDoc, doc, getDocs, limit as qLimit, orderBy, query, Timestamp, updateDoc, where, writeBatch } from 'firebase/firestore';
+import { db } from './firebase/client';
+import { chunk, col, getRow, listRows, nowIso, payloadOf, ref, rowOf } from './firebase/db';
 import { Event, AgendaItem, RecurrenceConfig } from '@/types/supabase';
 import { buildSeriesRows } from './recurrence';
 
+const byDate = (a: Event, b: Event) =>
+  new Date(a.event_datetime).getTime() - new Date(b.event_datetime).getTime();
+
 // Fetch upcoming events sorted by date
 export async function getUpcomingEvents(): Promise<Event[]> {
-  const { data, error } = await supabase
-    .from('events')
-    .select('*')
-    .gte('event_datetime', new Date().toISOString())
-    .order('event_datetime', { ascending: true });
-  if (error) {
-    console.error('Error fetching events:', error.message);
+  try {
+    return await listRows<Event>(
+      'events',
+      where('event_datetime', '>=', Timestamp.now()),
+      orderBy('event_datetime', 'asc'),
+    );
+  } catch (err) {
+    console.error('Error fetching events:', (err as Error).message);
     return [];
   }
-  return data || [];
 }
 
 // Insert a new event
@@ -24,22 +29,23 @@ export async function createEvent(newEvent: {
   location?: string | null;
   agenda?: AgendaItem[] | null;
 }): Promise<boolean> {
-  // Build row object conditionally to avoid errors if DB column doesn't exist yet
   const row: Partial<Event> = {
     title: newEvent.title,
     description: newEvent.description ?? null,
     event_datetime: newEvent.event_datetime,
     location: newEvent.location ?? null,
+    created_at: nowIso(),
   };
   if (typeof newEvent.agenda !== 'undefined') {
-    row.agenda = newEvent.agenda; // requires events.agenda jsonb column in DB
+    row.agenda = newEvent.agenda;
   }
-  const { error } = await supabase.from('events').insert([row]);
-  if (error) {
-    console.error('Failed to insert event:', error.message);
+  try {
+    await addDoc(col('events'), payloadOf(row));
+    return true;
+  } catch (err) {
+    console.error('Failed to insert event:', (err as Error).message);
     return false;
   }
-  return true;
 }
 
 // Update an existing event by ID
@@ -47,65 +53,66 @@ export async function updateEvent(
   eventId: string,
   updates: Partial<Event>
 ): Promise<boolean> {
-  const { error } = await supabase
-    .from('events')
-    .update(updates)
-    .eq('id', eventId);
-  if (error) {
-    console.error('Failed to update event:', error.message);
+  try {
+    await updateDoc(ref('events', eventId), payloadOf({ ...updates, updated_at: nowIso() }));
+    return true;
+  } catch (err) {
+    console.error('Failed to update event:', (err as Error).message);
     return false;
   }
-  return true;
 }
 
 // Get a single event by its ID
 export async function getEventById(id: string): Promise<Event | null> {
-  const { data, error } = await supabase
-    .from('events')
-    .select('*')
-    .eq('id', id)
-    .single();
-  if (error) {
-    console.error('Error fetching event:', error.message);
+  try {
+    return await getRow<Event>('events', id);
+  } catch (err) {
+    console.error('Error fetching event:', (err as Error).message);
     return null;
   }
-  return data as Event;
 }
 
 // Delete an event by ID
 export async function deleteEvent(eventId: string): Promise<boolean> {
-  const { error } = await supabase.from('events').delete().eq('id', eventId);
-  if (error) {
-    console.error('Failed to delete event:', error.message);
+  try {
+    await deleteDoc(ref('events', eventId));
+    return true;
+  } catch (err) {
+    console.error('Failed to delete event:', (err as Error).message);
     return false;
   }
-  return true;
 }
 
 // Delete every event sharing a series_id
 export async function deleteSeries(seriesId: string): Promise<boolean> {
-  const { error } = await supabase.from('events').delete().eq('series_id', seriesId);
-  if (error) {
-    console.error('Failed to delete series:', error.message);
+  try {
+    const snap = await getDocs(query(col('events'), where('series_id', '==', seriesId)));
+    for (const docs of chunk(snap.docs, 400)) {
+      const batch = writeBatch(db);
+      docs.forEach(d => batch.delete(d.ref));
+      await batch.commit();
+    }
+    return true;
+  } catch (err) {
+    console.error('Failed to delete series:', (err as Error).message);
     return false;
   }
-  return true;
 }
 
 // Fetch the next N upcoming events sharing a series_id (for "Series" view)
 export async function getUpcomingSeriesEvents(seriesId: string, limit = 12): Promise<Event[]> {
-  const { data, error } = await supabase
-    .from('events')
-    .select('*')
-    .eq('series_id', seriesId)
-    .gte('event_datetime', new Date().toISOString())
-    .order('event_datetime', { ascending: true })
-    .limit(limit);
-  if (error) {
-    console.error('Error fetching series events:', error.message);
+  try {
+    return await listRows<Event>(
+      'events',
+      where('series_id', '==', seriesId),
+      where('event_datetime', '>=', Timestamp.now()),
+      orderBy('event_datetime', 'asc'),
+      qLimit(limit),
+    );
+  } catch (err) {
+    console.error('Error fetching series events:', (err as Error).message);
     return [];
   }
-  return data || [];
 }
 
 /**
@@ -121,25 +128,35 @@ export async function createRecurringSeries(args: {
   recurrence: RecurrenceConfig;
 }): Promise<Event[] | null> {
   const rows = buildSeriesRows(args);
-  const { data, error } = await supabase.from('events').insert(rows).select();
-  if (error) {
-    console.error('Failed to create recurring series:', error.message);
+  try {
+    const created_at = nowIso();
+    const batch = writeBatch(db);
+    const out: Event[] = rows.map(r => {
+      const d = doc(col('events'));
+      const row = { ...r, created_at };
+      batch.set(d, payloadOf(row));
+      return { id: d.id, ...row } as Event;
+    });
+    await batch.commit();
+    return out;
+  } catch (err) {
+    console.error('Failed to create recurring series:', (err as Error).message);
     return null;
   }
-  return (data || []) as Event[];
 }
 
 // Fetch events by array of IDs (helper for "My RSVPs")
 export async function getEventsByIds(ids: string[]): Promise<Event[]> {
   if (!ids.length) return [];
-  const { data, error } = await supabase
-    .from('events')
-    .select('*')
-    .in('id', ids)
-    .order('event_datetime', { ascending: true });
-  if (error) {
-    console.error('Error fetching events by IDs:', error.message);
+  try {
+    const out: Event[] = [];
+    for (const part of chunk(Array.from(new Set(ids)))) {
+      const snap = await getDocs(query(col('events'), where('__name__', 'in', part)));
+      snap.docs.forEach(d => out.push(rowOf<Event>(d)));
+    }
+    return out.sort(byDate);
+  } catch (err) {
+    console.error('Error fetching events by IDs:', (err as Error).message);
     return [];
   }
-  return (data || []) as Event[];
 }

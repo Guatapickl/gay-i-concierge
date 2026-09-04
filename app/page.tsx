@@ -1,4 +1,4 @@
-import { createClient } from '@/utils/supabase/server';
+import { getServerUser } from '@/lib/firebase/session';
 import DashboardView from '@/components/DashboardView';
 import LandingHero from '@/components/LandingHero';
 
@@ -7,10 +7,7 @@ import LandingHero from '@/components/LandingHero';
  * client renders — no flash of unauthenticated content.
  */
 export default async function HomePage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getServerUser();
 
   if (user) return <DashboardView />;
   return <LandingHero />;

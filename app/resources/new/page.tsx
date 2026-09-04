@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { currentUser } from '@/lib/firebase/authClient';
 import { createResource } from '@/lib/resources';
 
 export default function NewResourcePage() {
@@ -23,8 +23,8 @@ export default function NewResourcePage() {
           e.preventDefault();
           setSaving(true);
           setMessage(null);
-          const { data } = await supabase.auth.getUser();
-          const uid = data.user?.id;
+          const user = await currentUser();
+          const uid = user?.uid;
           if (!uid) {
             setSaving(false);
             setMessage('Please sign in first.');

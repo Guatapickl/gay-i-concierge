@@ -1,7 +1,8 @@
 # Porting gayiclub.com from Netlify + Supabase to Firebase
 
-Status: **prepared, not executed.** Everything below is scaffolded in the repo; the app still runs on Supabase
-until the file-by-file port in §5 lands. Nothing here touches the live site.
+Status: **code port complete (all 73 files), not yet cut over.** The app now builds against Firebase only;
+`@supabase/*`, `netlify/` and `netlify.toml` are gone. Remaining work is console setup (§2), data/user
+migration (§4), and the App Hosting deploy + DNS move (§3). gayiclub.com keeps serving the old Netlify build until then.
 
 ## 1. Target architecture
 

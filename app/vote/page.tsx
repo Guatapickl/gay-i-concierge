@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Vote, Plus, CheckCircle2 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { currentUser } from '@/lib/firebase/authClient';
 import { getAllPolls } from '@/lib/polls';
 import { isCurrentUserAdmin } from '@/lib/isAdmin';
 import type { MeetingPoll } from '@/types/supabase';
@@ -17,13 +17,13 @@ export default function VoteIndexPage() {
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase.auth.getUser();
-      if (!data.user) {
+      const user = await currentUser();
+      if (!user) {
         setSignedIn(false);
         setLoading(false);
         return;
       }
-      const [list, admin] = await Promise.all([getAllPolls(), isCurrentUserAdmin(data.user.id)]);
+      const [list, admin] = await Promise.all([getAllPolls(), isCurrentUserAdmin(user.uid)]);
       setPolls(list);
       setIsAdmin(admin);
       setLoading(false);

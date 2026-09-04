@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Sparkles, Activity, Filter, RefreshCw, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
+import { currentUser } from '@/lib/firebase/authClient';
 import { getSavedNewsIds, toggleSavedNews } from '@/lib/news';
 import type { NewsItem } from '@/types/supabase';
 import { Alert, LoadingSpinner } from '@/components/ui';
@@ -27,12 +27,9 @@ export default function NewsFeedPage() {
     setError(null);
 
     try {
-      const { data: authData, error: authError } = await supabase.auth.getUser();
-      if (authError && authError.message !== 'Auth session missing!') {
-        console.error('Auth error:', authError);
-      }
+      const user = await currentUser();
       
-      const uid = authData?.user?.id || null;
+      const uid = user?.uid || null;
       setUserId(uid);
 
       // Fetch from the newly created backend API

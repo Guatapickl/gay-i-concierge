@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { adminDb, userFromRequest } from '@/lib/firebase/admin';
+import { adminPayloadOf, adminRowOf } from '@/lib/firebase/adminDb';
 import { enqueueRsvpConfirmation, scheduleEventReminders } from '@/lib/reminders';
 
 export const runtime = 'nodejs';
@@ -7,15 +8,9 @@ export const runtime = 'nodejs';
 /**
  * Authenticated RSVP endpoint that wraps the database insert with email
  * side-effects (confirmation + reminder scheduling). Clients can keep using
- * the direct supabase RSVP path; calling this route just adds the emails.
+ * the direct RSVP path; calling this route just adds the emails.
  */
 export async function POST(req: Request) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return NextResponse.json({ error: 'Supabase not configured' }, { status: 500 });
-  }
-
   let body: { event_id?: string };
   try {
     body = await req.json();
@@ -26,26 +21,34 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'event_id required' }, { status: 400 });
   }
 
-  const authHeader = req.headers.get('authorization');
-  if (!authHeader) {
+  if (!req.headers.get('authorization')) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
-
-  const userClient = createClient(supabaseUrl, supabaseAnonKey, {
-    global: { headers: { Authorization: authHeader } },
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-  const { data: userRes } = await userClient.auth.getUser();
-  const userId = userRes?.user?.id;
-  if (!userId) {
+  const user = await userFromRequest(req);
+  if (!user) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
+  const userId = user.uid;
 
-  const { error: insertError } = await userClient
-    .from('rsvps')
-    .insert([{ profile_id: userId, event_id: body.event_id }]);
-  if (insertError && !insertError.message.includes('duplicate')) {
-    return NextResponse.json({ error: insertError.message }, { status: 400 });
+  try {
+    const db = adminDb();
+    const ref = db.collection('rsvps').doc(`${body.event_id}_${userId}`);
+    const existing = await ref.get();
+    if (!existing.exists) {
+      // Postgres filled event_date via trigger/default; mirror it from the event when available.
+      const eventSnap = await db.collection('events').doc(body.event_id).get();
+      const event = eventSnap.exists ? adminRowOf<{ event_datetime: string | null }>(eventSnap) : null;
+      await ref.set(
+        adminPayloadOf({
+          profile_id: userId,
+          event_id: body.event_id,
+          event_date: event?.event_datetime ?? null,
+          created_at: new Date().toISOString(),
+        }),
+      );
+    }
+  } catch (e) {
+    return NextResponse.json({ error: e instanceof Error ? e.message : 'insert failed' }, { status: 400 });
   }
 
   // Side effects — best-effort, never fail the RSVP for email issues

@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { currentUser } from '@/lib/firebase/authClient';
+import { getRow } from '@/lib/firebase/db';
 import { getResourceById, updateResource, deleteResource } from '@/lib/resources';
 import type { Resource } from '@/types/supabase';
 
@@ -37,15 +38,11 @@ export default function EditResourcePage() {
         setTags((r.tags || []).join(', '));
         setIsPinned(!!r.is_pinned);
       }
-      const { data: authData } = await supabase.auth.getUser();
-      const uid = authData.user?.id || null;
+      const user = await currentUser();
+      const uid = user?.uid || null;
       setUserId(uid);
       if (uid) {
-        const { count } = await supabase
-          .from('app_admins')
-          .select('user_id', { count: 'exact', head: true })
-          .eq('user_id', uid);
-        setIsAdmin(!!count && count > 0);
+        setIsAdmin((await getRow('app_admins', uid)) !== null);
       }
       setLoading(false);
     })();

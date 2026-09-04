@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Plus, ExternalLink, Pencil, Tag, Filter, X } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { currentUser } from '@/lib/firebase/authClient';
+import { getRow } from '@/lib/firebase/db';
 import { getAllResources } from '@/lib/resources';
 import type { Resource } from '@/types/supabase';
 import { Button, Alert, LoadingSpinner } from '@/components/ui';
@@ -17,15 +18,11 @@ export default function ResourcesPage() {
 
   useEffect(() => {
     (async () => {
-      const { data: authData } = await supabase.auth.getUser();
-      const uid = authData.user?.id || null;
+      const user = await currentUser();
+      const uid = user?.uid || null;
       setUserId(uid);
       if (uid) {
-        const { count } = await supabase
-          .from('app_admins')
-          .select('user_id', { count: 'exact', head: true })
-          .eq('user_id', uid);
-        setIsAdmin(!!count && count > 0);
+        setIsAdmin((await getRow('app_admins', uid)) !== null);
       }
       const data = await getAllResources();
       setResources(data);

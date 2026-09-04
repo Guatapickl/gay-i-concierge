@@ -3,7 +3,9 @@
 import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { Search, Users, Sparkles, ArrowRight, Filter } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { currentUser } from '@/lib/firebase/authClient';
+import { listRows } from '@/lib/firebase/db';
+import { orderBy } from 'firebase/firestore';
 import { LoadingSpinner } from '@/components/ui';
 import InviteCard from '@/components/InviteCard';
 import type { DirectoryMember } from '@/lib/directory';
@@ -55,22 +57,20 @@ export default function CommunityPage() {
   useEffect(() => {
     (async () => {
       // Check auth
-      const { data: authData } = await supabase.auth.getUser();
-      if (!authData.user) {
+      const user = await currentUser();
+      if (!user) {
         setLoading(false);
         return;
       }
 
       // Fetch all member profiles
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .select('id, full_name, experience_level, interests, created_at')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching directory:', error.message);
+      let data: DirectoryMember[] = [];
+      try {
+        data = await listRows<DirectoryMember>('user_profiles', orderBy('created_at', 'desc'));
+      } catch (error) {
+        console.error('Error fetching directory:', error instanceof Error ? error.message : String(error));
       }
-      setMembers((data || []) as DirectoryMember[]);
+      setMembers(data);
       setLoading(false);
     })();
   }, []);

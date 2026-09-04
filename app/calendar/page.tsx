@@ -3,7 +3,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { currentUser } from '@/lib/firebase/authClient';
+import { getRow, listRows, toTs } from '@/lib/firebase/db';
+import { orderBy, where } from 'firebase/firestore';
 import type { Event } from '@/types/supabase';
 import { describeRecurrence } from '@/lib/recurrence';
 import { LoadingSpinner } from '@/components/ui';
@@ -40,21 +42,17 @@ export default function CalendarPage() {
       // Pull the current visible month plus 60 days of upcoming for the sidebar
       const start = new Date(year, month, 1).toISOString();
       const end = new Date(year, month + 2, 1).toISOString();
-      const { data } = await supabase
-        .from('events')
-        .select('*')
-        .gte('event_datetime', start)
-        .lt('event_datetime', end)
-        .order('event_datetime', { ascending: true });
-      setEvents((data || []) as Event[]);
+      const data = await listRows<Event>(
+        'events',
+        where('event_datetime', '>=', toTs(start)),
+        where('event_datetime', '<', toTs(end)),
+        orderBy('event_datetime', 'asc'),
+      );
+      setEvents(data);
 
-      const { data: authData } = await supabase.auth.getUser();
-      if (authData.user) {
-        const { count } = await supabase
-          .from('app_admins')
-          .select('user_id', { count: 'exact', head: true })
-          .eq('user_id', authData.user.id);
-        setIsAdmin(!!count && count > 0);
+      const user = await currentUser();
+      if (user) {
+        setIsAdmin((await getRow('app_admins', user.uid)) !== null);
       }
       setLoading(false);
     })();

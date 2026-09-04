@@ -1,4 +1,7 @@
-import { supabase } from './supabase';
+import { addDoc, deleteDoc, doc, getDocs, orderBy, query, updateDoc, where, writeBatch } from 'firebase/firestore';
+import { db } from './firebase/client';
+import { currentUser } from './firebase/authClient';
+import { col, getRow, listRows, nowIso, payloadOf, ref } from './firebase/db';
 import type { MeetingPoll, MeetingPollOption, MeetingPollVote } from '@/types/supabase';
 
 export type PollWithOptions = MeetingPoll & { options: MeetingPollOption[] };
@@ -17,45 +20,41 @@ export type PollTally = {
   ranked: OptionTally[]; // best first
 };
 
+/** meeting_poll_votes doc id — mirrors the Postgres (poll_id, user_id, option_id) unique key. */
+export function pollVoteDocId(pollId: string, userId: string, optionId: string) {
+  return `${pollId}_${userId}_${optionId}`;
+}
+
 export async function getOpenPolls(): Promise<MeetingPoll[]> {
-  const { data, error } = await supabase
-    .from('meeting_polls')
-    .select('*')
-    .eq('status', 'open')
-    .order('created_at', { ascending: false });
-  if (error) {
-    console.error('Error fetching polls:', error.message);
+  try {
+    return await listRows<MeetingPoll>('meeting_polls', where('status', '==', 'open'), orderBy('created_at', 'desc'));
+  } catch (err) {
+    console.error('Error fetching polls:', (err as Error).message);
     return [];
   }
-  return (data || []) as MeetingPoll[];
 }
 
 export async function getAllPolls(): Promise<MeetingPoll[]> {
-  const { data, error } = await supabase
-    .from('meeting_polls')
-    .select('*')
-    .order('created_at', { ascending: false });
-  if (error) {
-    console.error('Error fetching polls:', error.message);
+  try {
+    return await listRows<MeetingPoll>('meeting_polls', orderBy('created_at', 'desc'));
+  } catch (err) {
+    console.error('Error fetching polls:', (err as Error).message);
     return [];
   }
-  return (data || []) as MeetingPoll[];
 }
 
 export async function getPoll(id: string): Promise<PollWithOptions | null> {
-  const [{ data: poll, error }, { data: options }] = await Promise.all([
-    supabase.from('meeting_polls').select('*').eq('id', id).single(),
-    supabase
-      .from('meeting_poll_options')
-      .select('*')
-      .eq('poll_id', id)
-      .order('sort_order', { ascending: true }),
-  ]);
-  if (error || !poll) {
-    if (error) console.error('Error fetching poll:', error.message);
+  try {
+    const [poll, options] = await Promise.all([
+      getRow<MeetingPoll>('meeting_polls', id),
+      listRows<MeetingPollOption>('meeting_poll_options', where('poll_id', '==', id), orderBy('sort_order', 'asc')),
+    ]);
+    if (!poll) return null;
+    return { ...poll, options };
+  } catch (err) {
+    console.error('Error fetching poll:', (err as Error).message);
     return null;
   }
-  return { ...(poll as MeetingPoll), options: (options || []) as MeetingPollOption[] };
 }
 
 export async function createPoll(args: {
@@ -65,43 +64,55 @@ export async function createPoll(args: {
   /** ISO datetimes, in the order they should be displayed. */
   optionDatetimes: string[];
 }): Promise<string | null> {
-  const { data: userRes } = await supabase.auth.getUser();
-  const { data: poll, error } = await supabase
-    .from('meeting_polls')
-    .insert({
+  const user = await currentUser();
+  const now = nowIso();
+  let pollId: string;
+  try {
+    const d = await addDoc(col('meeting_polls'), payloadOf({
       title: args.title,
       description: args.description,
+      status: 'open',
+      event_id: null,
       closes_at: args.closesAt,
-      created_by: userRes.user?.id ?? null,
-    })
-    .select('id')
-    .single();
-  if (error || !poll) {
-    console.error('Failed to create poll:', error?.message);
+      created_by: user?.uid ?? null,
+      created_at: now,
+      updated_at: now,
+    }));
+    pollId = d.id;
+  } catch (err) {
+    console.error('Failed to create poll:', (err as Error).message);
     return null;
   }
-  const rows = args.optionDatetimes.map((dt, i) => ({
-    poll_id: poll.id as string,
-    option_datetime: dt,
-    sort_order: i,
-  }));
-  const { error: optErr } = await supabase.from('meeting_poll_options').insert(rows);
-  if (optErr) {
-    console.error('Failed to create poll options:', optErr.message);
-    await supabase.from('meeting_polls').delete().eq('id', poll.id);
+  try {
+    const batch = writeBatch(db);
+    args.optionDatetimes.forEach((dt, i) => {
+      batch.set(doc(col('meeting_poll_options')), payloadOf({
+        poll_id: pollId,
+        option_datetime: dt,
+        label: null,
+        sort_order: i,
+      }));
+    });
+    await batch.commit();
+  } catch (err) {
+    console.error('Failed to create poll options:', (err as Error).message);
+    await deleteDoc(ref('meeting_polls', pollId)).catch(() => {});
     return null;
   }
-  return poll.id as string;
+  return pollId;
 }
 
 export async function getMyRanking(pollId: string, userId: string): Promise<string[]> {
-  const { data } = await supabase
-    .from('meeting_poll_votes')
-    .select('option_id, rank')
-    .eq('poll_id', pollId)
-    .eq('user_id', userId)
-    .order('rank', { ascending: true });
-  return (data || []).map(r => r.option_id as string);
+  try {
+    const rows = await listRows<MeetingPollVote>(
+      'meeting_poll_votes',
+      where('poll_id', '==', pollId),
+      where('user_id', '==', userId),
+    );
+    return rows.sort((a, b) => a.rank - b.rank).map(r => r.option_id);
+  } catch {
+    return [];
+  }
 }
 
 /** Replace the caller's ranking with `orderedOptionIds` (best first). */
@@ -110,39 +121,48 @@ export async function submitRanking(
   userId: string,
   orderedOptionIds: string[]
 ): Promise<boolean> {
-  const { error: delErr } = await supabase
-    .from('meeting_poll_votes')
-    .delete()
-    .eq('poll_id', pollId)
-    .eq('user_id', userId);
-  if (delErr) {
-    console.error('Failed to clear previous ranking:', delErr.message);
+  try {
+    const existing = await getDocs(query(
+      col('meeting_poll_votes'),
+      where('poll_id', '==', pollId),
+      where('user_id', '==', userId),
+    ));
+    if (existing.size > 0) {
+      const del = writeBatch(db);
+      existing.docs.forEach(d => del.delete(d.ref));
+      await del.commit();
+    }
+  } catch (err) {
+    console.error('Failed to clear previous ranking:', (err as Error).message);
     return false;
   }
-  const rows = orderedOptionIds.map((option_id, i) => ({
-    poll_id: pollId,
-    option_id,
-    user_id: userId,
-    rank: i + 1,
-  }));
-  const { error } = await supabase.from('meeting_poll_votes').insert(rows);
-  if (error) {
-    console.error('Failed to submit ranking:', error.message);
+  try {
+    const batch = writeBatch(db);
+    const created_at = nowIso();
+    orderedOptionIds.forEach((option_id, i) => {
+      batch.set(ref('meeting_poll_votes', pollVoteDocId(pollId, userId, option_id)), payloadOf({
+        poll_id: pollId,
+        option_id,
+        user_id: userId,
+        rank: i + 1,
+        created_at,
+      }));
+    });
+    await batch.commit();
+    return true;
+  } catch (err) {
+    console.error('Failed to submit ranking:', (err as Error).message);
     return false;
   }
-  return true;
 }
 
 export async function getPollVotes(pollId: string): Promise<MeetingPollVote[]> {
-  const { data, error } = await supabase
-    .from('meeting_poll_votes')
-    .select('*')
-    .eq('poll_id', pollId);
-  if (error) {
-    console.error('Error fetching votes:', error.message);
+  try {
+    return await listRows<MeetingPollVote>('meeting_poll_votes', where('poll_id', '==', pollId));
+  } catch (err) {
+    console.error('Error fetching votes:', (err as Error).message);
     return [];
   }
-  return (data || []) as MeetingPollVote[];
 }
 
 /** Borda count over the ranked ballots. Ties broken by first-choice count, then earlier date. */
@@ -178,15 +198,17 @@ export function tallyPoll(options: MeetingPollOption[], votes: MeetingPollVote[]
 }
 
 export async function closePoll(pollId: string, eventId: string | null): Promise<boolean> {
-  const { error } = await supabase
-    .from('meeting_polls')
-    .update({ status: 'closed', event_id: eventId })
-    .eq('id', pollId);
-  if (error) {
-    console.error('Failed to close poll:', error.message);
+  try {
+    await updateDoc(ref('meeting_polls', pollId), payloadOf({
+      status: 'closed',
+      event_id: eventId,
+      updated_at: nowIso(),
+    }));
+    return true;
+  } catch (err) {
+    console.error('Failed to close poll:', (err as Error).message);
     return false;
   }
-  return true;
 }
 
 export function formatOption(o: MeetingPollOption): string {

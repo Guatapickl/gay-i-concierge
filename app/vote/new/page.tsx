@@ -56,7 +56,7 @@ export default function NewPollPage() {
     });
     setSaving(false);
     if (!id) {
-      setMessage('Could not create the poll. Are you an admin and is the Supabase migration applied?');
+      setMessage('Could not create the poll. Are you an admin and does the Firestore project have the meeting_polls collection rules deployed?');
       return;
     }
     router.push(`/vote/${id}`);

@@ -1,27 +1,16 @@
 "use client";
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { LogOut, User } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { signOut as fbSignOut } from '@/lib/firebase/authClient';
 
 export default function AuthNav() {
-  const [isAuthed, setAuthed] = useState(false);
-
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      const { data } = await supabase.auth.getSession();
-      if (mounted) setAuthed(!!data.session);
-    })();
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      setAuthed(!!session);
-    });
-    return () => { sub.subscription.unsubscribe(); mounted = false; };
-  }, []);
+  const { user } = useCurrentUser();
+  const isAuthed = !!user;
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    await fbSignOut();
     if (typeof window !== 'undefined') window.location.reload();
   };
 

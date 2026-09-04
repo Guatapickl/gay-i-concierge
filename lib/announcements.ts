@@ -1,19 +1,14 @@
-import { supabase } from './supabase';
+import { addDoc, deleteDoc, limit as qLimit, orderBy, updateDoc } from 'firebase/firestore';
+import { col, listRows, nowIso, payloadOf, ref } from './firebase/db';
 import type { Announcement } from '@/types/supabase';
 
 export async function getAnnouncements(limit = 100): Promise<Announcement[]> {
-  const { data, error } = await supabase
-    .from('announcements')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(limit);
-
-  if (error) {
-    console.error('Failed to fetch announcements:', error.message);
+  try {
+    return await listRows<Announcement>('announcements', orderBy('created_at', 'desc'), qLimit(limit));
+  } catch (err) {
+    console.error('Failed to fetch announcements:', (err as Error).message);
     return [];
   }
-
-  return (data || []) as Announcement[];
 }
 
 export async function createAnnouncement(args: {
@@ -21,54 +16,46 @@ export async function createAnnouncement(args: {
   title: string;
   body: string;
 }): Promise<Announcement | null> {
-  const { data, error } = await supabase
-    .from('announcements')
-    .insert({
-      author_user_id: args.authorUserId,
-      title: args.title.trim(),
-      body: args.body.trim(),
-    })
-    .select()
-    .single();
-
-  if (error) {
-    console.error('Failed to create announcement:', error.message);
+  const now = nowIso();
+  const row: Omit<Announcement, 'id'> = {
+    author_user_id: args.authorUserId,
+    title: args.title.trim(),
+    body: args.body.trim(),
+    created_at: now,
+    updated_at: now,
+  };
+  try {
+    const d = await addDoc(col('announcements'), payloadOf(row));
+    return { id: d.id, ...row };
+  } catch (err) {
+    console.error('Failed to create announcement:', (err as Error).message);
     return null;
   }
-
-  return data as Announcement;
 }
 
 export async function updateAnnouncement(
   announcementId: string,
   args: { title: string; body: string },
 ): Promise<boolean> {
-  const { error } = await supabase
-    .from('announcements')
-    .update({
+  try {
+    await updateDoc(ref('announcements', announcementId), payloadOf({
       title: args.title.trim(),
       body: args.body.trim(),
-    })
-    .eq('id', announcementId);
-
-  if (error) {
-    console.error('Failed to update announcement:', error.message);
+      updated_at: nowIso(),
+    }));
+    return true;
+  } catch (err) {
+    console.error('Failed to update announcement:', (err as Error).message);
     return false;
   }
-
-  return true;
 }
 
 export async function deleteAnnouncement(announcementId: string): Promise<boolean> {
-  const { error } = await supabase
-    .from('announcements')
-    .delete()
-    .eq('id', announcementId);
-
-  if (error) {
-    console.error('Failed to delete announcement:', error.message);
+  try {
+    await deleteDoc(ref('announcements', announcementId));
+    return true;
+  } catch (err) {
+    console.error('Failed to delete announcement:', (err as Error).message);
     return false;
   }
-
-  return true;
 }

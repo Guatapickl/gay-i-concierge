@@ -5,7 +5,9 @@ import { Send, ChevronDown, Sparkles } from "lucide-react";
 import { saveRsvp } from "@/lib/rsvp";
 import { getUpcomingEvents } from "@/lib/events";
 import { fetchInterests } from "@/lib/interests";
-import { supabase } from "@/lib/supabase";
+import { currentUser } from "@/lib/firebase/authClient";
+import { getRow, nowIso, payloadOf, ref } from "@/lib/firebase/db";
+import { setDoc } from "firebase/firestore";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -305,8 +307,7 @@ export default function ChatWindow() {
   /* Bootstrap */
   useEffect(() => {
     (async () => {
-      const { data } = await supabase.auth.getUser();
-      const user = data.user;
+      const user = await currentUser();
       if (!user) {
         setMessages([
           {
@@ -318,11 +319,7 @@ export default function ChatWindow() {
         setHasOnboarded(false);
         return;
       }
-      const { data: p } = await supabase
-        .from("user_profiles")
-        .select("full_name")
-        .eq("id", user.id)
-        .maybeSingle();
+      const p = await getRow<{ full_name?: string | null }>("user_profiles", user.uid).catch(() => null);
       const greetName = p?.full_name || user.email || "friend";
       setMessages([
         {
@@ -402,25 +399,27 @@ export default function ChatWindow() {
   };
 
   const handleExperienceSelect = async (level: ExperienceLevel) => {
-    const { data } = await supabase.auth.getUser();
-    const user = data.user;
+    const user = await currentUser();
     if (!user) {
       setOnboardingError("Please sign in first.");
       return;
     }
-    const { error } = await supabase.from("user_profiles").upsert(
-      {
-        id: user.id,
-        full_name: profileInput.name || null,
-        email: profileInput.email || user.email || null,
-        phone: null,
-        experience_level: level,
-        interests: profileInput.interests || [],
-      },
-      { onConflict: "id" }
-    );
-    if (error) {
-      console.warn("Failed to save profile", error.message);
+    try {
+      await setDoc(
+        ref("user_profiles", user.uid),
+        payloadOf({
+          id: user.uid,
+          full_name: profileInput.name || null,
+          email: profileInput.email || user.email || null,
+          phone: null,
+          experience_level: level,
+          interests: profileInput.interests || [],
+          updated_at: nowIso(),
+        }),
+        { merge: true }
+      );
+    } catch (error) {
+      console.warn("Failed to save profile", error instanceof Error ? error.message : String(error));
     }
     const greetName = profileInput.name || user.email || "friend";
     setMessages([
@@ -435,8 +434,8 @@ export default function ChatWindow() {
 
   const handleRsvpResponse = async (response: "yes" | "no") => {
     if (response === "yes" && nextEventId) {
-      const { data } = await supabase.auth.getUser();
-      const uid = data.user?.id;
+      const user = await currentUser();
+      const uid = user?.uid;
       if (uid) {
         const ok = await saveRsvp(uid, nextEventId);
         if (ok) {

@@ -23,14 +23,15 @@ service cloud.firestore {
     }
 
     // ---- profiles: self-only, as in Supabase
+    // Members can see each other (directory, post bylines); only self can write.
     match /user_profiles/{userId} {
-      allow read: if signedIn() && (userId == uid() || isAdmin());
+      allow read: if signedIn();
       allow create, update: if signedIn() && userId == uid();
       allow delete: if false;
     }
 
     // ---- public directory bits (community page) - keep readable to members
-    match /profiles/{id} { allow read: if signedIn(); allow write: if false; }
+    match /profiles/{id} { allow read: if signedIn(); allow create, update: if signedIn(); allow delete: if isAdmin(); }
     match /interests/{id} { allow read: if true; allow write: if isAdmin(); }
     match /user_interests/{id} { allow read: if signedIn(); allow write: if willOwn('user_id') || owns('user_id'); }
 

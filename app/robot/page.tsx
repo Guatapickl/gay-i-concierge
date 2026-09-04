@@ -19,7 +19,8 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Alert } from '@/components/ui';
-import { supabase } from '@/lib/supabase';
+import { currentUser } from '@/lib/firebase/authClient';
+import { getRow } from '@/lib/firebase/db';
 import { robots } from './registry';
 
 type ProviderId = 'anthropic' | 'google' | 'openai';
@@ -129,15 +130,11 @@ export default function RobotBenchmarkPage() {
 
       // Check current auth & admin status
       try {
-        const { data: authData } = await supabase.auth.getUser();
-        const uid = authData.user?.id || null;
+        const user = await currentUser();
+        const uid = user?.uid || null;
         setUserId(uid);
         if (uid) {
-          const { count } = await supabase
-            .from('app_admins')
-            .select('user_id', { count: 'exact', head: true })
-            .eq('user_id', uid);
-          setIsAdmin(!!count && count > 0);
+          setIsAdmin((await getRow('app_admins', uid)) !== null);
         }
       } catch (e) {
         console.error('Failed to retrieve user auth or admin status:', e);

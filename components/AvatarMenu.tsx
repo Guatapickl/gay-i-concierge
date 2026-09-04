@@ -4,7 +4,10 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { User, BookOpen, Bell, LogOut, ChevronDown, Vote } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { signOut as fbSignOut } from '@/lib/firebase/authClient';
 
 /**
  * Top-right user menu. Shows sign in/up CTAs when signed out, and an avatar
@@ -13,37 +16,27 @@ import { supabase } from '@/lib/supabase';
 export default function AvatarMenu() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [authed, setAuthed] = useState<boolean | null>(null);
-  const [email, setEmail] = useState<string | null>(null);
+  const { user, loading } = useCurrentUser();
+  const authed: boolean | null = loading ? null : !!user;
+  const email = user?.email ?? null;
   const [name, setName] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let mounted = true;
+    if (!user) { setName(null); return; }
+    setName(user.displayName ?? null);
     (async () => {
-      const { data } = await supabase.auth.getUser();
-      if (!mounted) return;
-      const user = data.user;
-      setAuthed(!!user);
-      setEmail(user?.email ?? null);
-      if (user?.id) {
-        const { data: prof } = await supabase
-          .from('user_profiles')
-          .select('full_name')
-          .eq('id', user.id)
-          .maybeSingle();
-        setName((prof?.full_name as string | null) ?? null);
+      try {
+        const snap = await getDoc(doc(db, 'user_profiles', user.uid));
+        const full = snap.exists() ? (snap.data().full_name as string | null | undefined) : null;
+        if (mounted && full) setName(full);
+      } catch {
+        // profile lookup is cosmetic
       }
     })();
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      setAuthed(!!session);
-      setEmail(session?.user?.email ?? null);
-    });
-    return () => {
-      mounted = false;
-      sub.subscription.unsubscribe();
-    };
-  }, []);
+    return () => { mounted = false; };
+  }, [user]);
 
   // Close on outside click
   useEffect(() => {
@@ -56,7 +49,7 @@ export default function AvatarMenu() {
   }, [open]);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    await fbSignOut();
     setOpen(false);
     router.push('/');
     router.refresh();

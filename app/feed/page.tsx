@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { Newspaper } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { currentUser } from '@/lib/firebase/authClient';
+import { getRow } from '@/lib/firebase/db';
 import { getFeed } from '@/lib/posts';
 import { getUpcomingEvents } from '@/lib/events';
 import type { FeedPost, Event } from '@/types/supabase';
@@ -21,20 +22,16 @@ export default function FeedPage() {
   const [filter, setFilter] = useState<FeedFilter>('all');
 
   const refresh = useCallback(async () => {
-    const [{ data: authData }, events] = await Promise.all([
-      supabase.auth.getUser(),
+    const [user, events] = await Promise.all([
+      currentUser(),
       getUpcomingEvents(),
     ]);
-    const uid = authData.user?.id || null;
+    const uid = user?.uid || null;
     setUserId(uid);
     setUpcomingEvents(events);
 
     if (uid) {
-      const { count } = await supabase
-        .from('app_admins')
-        .select('user_id', { count: 'exact', head: true })
-        .eq('user_id', uid);
-      setIsAdmin(!!count && count > 0);
+      setIsAdmin((await getRow('app_admins', uid)) !== null);
     }
 
     const feed = await getFeed(uid);

@@ -2,7 +2,9 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { currentUser, providerIds, setPassword } from '@/lib/firebase/authClient';
+import { getRow, listRows, nowIso, payloadOf, ref } from '@/lib/firebase/db';
+import { limit, orderBy, setDoc, where } from 'firebase/firestore';
 import { Button, FormInput, Alert, LoadingSpinner } from '@/components/ui';
 import MyRsvps from '@/components/MyRsvps';
 // Simple suggestion list pulling from `interests` table if present
@@ -42,20 +44,20 @@ export default function ProfilePage() {
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase.auth.getUser();
-      const user = data.user;
+      const user = await currentUser();
       if (!user) { router.replace('/auth/sign-in'); return; }
-      setUserId(user.id);
+      setUserId(user.uid);
       setUserEmail(user.email ?? null);
-      const provs = (user.identities || []).map(i => i.provider).filter(Boolean) as string[];
-      setProviders(provs.length ? provs : [(user.app_metadata?.provider as string) || 'email']);
+      const provs = providerIds(user).filter(Boolean);
+      setProviders(provs.length ? provs : ['password']);
 
       // Load profile (auth-coupled user profile)
-      const { data: profileRow } = await supabase
-        .from('user_profiles')
-        .select('full_name, phone, experience_level, interests')
-        .eq('id', user.id)
-        .maybeSingle();
+      const profileRow = await getRow<{
+        full_name?: string | null;
+        phone?: string | null;
+        experience_level?: string | null;
+        interests?: string[] | null;
+      }>('user_profiles', user.uid).catch(() => null);
       if (profileRow) {
         setFullName(profileRow.full_name ?? '');
         setPhone(profileRow.phone ?? '');
@@ -67,29 +69,22 @@ export default function ProfilePage() {
       }
 
       // Load suggestions for interests (optional)
-      const { data: interests } = await supabase
-        .from('interests')
-        .select('id, name')
-        .order('name');
-      setAllInterests((interests || []) as Interest[]);
+      const interests = await listRows<Interest>('interests', orderBy('name')).catch(() => [] as Interest[]);
+      setAllInterests(interests);
 
       // Alerts status
       // We treat email/phone as independent channels.
       const emailVal = user.email ?? null;
       if (emailVal) {
-        const { data: sub } = await supabase
-          .from('alerts_subscribers')
-          .select('email_opt_in')
-          .eq('email', emailVal)
-          .maybeSingle();
+        const [sub] = await listRows<{ email_opt_in?: boolean }>(
+          'alerts_subscribers', where('email', '==', emailVal), limit(1),
+        ).catch(() => []);
         if (sub) setEmailOptIn(!!sub.email_opt_in);
       }
       if (profileRow?.phone) {
-        const { data: sub } = await supabase
-          .from('alerts_subscribers')
-          .select('sms_opt_in')
-          .eq('phone', profileRow.phone)
-          .maybeSingle();
+        const [sub] = await listRows<{ sms_opt_in?: boolean }>(
+          'alerts_subscribers', where('phone', '==', profileRow.phone), limit(1),
+        ).catch(() => []);
         if (sub) setSmsOptIn(!!sub.sms_opt_in);
       }
 
@@ -115,15 +110,15 @@ export default function ProfilePage() {
     setError(null);
     try {
       // Upsert user profile
-      const { error: upErr } = await supabase.from('user_profiles').upsert({
+      await setDoc(ref('user_profiles', userId), payloadOf({
         id: userId,
         full_name: fullName || null,
         phone: phone || null,
         experience_level: experience,
         interests: selectedInterests,
         email: userEmail, // keep in sync for convenience
-      }, { onConflict: 'id' });
-      if (upErr) throw upErr;
+        updated_at: nowIso(),
+      }), { merge: true });
 
       // Sync alerts subscribers
       // Email
@@ -164,15 +159,17 @@ export default function ProfilePage() {
       return;
     }
     setPwSaving(true);
-    const { error: pwErr } = await supabase.auth.updateUser({ password: newPassword });
-    setPwSaving(false);
-    if (pwErr) {
-      setPwMessage({ text: pwErr.message, ok: false });
+    try {
+      await setPassword(newPassword);
+    } catch (pwErr) {
+      setPwSaving(false);
+      setPwMessage({ text: pwErr instanceof Error ? pwErr.message : 'Could not update password.', ok: false });
       return;
     }
+    setPwSaving(false);
     setNewPassword('');
     setConfirmPassword('');
-    setProviders(prev => (prev.includes('email') ? prev : [...prev, 'email']));
+    setProviders(prev => (prev.includes('password') ? prev : [...prev, 'password']));
     setPwMessage({ text: 'Password saved. You can now sign in with your email and password.', ok: true });
   };
 
@@ -260,8 +257,8 @@ export default function ProfilePage() {
       <section className="mt-8 card p-5 space-y-3">
         <h3 className="font-semibold">Sign-in &amp; password</h3>
         <p className="text-xs text-foreground-muted">
-          You currently sign in with: {providers.map(pv => (pv === 'email' ? 'email + password / magic link' : pv)).join(', ')}.
-          {!providers.includes('email') && ' Set a password below to also sign in without Google or a magic link.'}
+          You currently sign in with: {providers.map(pv => (pv === 'password' ? 'email + password / magic link' : pv === 'emailLink' ? 'magic link' : pv === 'google.com' ? 'google' : pv)).join(', ')}.
+          {!providers.includes('password') && ' Set a password below to also sign in without Google or a magic link.'}
         </p>
         <form onSubmit={savePassword} className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <FormInput
@@ -282,7 +279,7 @@ export default function ProfilePage() {
           />
           <div className="md:col-span-2 flex items-center gap-3">
             <Button type="submit" variant="outline" disabled={pwSaving || !newPassword}>
-              {pwSaving ? 'Saving…' : providers.includes('email') ? 'Change password' : 'Set password'}
+              {pwSaving ? 'Saving…' : providers.includes('password') ? 'Change password' : 'Set password'}
             </Button>
             {pwMessage && (
               <span className={`text-sm ${pwMessage.ok ? 'text-success' : 'text-danger'}`}>{pwMessage.text}</span>

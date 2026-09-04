@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase';
+import { signUpWithPassword } from '@/lib/firebase/authClient';
 import { Button, FormInput, Alert } from '@/components/ui';
 
 export default function SignUpPage() {
@@ -27,21 +27,11 @@ export default function SignUpPage() {
     }
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signUp({
-        email: email.trim(),
-        password,
-        options: {
-          emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined,
-        },
-      });
-      if (error) {
-        setMessage(error.message);
-      } else {
-        setMessage('Check your email to confirm your account.');
-        setTimeout(() => router.replace('/'), 1200);
-      }
-    } catch {
-      setMessage('Sign up failed.');
+      await signUpWithPassword(email.trim(), password);
+      setMessage('Check your email to confirm your account.');
+      setTimeout(() => { router.replace('/'); router.refresh(); }, 1200);
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : 'Sign up failed.');
     } finally {
       setLoading(false);
     }

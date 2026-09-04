@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { Plus } from 'lucide-react';
 import { getUpcomingEvents } from '@/lib/events';
 import { saveRsvp, deleteRsvp, getRsvpedEventIds } from '@/lib/rsvp';
-import { supabase } from '@/lib/supabase';
+import { currentUser } from '@/lib/firebase/authClient';
+import { getRow } from '@/lib/firebase/db';
 import type { Event } from '@/types/supabase';
 import { Button, Alert, LoadingSpinner } from '@/components/ui';
 import EventListItem from '@/components/EventListItem';
@@ -22,23 +23,20 @@ export default function EventsPage() {
   useEffect(() => {
     (async () => {
       try {
-        const [data, authData] = await Promise.all([
+        const [data, user] = await Promise.all([
           getUpcomingEvents(),
-          supabase.auth.getUser(),
+          currentUser(),
         ]);
         setEvents(data);
-        const uid = authData.data.user?.id || null;
+        const uid = user?.uid || null;
         setUserId(uid);
         if (uid) {
-          const [ids, adminResult] = await Promise.all([
+          const [ids, adminRow] = await Promise.all([
             getRsvpedEventIds(uid),
-            supabase
-              .from('app_admins')
-              .select('user_id', { count: 'exact', head: true })
-              .eq('user_id', uid),
+            getRow('app_admins', uid),
           ]);
           setRsvpedEvents(new Set(ids));
-          setIsAdmin(!!adminResult.count && adminResult.count > 0);
+          setIsAdmin(adminRow !== null);
         }
       } finally {
         setLoading(false);

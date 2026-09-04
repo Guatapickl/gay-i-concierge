@@ -1,10 +1,17 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
+import { adminDb, isAdminUid, userFromRequest } from '@/lib/firebase/admin';
+import { adminPayloadOf, adminRowOf } from '@/lib/firebase/adminDb';
 import { pollInviteEmail, pollResultEmail } from '@/lib/emailTemplates';
-import type { Event } from '@/types/supabase';
+import type { Event, MeetingPoll, MeetingPollOption } from '@/types/supabase';
 
 export const runtime = 'nodejs';
+
+/** Firestore `in` accepts ≤30 values. */
+function chunk<T>(arr: T[], size = 30): T[][] {
+  const out: T[][] = [];
+  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+  return out;
+}
 
 /**
  * Admin-only. Queues poll emails into `email_reminders` so the existing
@@ -17,28 +24,11 @@ export const runtime = 'nodejs';
  */
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const { id: pollId } = await ctx.params;
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!supabaseUrl || !anonKey) {
-    return NextResponse.json({ error: 'Supabase not configured' }, { status: 500 });
-  }
 
-  const authHeader = req.headers.get('authorization');
-  if (!authHeader) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
-  const userClient = createClient(supabaseUrl, anonKey, {
-    global: { headers: { Authorization: authHeader } },
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-  const { data: userRes } = await userClient.auth.getUser();
-  const userId = userRes?.user?.id;
-  if (!userId) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
-
-  const admin = getSupabaseAdmin();
-  const { count: adminCount } = await admin
-    .from('app_admins')
-    .select('user_id', { count: 'exact', head: true })
-    .eq('user_id', userId);
-  if (!adminCount) return NextResponse.json({ error: 'admin only' }, { status: 403 });
+  if (!req.headers.get('authorization')) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  const user = await userFromRequest(req);
+  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!(await isAdminUid(user.uid))) return NextResponse.json({ error: 'admin only' }, { status: 403 });
 
   let body: { type?: 'invite' | 'result' };
   try {
@@ -48,8 +38,10 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
   }
   const type = body.type === 'result' ? 'result' : 'invite';
 
-  const { data: poll } = await admin.from('meeting_polls').select('*').eq('id', pollId).single();
-  if (!poll) return NextResponse.json({ error: 'poll not found' }, { status: 404 });
+  const db = adminDb();
+  const pollSnap = await db.collection('meeting_polls').doc(pollId).get();
+  if (!pollSnap.exists) return NextResponse.json({ error: 'poll not found' }, { status: 404 });
+  const poll = adminRowOf<MeetingPoll>(pollSnap);
 
   let subject: string;
   let html: string;
@@ -57,41 +49,46 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
   let eventId: string | null = null;
   if (type === 'invite') {
     if (poll.status !== 'open') return NextResponse.json({ error: 'poll is closed' }, { status: 400 });
-    const { data: options } = await admin
-      .from('meeting_poll_options')
-      .select('*')
-      .eq('poll_id', pollId)
-      .order('sort_order', { ascending: true });
-    ({ subject, html, text } = pollInviteEmail(poll, options || []));
+    const optSnap = await db
+      .collection('meeting_poll_options')
+      .where('poll_id', '==', pollId)
+      .orderBy('sort_order', 'asc')
+      .get();
+    const options = optSnap.docs.map(d => adminRowOf<MeetingPollOption>(d));
+    ({ subject, html, text } = pollInviteEmail(poll, options));
   } else {
     if (!poll.event_id) return NextResponse.json({ error: 'poll has no booked meeting yet' }, { status: 400 });
-    const { data: event } = await admin.from('events').select('*').eq('id', poll.event_id).single();
-    if (!event) return NextResponse.json({ error: 'linked event not found' }, { status: 404 });
-    eventId = event.id as string;
-    ({ subject, html, text } = pollResultEmail(poll, event as Event));
+    const eventSnap = await db.collection('events').doc(poll.event_id).get();
+    if (!eventSnap.exists) return NextResponse.json({ error: 'linked event not found' }, { status: 404 });
+    const event = adminRowOf<Event>(eventSnap);
+    eventId = event.id;
+    ({ subject, html, text } = pollResultEmail(poll, event));
   }
 
   // Recipients: every member who opted into club email.
-  const { data: subs } = await admin
-    .from('alerts_subscribers')
-    .select('email, user_id')
-    .eq('email_opt_in', true)
-    .not('email', 'is', null);
-  const recipients = (subs || []).filter(s => !!s.email) as { email: string; user_id: string | null }[];
+  const subSnap = await db.collection('alerts_subscribers').where('email_opt_in', '==', true).get();
+  const recipients = subSnap.docs
+    .map(d => d.data() as { email?: string | null; user_id?: string | null })
+    .filter(s => !!s.email)
+    .map(s => ({ email: s.email as string, user_id: s.user_id ?? null }));
   if (recipients.length === 0) {
     return NextResponse.json({ ok: true, queued: 0, skipped: 0, note: 'no opted-in email subscribers' });
   }
 
   const kind = type === 'invite' ? 'poll_invite' : 'poll_result';
   const marker = `poll:${pollId}:${kind}`;
-  const { data: already } = await admin
-    .from('email_reminders')
-    .select('recipient_email')
-    .eq('kind', kind)
-    .eq('subject', subject)
-    .in('recipient_email', recipients.map(r => r.email));
-  const done = new Set((already || []).map(r => r.recipient_email as string));
+  const done = new Set<string>();
+  for (const emails of chunk(recipients.map(r => r.email))) {
+    const snap = await db
+      .collection('email_reminders')
+      .where('kind', '==', kind)
+      .where('subject', '==', subject)
+      .where('recipient_email', 'in', emails)
+      .get();
+    for (const d of snap.docs) done.add((d.data() as { recipient_email: string }).recipient_email);
+  }
 
+  const now = new Date().toISOString();
   const rows = recipients
     .filter(r => !done.has(r.email))
     .map(r => ({
@@ -102,12 +99,26 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       subject,
       body_html: html,
       body_text: `${text}\n\n[${marker}]`,
-      send_at: new Date().toISOString(),
+      send_at: now,
+      // Postgres column defaults, made explicit for Firestore:
+      sent_at: null,
+      status: 'pending',
+      error: null,
+      attempts: 0,
+      created_at: now,
     }));
 
   if (rows.length > 0) {
-    const { error } = await admin.from('email_reminders').insert(rows);
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    try {
+      const col = db.collection('email_reminders');
+      for (const part of chunk(rows, 400)) {
+        const batch = db.batch();
+        for (const row of part) batch.set(col.doc(), adminPayloadOf(row));
+        await batch.commit();
+      }
+    } catch (e) {
+      return NextResponse.json({ error: e instanceof Error ? e.message : 'queue failed' }, { status: 500 });
+    }
   }
   return NextResponse.json({ ok: true, queued: rows.length, skipped: done.size });
 }

@@ -1,8 +1,9 @@
-import { supabase } from './supabase';
+import { addDoc } from 'firebase/firestore';
+import { col, nowIso, payloadOf } from './firebase/db';
 import { Profile } from '@/types/supabase';
 
 /**
- * Save a new profile to Supabase.
+ * Save a new profile to Firestore (`profiles` collection).
  * Note: This function is side-effect free (does not touch localStorage).
  * Caller components can persist returned IDs in localStorage as needed.
  * @param profile - Profile data without 'id' and 'created_at'
@@ -11,37 +12,26 @@ import { Profile } from '@/types/supabase';
 export async function saveProfile(
   profile: Omit<Profile, 'id' | 'created_at'>
 ): Promise<string | null> {
-  // Define the insert payload matching Supabase column names
+  // Insert payload keeps the Postgres column names (snake_case).
   type ProfileInsert = {
     name: Profile['name'];
     email: Profile['email'];
     interests: Profile['interests'];
-    // experience_level column in snake_case
     experience_level: NonNullable<Profile['experienceLevel']>;
+    created_at: string;
   };
   const insertData: ProfileInsert = {
     name: profile.name,
-    // Ensure null is used instead of undefined
     email: profile.email ?? null,
     interests: profile.interests,
-    // Map camelCase to snake_case for Supabase
     experience_level: profile.experienceLevel!,
+    created_at: nowIso(),
   };
-  const { data, error } = await supabase
-    .from('profiles')
-    .insert([insertData])
-    .select('id')
-    .single();
-
-  if (error || !data) {
-    // Enhanced logging for debugging Supabase insert failures
-    console.error(
-      '❌ Error saving profile to Supabase:',
-      error?.message || '',
-      error?.details || '',
-      error?.hint || ''
-    );
+  try {
+    const d = await addDoc(col('profiles'), payloadOf(insertData));
+    return d.id;
+  } catch (err) {
+    console.error('❌ Error saving profile:', (err as Error).message);
     return null;
   }
-  return data.id;
 }

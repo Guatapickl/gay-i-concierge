@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
 import { rateLimit, getClientId } from '@/lib/rateLimit';
+import { consumeAlertToken } from '../_lib';
 
 export const runtime = 'nodejs';
 
@@ -13,47 +13,18 @@ export async function GET(req: Request) {
   const token = url.searchParams.get('token') || '';
   if (!token) return NextResponse.json({ error: 'Missing token' }, { status: 400 });
 
-  const { data: rows, error } = await getSupabaseAdmin()
-    .from('alerts_confirmations')
-    .select('*')
-    .eq('token', token)
-    .is('consumed_at', null)
-    .limit(1);
-  if (error) return NextResponse.json({ error: 'Lookup failed' }, { status: 500 });
-  const row = rows?.[0];
-  if (!row) return NextResponse.json({ error: 'Invalid or used token' }, { status: 400 });
-  if (row.expires_at && new Date(row.expires_at) < new Date()) {
-    return NextResponse.json({ error: 'Token expired' }, { status: 400 });
+  let result;
+  try {
+    result = await consumeAlertToken({
+      token,
+      expectedAction: 'subscribe',
+      consent_ip: getClientId(req),
+      consent_source: 'confirm',
+    });
+  } catch (e) {
+    console.error('alerts confirm failed:', e);
+    return NextResponse.json({ error: 'Update failed' }, { status: 500 });
   }
-  if (row.action !== 'subscribe') return NextResponse.json({ error: 'Wrong token action' }, { status: 400 });
-
-  const consent_ip = getClientId(req);
-  const consent_source = 'confirm';
-
-  if (row.channel === 'email' && row.email) {
-    const { error: upErr } = await getSupabaseAdmin()
-      .from('alerts_subscribers')
-      .upsert(
-        { email: row.email, email_opt_in: true, email_opt_in_at: new Date().toISOString(), email_opt_out_at: null, consent_source, consent_ip },
-        { onConflict: 'email' }
-      );
-    if (upErr) return NextResponse.json({ error: 'Update failed' }, { status: 500 });
-  } else if (row.channel === 'sms' && row.phone) {
-    const { error: upErr } = await getSupabaseAdmin()
-      .from('alerts_subscribers')
-      .upsert(
-        { phone: row.phone, sms_opt_in: true, sms_opt_in_at: new Date().toISOString(), sms_opt_out_at: null, consent_source, consent_ip },
-        { onConflict: 'phone' }
-      );
-    if (upErr) return NextResponse.json({ error: 'Update failed' }, { status: 500 });
-  } else {
-    return NextResponse.json({ error: 'Token incomplete' }, { status: 400 });
-  }
-
-  await getSupabaseAdmin()
-    .from('alerts_confirmations')
-    .update({ consumed_at: new Date().toISOString() })
-    .eq('token', token);
-
+  if (!result.ok) return NextResponse.json({ error: result.error }, { status: result.status });
   return NextResponse.json({ ok: true });
 }

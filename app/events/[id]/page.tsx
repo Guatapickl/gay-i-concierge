@@ -16,7 +16,7 @@ import {
 import type { Event } from '@/types/supabase';
 import { getEventById } from '@/lib/events';
 import { getRsvpedEventIds, saveRsvp, deleteRsvp, getEventAttendees } from '@/lib/rsvp';
-import { supabase } from '@/lib/supabase';
+import { currentUser } from '@/lib/firebase/authClient';
 import { describeRecurrence } from '@/lib/recurrence';
 import CalendarExportButtons from '@/components/CalendarExportButtons';
 import AgendaSuggestions from '@/components/AgendaSuggestions';
@@ -38,14 +38,14 @@ export default function EventDetailsPage() {
   useEffect(() => {
     if (!eventId) return;
     (async () => {
-      const [e, authData, attendees] = await Promise.all([
+      const [e, user, attendees] = await Promise.all([
         getEventById(eventId),
-        supabase.auth.getUser(),
+        currentUser(),
         getEventAttendees(eventId),
       ]);
       setEvent(e);
       setAttendeeCount(attendees.count);
-      const uid = authData.data.user?.id || null;
+      const uid = user?.uid || null;
       setUserId(uid);
       if (uid) {
         const ids = await getRsvpedEventIds(uid);

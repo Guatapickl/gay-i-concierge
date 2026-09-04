@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getClientId, rateLimit } from '@/lib/rateLimit';
-import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
-import { generateToken, expiresIn } from '@/lib/tokens';
+import { createAlertToken, upsertSubscriber } from '../_lib';
 
 export const runtime = 'nodejs';
 
@@ -52,20 +51,18 @@ export async function POST(req: Request) {
 
   // Ensure subscriber rows exist (but do not opt-in yet)
   if (wantsEmail && email) {
-    const { error } = await getSupabaseAdmin()
-      .from('alerts_subscribers')
-      .upsert({ email, email_opt_in: false, user_id: user_id || null, consent_source, consent_ip }, { onConflict: 'email' });
-    if (error) {
-      console.error('Failed to upsert email subscriber:', error.message);
+    try {
+      await upsertSubscriber({ email }, { email_opt_in: false, user_id: user_id || null, consent_source, consent_ip });
+    } catch (e) {
+      console.error('Failed to upsert email subscriber:', e instanceof Error ? e.message : e);
       return NextResponse.json({ error: 'Failed to subscribe.' }, { status: 500 });
     }
   }
   if (wantsSms && phone) {
-    const { error } = await getSupabaseAdmin()
-      .from('alerts_subscribers')
-      .upsert({ phone, sms_opt_in: false, user_id: user_id || null, consent_source, consent_ip }, { onConflict: 'phone' });
-    if (error) {
-      console.error('Failed to upsert SMS subscriber:', error.message);
+    try {
+      await upsertSubscriber({ phone }, { sms_opt_in: false, user_id: user_id || null, consent_source, consent_ip });
+    } catch (e) {
+      console.error('Failed to upsert SMS subscriber:', e instanceof Error ? e.message : e);
       return NextResponse.json({ error: 'Failed to subscribe.' }, { status: 500 });
     }
   }
@@ -73,26 +70,22 @@ export async function POST(req: Request) {
   // Create confirmation tokens (24h expiry)
   const tokens: { channel: 'email' | 'sms'; token: string }[] = [];
   if (wantsEmail && email) {
-    const token = generateToken();
-    const { error } = await getSupabaseAdmin().from('alerts_confirmations').insert([
-      { token, action: 'subscribe', channel: 'email', email, expires_at: expiresIn(24) },
-    ]);
-    if (error) {
-      console.error('Failed to create email confirm token:', error.message);
+    try {
+      const token = await createAlertToken({ action: 'subscribe', channel: 'email', email, ttlHours: 24 });
+      tokens.push({ channel: 'email', token });
+    } catch (e) {
+      console.error('Failed to create email confirm token:', e instanceof Error ? e.message : e);
       return NextResponse.json({ error: 'Failed to subscribe.' }, { status: 500 });
     }
-    tokens.push({ channel: 'email', token });
   }
   if (wantsSms && phone) {
-    const token = generateToken();
-    const { error } = await getSupabaseAdmin().from('alerts_confirmations').insert([
-      { token, action: 'subscribe', channel: 'sms', phone, expires_at: expiresIn(24) },
-    ]);
-    if (error) {
-      console.error('Failed to create SMS confirm token:', error.message);
+    try {
+      const token = await createAlertToken({ action: 'subscribe', channel: 'sms', phone, ttlHours: 24 });
+      tokens.push({ channel: 'sms', token });
+    } catch (e) {
+      console.error('Failed to create SMS confirm token:', e instanceof Error ? e.message : e);
       return NextResponse.json({ error: 'Failed to subscribe.' }, { status: 500 });
     }
-    tokens.push({ channel: 'sms', token });
   }
 
   // In production, you would send email/SMS containing links to /alerts/confirm?token=...

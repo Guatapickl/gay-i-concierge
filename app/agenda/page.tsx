@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Download, FileText, Sparkles, Save } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { currentUser } from '@/lib/firebase/authClient';
+import { getRow } from '@/lib/firebase/db';
 import { getUpcomingEvents, updateEvent } from '@/lib/events';
 import { getSuggestions } from '@/lib/agendaSuggestions';
 import type { Event } from '@/types/supabase';
@@ -105,13 +106,9 @@ export default function AgendaMakerPage() {
     (async () => {
       const events = await getUpcomingEvents();
       setUpcomingEvents(events);
-      const { data: authData } = await supabase.auth.getUser();
-      if (authData.user) {
-        const { count } = await supabase
-          .from('app_admins')
-          .select('user_id', { count: 'exact', head: true })
-          .eq('user_id', authData.user.id);
-        setIsAdmin(!!count && count > 0);
+      const user = await currentUser();
+      if (user) {
+        setIsAdmin((await getRow('app_admins', user.uid)) !== null);
       }
     })();
   }, []);

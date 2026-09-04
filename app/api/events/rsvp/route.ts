@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { adminDb, userFromRequest } from '@/lib/firebase/admin';
+import { adminPayloadOf, adminRowOf } from '@/lib/firebase/adminDb';
 import {
   enqueueRsvpConfirmation,
   scheduleEventReminders,
@@ -9,31 +10,17 @@ export const runtime = 'nodejs';
 
 /* ─── helpers ─────────────────────────────────────────────────────── */
 
-function envOrFail() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !anon) return null;
-  return { url, anon };
+/** rsvps doc id — mirrors the Postgres (event_id, profile_id) unique key. */
+const rsvpId = (eventId: string, userId: string) => `${eventId}_${userId}`;
+
+/** Firestore `in` accepts ≤30 values. */
+function chunk<T>(arr: T[], size = 30): T[][] {
+  const out: T[][] = [];
+  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+  return out;
 }
 
-/** Build a per-request Supabase client scoped to the caller's JWT. */
-function userClient(url: string, anon: string, authHeader: string) {
-  return createClient(url, anon, {
-    global: { headers: { Authorization: authHeader } },
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-}
-
-async function authenticatedUserId(
-  url: string,
-  anon: string,
-  authHeader: string | null,
-) {
-  if (!authHeader) return null;
-  const client = userClient(url, anon, authHeader);
-  const { data } = await client.auth.getUser();
-  return { userId: data?.user?.id ?? null, client };
-}
+type RsvpRow = { id: string; event_id: string; profile_id: string; created_at: string | null };
 
 /* ─── GET  /api/events/rsvp?event_id=...&check=true ──────────────── */
 
@@ -46,70 +33,57 @@ async function authenticatedUserId(
  *                           the authenticated user instead of the attendee list
  */
 export async function GET(req: NextRequest) {
-  const env = envOrFail();
-  if (!env) {
-    return NextResponse.json({ error: 'Supabase not configured' }, { status: 500 });
-  }
-
   const eventId = req.nextUrl.searchParams.get('event_id');
   if (!eventId) {
     return NextResponse.json({ error: 'event_id query param required' }, { status: 400 });
   }
 
   const checkOnly = req.nextUrl.searchParams.get('check') === 'true';
-  const authHeader = req.headers.get('authorization');
+  const db = adminDb();
 
   if (checkOnly) {
     // ── Check if the current user has RSVPed ──
-    const auth = await authenticatedUserId(env.url, env.anon, authHeader);
-    if (!auth?.userId) {
+    const user = await userFromRequest(req);
+    if (!user) {
       return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
     }
-    const { data, error } = await auth.client
-      .from('rsvps')
-      .select('id')
-      .eq('event_id', eventId)
-      .eq('profile_id', auth.userId)
-      .limit(1);
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    try {
+      const snap = await db.collection('rsvps').doc(rsvpId(eventId, user.uid)).get();
+      return NextResponse.json({ rsvped: snap.exists });
+    } catch (e) {
+      return NextResponse.json({ error: e instanceof Error ? e.message : 'lookup failed' }, { status: 500 });
     }
-    return NextResponse.json({ rsvped: (data ?? []).length > 0 });
   }
 
   // ── Attendee list (public, no auth required) ──
-  // Uses an anon-key client so RLS controls visibility.
-  const anonClient = createClient(env.url, env.anon, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-
-  const { data: rsvps, error: rsvpErr } = await anonClient
-    .from('rsvps')
-    .select('id, profile_id, created_at')
-    .eq('event_id', eventId)
-    .order('created_at', { ascending: true });
-
-  if (rsvpErr) {
-    return NextResponse.json({ error: rsvpErr.message }, { status: 500 });
+  let rsvps: RsvpRow[];
+  try {
+    const snap = await db
+      .collection('rsvps')
+      .where('event_id', '==', eventId)
+      .orderBy('created_at', 'asc')
+      .get();
+    rsvps = snap.docs.map(d => adminRowOf<RsvpRow>(d));
+  } catch (e) {
+    return NextResponse.json({ error: e instanceof Error ? e.message : 'lookup failed' }, { status: 500 });
   }
 
   // Hydrate with profile names for the attendee list
-  const profileIds = (rsvps ?? []).map((r) => r.profile_id as string);
-  let profileMap: Record<string, string | null> = {};
+  const profileIds = rsvps.map(r => r.profile_id);
+  const profileMap: Record<string, string | null> = {};
   if (profileIds.length > 0) {
-    const { data: profiles } = await anonClient
-      .from('profiles')
-      .select('id, name')
-      .in('id', profileIds);
-    for (const p of profiles ?? []) {
-      profileMap[p.id as string] = (p.name as string) || null;
+    for (const ids of chunk(profileIds)) {
+      const snap = await db.collection('profiles').where('__name__', 'in', ids).get();
+      for (const d of snap.docs) {
+        profileMap[d.id] = ((d.data() as { name?: string | null }).name as string) || null;
+      }
     }
   }
 
-  const attendees = (rsvps ?? []).map((r) => ({
+  const attendees = rsvps.map(r => ({
     id: r.id,
     profile_id: r.profile_id,
-    name: profileMap[r.profile_id as string] ?? null,
+    name: profileMap[r.profile_id] ?? null,
     rsvped_at: r.created_at,
   }));
 
@@ -123,11 +97,6 @@ export async function GET(req: NextRequest) {
  * and schedules event reminders as side-effects (best-effort).
  */
 export async function POST(req: NextRequest) {
-  const env = envOrFail();
-  if (!env) {
-    return NextResponse.json({ error: 'Supabase not configured' }, { status: 500 });
-  }
-
   let body: { event_id?: string };
   try {
     body = await req.json();
@@ -138,44 +107,44 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'event_id required' }, { status: 400 });
   }
 
-  const authHeader = req.headers.get('authorization');
-  const auth = await authenticatedUserId(env.url, env.anon, authHeader);
-  if (!auth?.userId) {
+  const user = await userFromRequest(req);
+  if (!user) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
+  const db = adminDb();
 
   // Verify event exists
-  const { data: event, error: eventErr } = await auth.client
-    .from('events')
-    .select('id, event_datetime')
-    .eq('id', body.event_id)
-    .single();
-
-  if (eventErr || !event) {
+  const eventSnap = await db.collection('events').doc(body.event_id).get();
+  if (!eventSnap.exists) {
     return NextResponse.json({ error: 'event not found' }, { status: 404 });
   }
+  const event = adminRowOf<{ id: string; event_datetime: string | null }>(eventSnap);
 
-  // Insert RSVP row — tolerate duplicate (idempotent)
-  const { error: insertError } = await auth.client
-    .from('rsvps')
-    .insert([
-      {
-        profile_id: auth.userId,
-        event_id: body.event_id,
-        event_date: event.event_datetime,
-      },
-    ]);
-  if (insertError && !insertError.message.includes('duplicate')) {
-    return NextResponse.json({ error: insertError.message }, { status: 400 });
+  // Insert RSVP row — idempotent thanks to the deterministic doc id
+  try {
+    const ref = db.collection('rsvps').doc(rsvpId(body.event_id, user.uid));
+    const existing = await ref.get();
+    if (!existing.exists) {
+      await ref.set(
+        adminPayloadOf({
+          profile_id: user.uid,
+          event_id: body.event_id,
+          event_date: event.event_datetime,
+          created_at: new Date().toISOString(),
+        }),
+      );
+    }
+  } catch (e) {
+    return NextResponse.json({ error: e instanceof Error ? e.message : 'insert failed' }, { status: 400 });
   }
 
   // Side-effects — best-effort, never fail the RSVP for email issues
   await Promise.allSettled([
-    enqueueRsvpConfirmation({ eventId: body.event_id, userId: auth.userId }),
+    enqueueRsvpConfirmation({ eventId: body.event_id, userId: user.uid }),
     scheduleEventReminders(body.event_id),
   ]);
 
-  return NextResponse.json({ ok: true, event_id: body.event_id, profile_id: auth.userId });
+  return NextResponse.json({ ok: true, event_id: body.event_id, profile_id: user.uid });
 }
 
 /* ─── DELETE  /api/events/rsvp?event_id=...  ─────────────────────── */
@@ -184,30 +153,20 @@ export async function POST(req: NextRequest) {
  * Cancel an RSVP for the authenticated user.
  */
 export async function DELETE(req: NextRequest) {
-  const env = envOrFail();
-  if (!env) {
-    return NextResponse.json({ error: 'Supabase not configured' }, { status: 500 });
-  }
-
   const eventId = req.nextUrl.searchParams.get('event_id');
   if (!eventId) {
     return NextResponse.json({ error: 'event_id query param required' }, { status: 400 });
   }
 
-  const authHeader = req.headers.get('authorization');
-  const auth = await authenticatedUserId(env.url, env.anon, authHeader);
-  if (!auth?.userId) {
+  const user = await userFromRequest(req);
+  if (!user) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
 
-  const { error } = await auth.client
-    .from('rsvps')
-    .delete()
-    .eq('profile_id', auth.userId)
-    .eq('event_id', eventId);
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  try {
+    await adminDb().collection('rsvps').doc(rsvpId(eventId, user.uid)).delete();
+  } catch (e) {
+    return NextResponse.json({ error: e instanceof Error ? e.message : 'delete failed' }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true, event_id: eventId });

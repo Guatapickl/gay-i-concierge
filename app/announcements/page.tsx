@@ -9,7 +9,8 @@ import {
   getAnnouncements,
   updateAnnouncement,
 } from '@/lib/announcements';
-import { supabase } from '@/lib/supabase';
+import { currentUser } from '@/lib/firebase/authClient';
+import { getRow } from '@/lib/firebase/db';
 import type { Announcement } from '@/types/supabase';
 import { Alert, Button, FormInput, FormTextarea, LoadingSpinner } from '@/components/ui';
 
@@ -33,19 +34,16 @@ export default function AnnouncementsPage() {
 
   useEffect(() => {
     (async () => {
-      const { data: authData } = await supabase.auth.getUser();
-      const uid = authData.user?.id || null;
+      const user = await currentUser();
+      const uid = user?.uid || null;
       setUserId(uid);
 
       if (uid) {
-        const [{ count }] = await Promise.all([
-          supabase
-            .from('app_admins')
-            .select('user_id', { count: 'exact', head: true })
-            .eq('user_id', uid),
+        const [adminRow] = await Promise.all([
+          getRow('app_admins', uid),
           refresh(),
         ]);
-        setIsAdmin(!!count && count > 0);
+        setIsAdmin(adminRow !== null);
       }
 
       setLoading(false);

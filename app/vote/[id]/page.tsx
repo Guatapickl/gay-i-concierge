@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, ArrowUp, ArrowDown, Trophy, CalendarPlus, Mail, Users } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { authHeader, currentUser } from '@/lib/firebase/authClient';
 import {
   getPoll,
   getMyRanking,
@@ -46,8 +46,8 @@ export default function PollPage() {
 
   const load = useCallback(async () => {
     if (!pollId) return;
-    const [p, auth] = await Promise.all([getPoll(pollId), supabase.auth.getUser()]);
-    const uid = auth.data.user?.id ?? null;
+    const [p, user] = await Promise.all([getPoll(pollId), currentUser()]);
+    const uid = user?.uid ?? null;
     setUserId(uid);
     setPoll(p);
     if (p && uid) {
@@ -101,12 +101,6 @@ export default function PollPage() {
     } else {
       setMessage({ text: 'Could not save your ranking. Please try again.', variant: 'error' });
     }
-  };
-
-  const authHeader = async (): Promise<Record<string, string>> => {
-    const { data } = await supabase.auth.getSession();
-    const token = data.session?.access_token;
-    return token ? { Authorization: `Bearer ${token}` } : {};
   };
 
   const notify = async (type: 'invite' | 'result') => {

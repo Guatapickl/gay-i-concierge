@@ -1,40 +1,46 @@
-import { supabase } from './supabase';
+import { deleteDoc, getDoc, limit as qLimit, orderBy, setDoc, where } from 'firebase/firestore';
+import { listRows, nowIso, payloadOf, ref, toIso } from './firebase/db';
 import type { NewsItem } from '@/types/supabase';
 
+/** news_saves doc id — mirrors the Postgres (news_id, user_id) unique key. */
+export function newsSaveDocId(newsId: string, userId: string) {
+  return `${newsId}_${userId}`;
+}
+
 export async function getNewsItems(limit = 60): Promise<NewsItem[]> {
-  const { data, error } = await supabase
-    .from('news_items')
-    .select('*')
-    .order('published_at', { ascending: false, nullsFirst: false })
-    .order('ingested_at', { ascending: false })
-    .limit(limit);
-  if (error) {
-    console.error('Failed to load news items:', error.message);
+  try {
+    // Firestore sorts nulls first ascending → last when descending, matching nullsFirst:false.
+    const rows = await listRows<NewsItem & { ingested_at: unknown }>(
+      'news_items',
+      orderBy('published_at', 'desc'),
+      orderBy('ingested_at', 'desc'),
+      qLimit(limit),
+    );
+    return rows.map(r => ({ ...r, ingested_at: toIso(r.ingested_at) ?? '' }));
+  } catch (err) {
+    console.error('Failed to load news items:', (err as Error).message);
     return [];
   }
-  return (data || []) as NewsItem[];
 }
 
 export async function getSavedNewsIds(userId: string): Promise<Set<string>> {
-  const { data, error } = await supabase
-    .from('news_saves')
-    .select('news_id')
-    .eq('user_id', userId);
-  if (error) {
-    console.error('Failed to load saved news:', error.message);
+  try {
+    const rows = await listRows<{ news_id: string }>('news_saves', where('user_id', '==', userId));
+    return new Set(rows.map(r => r.news_id));
+  } catch (err) {
+    console.error('Failed to load saved news:', (err as Error).message);
     return new Set();
   }
-  return new Set((data || []).map(r => r.news_id as string));
 }
 
 export async function toggleSavedNews(userId: string, newsId: string): Promise<boolean> {
-  const { data: deleted } = await supabase
-    .from('news_saves')
-    .delete()
-    .match({ user_id: userId, news_id: newsId })
-    .select();
-  if (deleted && deleted.length > 0) return false; // was saved, now unsaved
-  await supabase.from('news_saves').insert({ user_id: userId, news_id: newsId });
+  const r = ref('news_saves', newsSaveDocId(newsId, userId));
+  const snap = await getDoc(r);
+  if (snap.exists()) {
+    await deleteDoc(r);
+    return false; // was saved, now unsaved
+  }
+  await setDoc(r, payloadOf({ user_id: userId, news_id: newsId, created_at: nowIso() }));
   return true; // now saved
 }
 
