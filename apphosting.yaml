@@ -12,7 +12,7 @@ env:
     value: https://gayiclub.com
     availability: [BUILD, RUNTIME]
   - variable: NEXT_PUBLIC_FIREBASE_API_KEY
-    value: REPLACE_ME
+    value: AIzaSyBHNWH7BsH3CkLidpkgoojOE-ArDfoOZIU
     availability: [BUILD, RUNTIME]
   - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
     value: gayiclub.firebaseapp.com
@@ -21,7 +21,7 @@ env:
     value: gayiclub
     availability: [BUILD, RUNTIME]
   - variable: NEXT_PUBLIC_FIREBASE_APP_ID
-    value: REPLACE_ME
+    value: 1:692568338842:web:431417ac41fa188e2a0a23
     availability: [BUILD, RUNTIME]
   - variable: EMAIL_FROM
     value: "Gay I Club <noreply@gayiclub.com>"
