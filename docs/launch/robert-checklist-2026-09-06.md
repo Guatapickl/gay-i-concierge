@@ -9,7 +9,7 @@ Gay I Club · September 6, 2026
 - [ ] Open [September’s poll](https://gayiclub.com/vote/september-2026). When ready, use the admin control to email members the invitation. No synthetic poll invitations were broadcast during testing.
 - [ ] When voting is finished, choose the date and explicitly enter the meeting time in New York time. Confirm location/agenda and book the meeting. Dates are not booked automatically.
 - [ ] After each meeting, answer the Praxis availability questionnaire for the following month. Mark every offered Saturday/Sunday Available or Unavailable. Only your available dates become a member poll. No response or no available dates means no member poll.
-- [ ] Review [News](https://gayiclub.com/news). Use Remove to delete an item, Collect latest news for an immediate refresh, Save for personal bookmarks, and Share to pass along a source link.
+- [ ] Review [News](https://gayiclub.com/news). Use Remove to delete an item, Check sources now for an immediate refresh, Save for personal bookmarks, and Share to pass along a source link.
 - [ ] Check real email delivery to your inbox: verification, sign-in link, password reset, opt-in/opt-out, and RSVP confirmation. These delivery checks remain separate from automated code tests. Avoid using the membership as a test list.
 - [ ] Review the public Privacy Policy, Terms of Use and Accessibility pages, and confirm who handles moderation/account requests at praxis+gayiclub@vibeshiftai.com.
 - [ ] Send your relaunch announcement when you are happy with the live review. Include the sign-in URL and September poll link.

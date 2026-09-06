@@ -1,0 +1,59 @@
+{
+  "at": "2026-09-06T13:55:30.105Z",
+  "/api/automation/owner-questions": {
+    "unauthorized": 401,
+    "authorized": 200,
+    "result": {
+      "requests": []
+    }
+  },
+  "/api/cron/meeting-polls": {
+    "unauthorized": 401,
+    "authorized": 200,
+    "result": {
+      "created": 0,
+      "enabled": true
+    }
+  },
+  "/api/cron/news": {
+    "unauthorized": 401,
+    "authorized": 200,
+    "result": {
+      "ok": true,
+      "inserted": 45,
+      "updated": 0,
+      "skipped": 0,
+      "sources": [
+        {
+          "name": "OpenAI",
+          "ok": true,
+          "count": 15
+        },
+        {
+          "name": "Google AI",
+          "ok": true,
+          "count": 15
+        },
+        {
+          "name": "MIT News",
+          "ok": true,
+          "count": 15
+        }
+      ],
+      "partial": false
+    }
+  },
+  "session": 200,
+  "news": {
+    "status": 200,
+    "count": 45,
+    "hasSourceLinks": true,
+    "verifiedAfterIndexDeployment": "2026-09-06T14:01:22.548Z"
+  },
+  "ownerConfigBrowserRead": 403,
+  "schedulerSmoke": {
+    "news": "success: 45 updated, 0 duplicates",
+    "meeting": "success: 0 requests created with empty calendar",
+    "timeZone": "America/New_York"
+  }
+}

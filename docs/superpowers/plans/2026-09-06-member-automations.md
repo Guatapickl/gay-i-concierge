@@ -9,10 +9,10 @@ Defaults pending optional timing answer: owner request9AM New York the day after
 Architecture: retain Firebase app/Firestore for club data and cloud cron, use existing Praxis hosted questionnaire and human-query persistence for owner approval, with deterministic workflow IDs and authenticated handoff of selected dates. Implement reusable request/answer orchestration without copying shared mailbox credentials into the club browser. Keep delivery idempotent and reruns safe. News uses deduplication plus deletion tombstones so removed URLs do not reappear.
 
 Tasks:
-- [ ] Audit live calendar/polls/queues and current cron/Praxis question APIs.
-- [ ] Frontend: primary sign-in, smaller sign-up, real model label, semantic theme inputs; browser verification.
-- [ ] News: daily ingestion endpoint; trusted sources; owner remove and member share/save; tombstone semantics; tests.
-- [ ] Meetings: one-off events only; remove old event/series records and pending linked reminders, preserve September polls.
-- [ ] Reusable owner-question → selected-date poll workflow; robust timezone/date generation, empty/malformed/no-answer states, deduplication, notifications and scheduler; tests.
-- [ ] Integrate/review, run production build and appropriate tests; deploy app/functions/rules as needed.
-- [ ] Verify live controls, scheduled jobs and dry-run cycle without broadcasting synthetic polls; update documentation and owner checklist.
+- [x] Audit live calendar/polls/queues and current cron/Praxis question APIs.
+- [x] Frontend: primary sign-in, smaller sign-up, real model label, semantic theme inputs; browser verification.
+- [x] News: daily ingestion endpoint; trusted sources; owner remove and member share/save; tombstone semantics; tests.
+- [x] Meetings: one-off events only; remove old event/series records and pending linked reminders, preserve September polls.
+- [x] Reusable owner-question → selected-date poll workflow; robust timezone/date generation, empty/malformed/no-answer states, deduplication, notifications and scheduler; tests.
+- [x] Integrate/review, run production build and appropriate tests; deploy app/functions/rules as needed.
+- [x] Verify live controls, scheduled jobs and dry-run cycle without broadcasting synthetic polls; update documentation and owner checklist.
