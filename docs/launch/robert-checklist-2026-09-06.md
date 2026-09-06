@@ -22,7 +22,7 @@ Gay I Club · September 6, 2026
 - Member voting normally lasts **seven days**, or ends before the earliest offered date if sooner. Voting deadlines are enforced on the server. September’s restored poll has no automatic closing date; you decide when to book it.
 - All members see published polls in the site. Invitation email respects subscription preferences and excludes you from the automatic member invitation.
 - The cloud schedule runs independently of ChatGPT. Owner questionnaire delivery and answer forwarding use the existing Praxis daemon and feedback relay; keep Praxis running on its host. A temporary outage retries safely, but an expired questionnaire needs operator attention.
-- AIlex uses **OpenAI GPT-4o**, displayed in its chat interface. This label comes from the same constant used by its API request.
+- **AIlex is paused** at your request. Its launcher is hidden and its API rejects requests without contacting OpenAI. The invite card now provides a standard message without a model call. Agenda drafting and the admin robot benchmark are separate AI features.
 
 ## Already handled
 

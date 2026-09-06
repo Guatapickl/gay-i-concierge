@@ -59,9 +59,9 @@ has('lib/tokens.ts');
 contains('app/api/invite/route.ts', /gayiclub\.com/, 'invite prompt includes link');
 contains('components/ChatWindow.tsx', /AbortController/, 'chat uses AbortController');
 contains('components/ChatWindow.tsx', /sendMessage/, 'chat has a message submission handler');
-contains('app/api/chat/route.ts', /rateLimit\(|getClientId\(/, 'chat route rate limited');
-contains('app/api/invite/route.ts', /rateLimit\(|getClientId\(/, 'invite route rate limited');
-contains('app/api/chat/route.ts', /system.*Upcoming events|getUpcomingEvents\(/, 'chat enriched with upcoming events');
+contains('app/api/chat/route.ts', /AILEX_DISABLED/, 'chat API is paused');
+
+
 contains('lib/calendar.ts', /export function buildICS|downloadICS|googleCalendarUrl/, 'calendar helpers exported');
 contains('lib/rsvp.ts', /export async function deleteRsvp|getRsvpedEventIds/, 'rsvp helpers added');
 contains('app/api/alerts/confirm/route.ts', /alerts_confirmations|subscribe/, 'subscribe confirmation handler');

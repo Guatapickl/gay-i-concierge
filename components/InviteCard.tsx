@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 /**
- * InviteCard component allows users to generate a short invite message
+ * InviteCard component allows users to load a standard invite message
  * using the /api/invite endpoint and copy it to their clipboard.
  */
 export default function InviteCard() {
@@ -29,7 +29,7 @@ export default function InviteCard() {
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({ error: "Unknown error" }));
         console.error("API Error:", errorData);
-        setError(`Error ${res.status}: ${errorData.error || "Couldn't generate invite"}`);
+        setError(`Error ${res.status}: ${errorData.error || "Couldn't load invite"}`);
         setLoading(false);
         return;
       }
@@ -63,7 +63,7 @@ export default function InviteCard() {
         disabled={loading}
         className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
       >
-        {loading ? "Generating..." : "Generate Invite"}
+        {loading ? "Loading..." : "Get invite message"}
       </button>
       
       {error && (

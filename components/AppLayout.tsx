@@ -8,7 +8,6 @@ const AvatarMenu = dynamic(() => import('@/components/AvatarMenu'), {ssr:false})
 import FeedbackWidget from '@/components/FeedbackWidget';
 import ThemeToggle from '@/components/ThemeToggle';
 import AuthNav from '@/components/AuthNav';
-const ChatModalProvider = dynamic(() => import('@/components/ChatModalProvider'), {ssr:false});
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 
 const navigation = [
@@ -86,6 +85,6 @@ export default function AppLayout({ children }: {children: React.ReactNode}) {
       <footer className="site-footer"><div><span>Gay I Club · a VibeShift AI project</span><p>© {new Date().getFullYear()} VibeShift AI. All rights reserved.</p></div><nav aria-label="Legal"><Link href="/privacy-policy">Privacy Policy</Link><Link href="/terms-of-use">Terms of Use</Link><Link href="/accessibility">Accessibility</Link></nav></footer>
     </div>
     <FeedbackWidget hidden={mobileOpen || pathname==='/profile'}/>
-    {member && !mobileOpen && <><nav className="mobile-tabbar" aria-label="Quick navigation">{[navigation[0],navigation[1],navigation[3],navigation[4]].map(({href,label,icon:Icon})=><Link href={href} key={href} aria-label={label} aria-current={active(href)?'page':undefined}><Icon size={20}/><span>{href==='/'?'Home':href==='/chat'?'Hub':href==='/events'?'Events':'News'}</span></Link>)}</nav>{pathname!=='/profile' && <ChatModalProvider/>}</>}
+    {member && !mobileOpen && <><nav className="mobile-tabbar" aria-label="Quick navigation">{[navigation[0],navigation[1],navigation[3],navigation[4]].map(({href,label,icon:Icon})=><Link href={href} key={href} aria-label={label} aria-current={active(href)?'page':undefined}><Icon size={20}/><span>{href==='/'?'Home':href==='/chat'?'Hub':href==='/events'?'Events':'News'}</span></Link>)}</nav></>}
   </div>;
 }
