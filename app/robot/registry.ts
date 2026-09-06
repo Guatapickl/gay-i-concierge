@@ -1,4 +1,5 @@
 import Fable5Robot from '@/components/robots/Fable5Robot';
+import Fable51Robot from '@/components/robots/Fable51Robot';
 import Gemini3Robot from '@/components/robots/Gemini3Robot';
 import Gpt51CodexMaxRobot from '@/components/robots/Gpt51CodexMaxRobot';
 import Opus45Robot from '@/components/robots/Opus45Robot';
@@ -7,6 +8,7 @@ import type React from 'react';
 
 export type RobotEntry = RobotShowcaseEntry & { component: React.ComponentType<{ className?: string }> };
 const artwork: Record<string, RobotEntry['component']> = {
+  'claude-fable-5-1': Fable51Robot,
   'claude-fable-5': Fable5Robot,
   'claude-opus-4-5': Opus45Robot,
   'gpt-51-codex-max': Gpt51CodexMaxRobot,
