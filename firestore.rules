@@ -107,6 +107,8 @@ service cloud.firestore {
 
     // ---- robot benchmark: results written by the API route
     match /robot_benchmarks/{id} { allow read: if signedIn(); allow write: if false; }
+    // The authenticated API exposes totals and the caller's choice, never voter identities.
+    match /robot_showcase_votes/{id} { allow read, write: if false; }
 
     match /news_tombstones/{id} { allow read, write: if false; }
     match /meeting_automation_config/{id} { allow read, write: if false; }

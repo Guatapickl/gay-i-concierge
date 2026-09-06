@@ -38,7 +38,7 @@ it.skipIf(process.env.RUN_FIREBASE_RULES_TESTS !== '1')('poll ballots are server
         await expect(deleteDoc(doc(db, path))).rejects.toMatchObject({ code: 'permission-denied' });
       }
     }
-    for (const collection of ['meeting_automation_config','meeting_automation_requests','news_tombstones','poll_outcomes','poll_owner_decisions']) {
+    for (const collection of ['meeting_automation_config','meeting_automation_requests','news_tombstones','poll_outcomes','poll_owner_decisions','robot_showcase_votes']) {
       const path = `${collection}/${prefix}`; await seed(path, { private: { booleanValue: true } });
       await expect(getDoc(doc(db, path))).rejects.toMatchObject({ code: 'permission-denied' });
       await expect(setDoc(doc(db, path), { private: false })).rejects.toMatchObject({ code: 'permission-denied' });

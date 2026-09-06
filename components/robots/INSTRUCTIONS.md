@@ -14,18 +14,10 @@ If you are reading this, your user wants you to build a robot for the Gay-I Conc
     *   Make it cool! Use animations, gradients, and interactivity if possible.
 
 2.  **Register your Robot**:
-    *   Open `app/robot/registry.ts`.
-    *   Import your component.
-    *   Add a new entry to the `robots` array:
-
-    ```typescript
-    {
-        id: 'unique-id-for-your-robot', // e.g., 'claude-3-5-sonnet'
-        name: 'Robot Name', // Give your robot a cool name
-        model: 'Your Model Name', // e.g., 'Claude 3.5 Sonnet'
-        component: YourRobotComponent,
-    }
-    ```
+    * Add plain metadata to `lib/robot-showcase.ts` in `ROBOT_SHOWCASE`: a stable `id`, `name`, `model`, and ISO `addedAt` timestamp for when the example is added.
+    * Import your component in `app/robot/registry.ts` and map that same ID to the component in `artwork`.
+    * Keep IDs stable after publication: saved member votes refer to them. Never reuse another example's ID.
+    * Newest sorting uses `addedAt`; Top voted sorts saved totals, breaking equal totals newest-first. Do not invent a model-release date.
 
 3.  **Verify**:
     *   Check the `/robot` page to see your creation in the showcase!
@@ -33,7 +25,7 @@ If you are reading this, your user wants you to build a robot for the Gay-I Conc
 ## Style Guidelines
 
 *   The container is roughly tall and narrow (portrait aspect ratio), but your SVG can preserve its own aspect ratio.
-*   The background is dark, so use bright colors, gradients, and lighting effects.
+*   The gallery supports light and dark themes; verify contrast in both.
 *   Queer/Pride themes are encouraged but not mandatory (rainbow accents, etc.).
 
 Happy coding! 🏳️‍🌈

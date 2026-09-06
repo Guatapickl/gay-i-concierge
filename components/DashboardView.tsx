@@ -67,7 +67,7 @@ export default function DashboardView() {
         <div className="space-y-6">
           <section className="card p-6"><PanelHeader title="Communication hub" href="/chat" label="Open" /><div className="mt-4 divide-y divide-border">{channels.length ? channels.slice(0, 6).map(channel => <Link key={channel.id} href="/chat" className="block py-3 text-sm text-foreground-muted hover:text-primary">{channel.name.startsWith('#') ? channel.name : `# ${channel.name}`}</Link>) : <p className="py-4 text-sm text-foreground-muted">Join the conversation in the communication hub.</p>}</div></section>
           <section className="card p-6"><PanelHeader title="Community feed" href="/feed" label="Open" /><div className="divide-y divide-border mt-3">{posts.length ? posts.map(post => <Link key={post.id} href="/feed" className="block py-4"><p className="text-sm line-clamp-3">{post.body}</p><p className="text-xs font-mono text-foreground-muted mt-2">{relativeTime(post.created_at)}</p></Link>) : <p className="py-5 text-sm text-foreground-muted">No community updates yet. Share something with the club.</p>}</div></section>
-          <div className="flex flex-wrap gap-x-5 gap-y-3 text-xs font-mono text-foreground-muted"><Link href="/vote">Meeting date polls →</Link><Link href="/agenda">Agenda maker →</Link><Link href="/robot">Robot benchmark →</Link><Link href="/community">Member directory →</Link></div>
+          <div className="flex flex-wrap gap-x-5 gap-y-3 text-xs font-mono text-foreground-muted"><Link href="/vote">Meeting date polls →</Link><Link href="/agenda">Agenda maker →</Link><Link href="/robot">Robot showcase →</Link><Link href="/community">Member directory →</Link></div>
         </div>
       </div>
     </div>

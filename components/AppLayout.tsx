@@ -21,7 +21,7 @@ const navigation = [
   {href:'/feed',label:'Community Feed',icon:Rss},
   {href:'/announcements',label:'Announcements',icon:Megaphone},
   {href:'/agenda',label:'Agenda Maker',icon:ListTodo},
-  {href:'/robot',label:'Robot Benchmark',icon:Bot},
+  {href:'/robot',label:'Robot Showcase',icon:Bot},
   {href:'/vote',label:'Date votes',icon:Vote},
 ];
 const publicNavigation = [
