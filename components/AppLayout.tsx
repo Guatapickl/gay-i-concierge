@@ -7,6 +7,7 @@ import dynamic from 'next/dynamic';
 const AvatarMenu = dynamic(() => import('@/components/AvatarMenu'), {ssr:false});
 import FeedbackWidget from '@/components/FeedbackWidget';
 import ThemeToggle from '@/components/ThemeToggle';
+import AuthNav from '@/components/AuthNav';
 const ChatModalProvider = dynamic(() => import('@/components/ChatModalProvider'), {ssr:false});
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 
@@ -78,7 +79,7 @@ export default function AppLayout({ children }: {children: React.ReactNode}) {
       <div className="mobile-drawer" id="mobile-navigation" role="dialog" aria-modal="true" aria-label="Navigation" ref={drawer}>
         <div className="flex justify-between items-center mb-6"><span className="font-semibold">Gay I Club</span><button className="icon-button" aria-label="Close navigation" onClick={()=>{setMobileOpen(false);menuButton.current?.focus();}}><X size={22}/></button></div>
         <nav aria-label="Mobile navigation">{(member ? navigation : [{href:'/',label:'Home'},...publicNavigation,{href:'/auth/sign-in',label:'Sign in'},{href:'/auth/sign-up',label:'Join the club'}]).map(n=><Link key={n.href} href={n.href} onClick={()=>setMobileOpen(false)} aria-current={active(n.href)?'page':undefined}>{n.label}</Link>)}</nav>
-        {member && <Link className="btn-secondary mt-5" href="/profile" onClick={()=>setMobileOpen(false)}>Your profile</Link>}
+        {member && <div className="mt-5"><AuthNav/></div>}
       </div>
     </div>}
     <div className="site-body" inert={mobileOpen}><main id="main-content" tabIndex={-1} className={pathname==='/'&&!member?'landing-main':'content-main'}>{children}</main>
