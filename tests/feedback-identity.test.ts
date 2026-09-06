@@ -2,7 +2,8 @@ import {describe,it,expect} from 'vitest';
 import {createFeedbackEmailSync} from '../lib/feedback-identity';
 
 function field(value='') {
-  const input={value, events:0, dispatchEvent(){input.events++;return true;}};
+  const listeners: Array<()=>void>=[];
+  const input={value, events:0, addEventListener(_name:string,listener:()=>void){listeners.push(listener);}, dispatchEvent(){input.events++;listeners.forEach(fn=>fn());return true;}};
   return input as unknown as HTMLInputElement & {events:number};
 }
 describe('feedback account email',()=>{
@@ -23,6 +24,13 @@ describe('feedback account email',()=>{
   it('does not erase guest typing on repeated updates and clears stale remembered email',()=>{
     const sync=createFeedbackEmailSync();sync.setAccount(null);const input=field('old@example.test');
     sync.apply(input);expect(input.value).toBe('');input.value='guest@example.test';sync.apply(input);expect(input.value).toBe('guest@example.test');
+  });
+  it('preserves an edited or cleared reply address when screenshot markup recreates the form',()=>{
+    const sync=createFeedbackEmailSync();sync.setAccount('member@example.test');const input=field();sync.apply(input);
+    input.value='alternate@example.test';input.dispatchEvent(new Event('input'));
+    sync.setAccount('member@example.test');
+    const recreated=field();sync.apply(recreated);expect(recreated.value).toBe('alternate@example.test');
+    recreated.value='';recreated.dispatchEvent(new Event('input'));const cleared=field();sync.apply(cleared);expect(cleared.value).toBe('');
   });
   it('waits for restored auth and fills newly rendered compose fields',()=>{
     const sync=createFeedbackEmailSync();const input=field('remembered');sync.apply(input);expect(input.value).toBe('remembered');
