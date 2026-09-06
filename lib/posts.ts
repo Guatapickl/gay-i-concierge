@@ -1,5 +1,6 @@
 import { addDoc, deleteDoc, getDoc, getDocs, limit as qLimit, orderBy, query, setDoc, Timestamp, where, type QueryConstraint } from 'firebase/firestore';
 import { chunk, col, listRows, nowIso, payloadOf, ref, rowOf, toIso } from './firebase/db';
+import { getMemberProfile } from './directory';
 import type { Post, PostComment, FeedPost, ChatChannel, Event } from '@/types/supabase';
 
 /** post_reactions doc id — mirrors the Postgres (post_id, user_id, emoji) unique key. */
@@ -14,8 +15,8 @@ async function namesByIds(ids: string[]): Promise<Map<string, string | null>> {
   await Promise.all(
     unique.map(async id => {
       try {
-        const snap = await getDoc(ref('user_profiles', id));
-        out.set(id, snap.exists() ? ((snap.data().full_name as string | null) ?? null) : null);
+        const profile = await getMemberProfile(id);
+        out.set(id, profile?.full_name ?? null);
       } catch {
         out.set(id, null);
       }

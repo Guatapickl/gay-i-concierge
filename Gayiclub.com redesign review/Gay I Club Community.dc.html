@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f7f7f5;color:#2a2d31;font-family:'Space Grotesk',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#3aa8b4;text-decoration:none}a:hover{color:#2b8992}
+::selection{background:oklch(0.75 0.15 190 / 0.35)}
+</style>
+</helmet>
+<div style="min-height:100vh;background:{{ t.bg }};color:{{ t.text }}">
+  <nav style="display:flex;align-items:center;justify-content:space-between;padding:18px 40px;border-bottom:1px solid {{ t.line }}">
+    <div style="display:flex;align-items:baseline;gap:20px">
+      <a href="Gay I Club Internal.dc.html" style="font-size:13.5px;font-weight:500;color:{{ t.muted }}" style-hover="color:{{ t.strong }}">← Dashboard</a>
+      <div style="display:flex;align-items:baseline;gap:12px">
+        <a href="Gay I Club Landing.dc.html" style="font-weight:700;font-size:16px;letter-spacing:-0.02em;color:{{ t.strong }}">Gay I Club</a>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:{{ t.faint }};letter-spacing:0.08em">COMMUNITY</span>
+      </div>
+    </div>
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;color:{{ t.faint }}">203 MEMBERS</span>
+  </nav>
+  <main style="max-width:920px;margin:0 auto;padding:40px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px;flex-wrap:wrap">
+      <h1 style="font-size:26px;font-weight:600;letter-spacing:-0.02em;margin:0;color:{{ t.strong }}">Member directory</h1>
+      <input value="{{ query }}" onChange="{{ onQuery }}" placeholder="Search by name, skill, or interest…" style="width:280px;border:1px solid {{ t.line2 }};border-radius:8px;padding:10px 16px;background:{{ t.card }};font-family:'Space Grotesk',sans-serif;font-size:13.5px;color:{{ t.strong }};outline:none"></input>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px">
+      <sc-for list="{{ members }}" as="m" hint-placeholder-count="6">
+        <div style="border:1px solid {{ t.line }};border-radius:12px;background:{{ t.card }};padding:20px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="width:38px;height:38px;border-radius:50%;background:{{ m.avatarBg }};color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700;flex-shrink:0">{{ m.initials }}</span>
+            <div>
+              <div style="font-size:14.5px;font-weight:600;color:{{ t.strong }}">{{ m.name }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:{{ t.faint }};letter-spacing:0.06em;margin-top:1px">{{ m.role }}</div>
+            </div>
+          </div>
+          <p style="margin:0;font-size:13px;line-height:1.5;color:{{ t.muted }};text-wrap:pretty">{{ m.bio }}</p>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <sc-for list="{{ m.tags }}" as="tag" hint-placeholder-count="2">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:{{ t.accentText }};border:1px solid {{ t.line }};padding:2px 8px;border-radius:99px">{{ tag }}</span>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'dark'|'light'&quot;}}">
+class Component extends DCLogic {
+  state = { query: '' };
+  renderVals() {
+    const dark = (this.props.theme ?? 'light') !== 'light';
+    const themes = {
+      dark: { bg:'#0a0b0d', card:'#0e1013', text:'#e8eaed', strong:'#f2f4f6', muted:'#a9afb8', faint:'#5c626b', line:'#1c1e22', line2:'#2a2d33', accentText:'#7fd8e0' },
+      light:{ bg:'#f7f7f5', card:'#ffffff', text:'#2a2d31', strong:'#141619', muted:'#5a6068', faint:'#9aa0a8', line:'#e4e4e0', line2:'#d4d4cf', accentText:'oklch(0.5 0.13 190)' }
+    };
+    const all = [
+      {initials:'AR', avatarBg:'#6b9bb8', name:'Alex R.', role:'ORGANIZER', bio:'Runs the paper club. ML engineer working on retrieval systems.', tags:['retrieval','paper-club']},
+      {initials:'JM', avatarBg:'#3aa8b4', name:'Jamie', role:'ORGANIZER', bio:'Keeps the news feed honest. Evals and benchmarks nerd.', tags:['evals','news']},
+      {initials:'PR', avatarBg:'#8b6bb8', name:'Priya', role:'MEMBER', bio:'Local-model tinkerer. Runs everything on a single 4090.', tags:['local-llms','quantization']},
+      {initials:'DK', avatarBg:'#b86b6b', name:'Dev', role:'MEMBER', bio:'Agent tooling by day, workshop demos by night.', tags:['agents','workshops']},
+      {initials:'SM', avatarBg:'#6bb87f', name:'Sam', role:'MEMBER', bio:'Vision models and creative coding. New to NYC, say hi.', tags:['vision','creative']},
+      {initials:'MC', avatarBg:'#b8996b', name:'Marcus', role:'MEMBER', bio:'Policy researcher tracking the city\u2019s AI regulation work.', tags:['policy','nyc']}
+    ];
+    const q = this.state.query.toLowerCase();
+    return {
+      t: dark ? themes.dark : themes.light,
+      query: this.state.query,
+      onQuery: e => this.setState({query: e.target.value}),
+      members: q ? all.filter(m => (m.name + ' ' + m.bio + ' ' + m.tags.join(' ')).toLowerCase().includes(q)) : all
+    };
+  }
+}
+</script>
+</body>
+</html>

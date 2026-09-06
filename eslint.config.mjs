@@ -1,24 +1,9 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
-
-const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
-  {
-    rules: {
-      // Prefer warnings for dev ergonomics
-      "no-console": ["warn", { allow: ["warn", "error"] }],
-      "consistent-return": "warn",
-      "no-redeclare": "error",
-    },
-  },
+import nextVitals from 'eslint-config-next/core-web-vitals';
+import nextTypescript from 'eslint-config-next/typescript';
+export default [
+  ...nextVitals, ...nextTypescript,
+  { ignores: ['.next/**','.next-audit/**','functions/lib/**','docs/**','Gayiclub.com redesign review/**','public/**'] },
+  { rules: { 'no-console':['warn',{allow:['warn','error']}], 'consistent-return':'warn', 'no-redeclare':'error', 'react-hooks/set-state-in-effect':'warn', 'react-hooks/purity':'warn' } },
+  // Existing test doubles intentionally use permissive provider-shaped mocks.
+  {files:['tests/**'],rules:{'@typescript-eslint/no-explicit-any':'warn'}},
 ];
-
-export default eslintConfig;

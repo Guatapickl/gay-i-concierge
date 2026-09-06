@@ -38,15 +38,14 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'event_id query param required' }, { status: 400 });
   }
 
+  const user = await userFromRequest(req);
+  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401, headers: { 'Cache-Control': 'no-store' } });
+
   const checkOnly = req.nextUrl.searchParams.get('check') === 'true';
   const db = adminDb();
 
   if (checkOnly) {
     // ── Check if the current user has RSVPed ──
-    const user = await userFromRequest(req);
-    if (!user) {
-      return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
-    }
     try {
       const snap = await db.collection('rsvps').doc(rsvpId(eventId, user.uid)).get();
       return NextResponse.json({ rsvped: snap.exists });
@@ -55,7 +54,7 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // ── Attendee list (public, no auth required) ──
+  // ── Attendee list for authenticated members ──
   let rsvps: RsvpRow[];
   try {
     const snap = await db
@@ -87,7 +86,7 @@ export async function GET(req: NextRequest) {
     rsvped_at: r.created_at,
   }));
 
-  return NextResponse.json({ event_id: eventId, count: attendees.length, attendees });
+  return NextResponse.json({ event_id: eventId, count: attendees.length, attendees }, { headers: { 'Cache-Control': 'private, no-store' } });
 }
 
 /* ─── POST  /api/events/rsvp  { event_id } ───────────────────────── */

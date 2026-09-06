@@ -1,27 +1,37 @@
 {
-    "name": "Gay-I Club Concierge",
-    "type": "web-app",
-    "description": "AI-powered community concierge platform for the Gay-I Club. Features event management, RSVPs, community resources, member profiles, and an AI chatbot assistant.",
-    "created": "2025-12-16",
-    "vibe": "cyberpunk-futuristic",
-    "features": [
-        "User authentication (Email, Magic Link, Google OAuth)",
-        "Event management with RSVP system",
-        "Community resource library",
-        "Member profiles and interests",
-        "AI-powered chat assistant",
-        "Calendar integration (iCal, Google Calendar)",
-        "Event alerts and notifications"
-    ],
-    "stack": {
-        "backend": "Next.js 16 (App Router)",
-        "frontend": "React 19 + TypeScript",
-        "database": "Supabase (PostgreSQL)",
-        "styling": "Tailwind CSS",
-        "ai": "OpenAI"
-    },
-    "urls": {
-        "production": "https://gayiclub.com",
-        "repo": "https://github.com/Guatapickl/gay-i-concierge"
-    }
+  "name": "Gay-I Club Concierge",
+  "type": "web-app",
+  "description": "AI-powered community concierge platform for the Gay-I Club. Features event management, RSVPs, community resources, member profiles, and an AI chatbot assistant.",
+  "created": "2025-12-16",
+  "vibe": "quiet teal, light and dark, typography led",
+  "features": [
+    "User authentication (Email, Magic Link, Google OAuth)",
+    "Event management with RSVP system",
+    "Community resource library",
+    "Member profiles and interests",
+    "AI-powered chat assistant",
+    "Calendar integration (iCal, Google Calendar)",
+    "Event alerts and notifications"
+  ],
+  "stack": {
+    "backend": "Next.js 16 (App Router)",
+    "frontend": "React 19 + TypeScript",
+    "database": "Cloud Firestore",
+    "styling": "Tailwind CSS",
+    "ai": "OpenAI"
+  },
+  "urls": {
+    "production": "https://gayiclub.com",
+    "repo": "https://github.com/Guatapickl/gay-i-concierge"
+  },
+  "owner": "VibeShift AI",
+  "brand": "Gay I Club",
+  "platform": "Firebase App Hosting",
+  "firebase_project_id": "gayiclub",
+  "registry_slug": "gayiclub",
+  "support_email": "praxis+gayiclub@vibeshiftai.com",
+  "dns_host": "Cloudflare",
+  "dns_zone_id": "ebbd1ef86d7ca7f3c545e678238469b4",
+  "legal_effective_date": "2026-09-06",
+  "nexus_project_id": "5c98a3a8-2d8d-4fb0-90f5-6328afbc0ced"
 }

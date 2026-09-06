@@ -22,7 +22,7 @@ export type SendEmailResult =
   | { ok: true; id: string | null; provider: 'resend' | 'console' }
   | { ok: false; error: string };
 
-const DEFAULT_FROM = 'Gay I Club <noreply@gayiclub.com>';
+const DEFAULT_FROM = 'VibeShift AI Support <noreply@gayiclub.com>';
 
 export async function sendEmail(args: SendEmailArgs): Promise<SendEmailResult> {
   const apiKey = process.env.RESEND_API_KEY;
@@ -54,7 +54,7 @@ export async function sendEmail(args: SendEmailArgs): Promise<SendEmailResult> {
         subject: args.subject,
         html: args.html,
         text: args.text,
-        reply_to: args.replyTo,
+        reply_to: args.replyTo || 'praxis+gayiclub@vibeshiftai.com',
         headers: args.headers,
       }),
     });

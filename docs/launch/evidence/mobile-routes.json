@@ -1,0 +1,134 @@
+[
+  {
+    "route": "/",
+    "h1": "Welcome back, Launch",
+    "links": [
+      "/calendar",
+      "/events/launch-test-event",
+      "/news",
+      "/events",
+      "/chat",
+      "/chat",
+      "/chat",
+      "/chat",
+      "/feed",
+      "/agenda",
+      "/robot",
+      "/community"
+    ],
+    "overflow": false,
+    "title": "Gay I Club — NYC AI community"
+  },
+  {
+    "route": "/calendar",
+    "h1": "Meeting calendar",
+    "links": [
+      "/events/new",
+      "/events/launch-test-event"
+    ],
+    "overflow": false,
+    "title": "Meeting calendar · Gay I Club"
+  },
+  {
+    "route": "/chat",
+    "h1": "# general",
+    "links": [],
+    "overflow": false,
+    "title": "Communication hub · Gay I Club"
+  },
+  {
+    "route": "/news",
+    "h1": "News feed",
+    "links": [],
+    "overflow": false,
+    "title": "AI news · Gay I Club"
+  },
+  {
+    "route": "/resources",
+    "h1": "Resources",
+    "links": [
+      "/resources/new"
+    ],
+    "overflow": false,
+    "title": "Resources · Gay I Club"
+  },
+  {
+    "route": "/community",
+    "h1": "Member directory",
+    "links": [
+      "/community/launch-test-admin",
+      "/community/0RcLWXNf1P3TSiDEONChH27rUSK8",
+      "/community/1XDXBTJg5if844a9UDv4w38Ax0kn",
+      "/community/Wq7FuW1NIKqEuGVwcy6kbReTwGid",
+      "/community/cOJ8LYXk4TngojeSe8HSjL8rytdq",
+      "/community/dfEe1HEsRmIeJffpvD8e2tNVVwBX",
+      "/community/kr1lxMKsTxcG01UaVDvZp4CCARwt",
+      "/community/luQ5NW6EX9cgKxIwZ1PBUK15OUwp",
+      "/community/qMp9B7CQTXUXrKH2voVooCZZappC",
+      "/community/launch-test-member"
+    ],
+    "overflow": true,
+    "title": "Member directory · Gay I Club"
+  },
+  {
+    "route": "/feed",
+    "h1": "Community feed",
+    "links": [],
+    "overflow": false,
+    "title": "Community feed · Gay I Club"
+  },
+  {
+    "route": "/announcements",
+    "h1": "Announcements",
+    "links": [],
+    "overflow": false,
+    "title": "Announcements · Gay I Club"
+  },
+  {
+    "route": "/profile",
+    "h1": "Your profile",
+    "links": [
+      "mailto:praxis+gayiclub@vibeshiftai.com"
+    ],
+    "overflow": false,
+    "title": "Your profile · Gay I Club"
+  },
+  {
+    "route": "/events",
+    "h1": "Events",
+    "links": [
+      "/events/new",
+      "/calendar",
+      "/events/launch-test-event",
+      "https://www.google.com/calendar/render?action=TEMPLATE&text=Launch+test+meetup&dates=20260920T180000Z%2F20260920T190000Z&details=Local+test+fixture+%E2%80%94+not+a+real+club+event.&location=Test+venue",
+      "/events/launch-test-event/edit"
+    ],
+    "overflow": false,
+    "title": "Events · Gay I Club"
+  },
+  {
+    "route": "/events/new",
+    "h1": "New Event",
+    "links": [],
+    "overflow": false,
+    "title": "Events · Gay I Club"
+  },
+  {
+    "route": "/events/launch-test-event",
+    "h1": "Launch test meetup",
+    "links": [
+      "https://www.google.com/calendar/render?action=TEMPLATE&text=Launch+test+meetup&dates=20260920T180000Z%2F20260920T190000Z&details=Local+test+fixture+%E2%80%94+not+a+real+club+event.&location=Test+venue"
+    ],
+    "overflow": false,
+    "title": "Events · Gay I Club"
+  },
+  {
+    "route": "/vote",
+    "h1": "Meeting date votes",
+    "links": [
+      "/vote/new"
+    ],
+    "overflow": false,
+    "title": "Meeting date votes · Gay I Club"
+  }
+]

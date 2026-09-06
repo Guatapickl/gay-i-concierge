@@ -55,13 +55,13 @@ export default function EventsPage() {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-display-md font-display font-bold text-foreground">
+          <h1 className="page-heading">
             Events
           </h1>
           <p className="text-foreground-muted mt-1">
-            Upcoming gatherings and meetups
+            Meetups, paper clubs, and shared experiments.
           </p>
         </div>
         {isAdmin && (
@@ -74,6 +74,7 @@ export default function EventsPage() {
         )}
       </div>
 
+      <div className="flex items-center justify-between border-b border-border pb-3"><h2 className="section-heading">Upcoming events</h2><Link href="/calendar" className="text-sm text-primary">Calendar view →</Link></div>
       {/* Events List */}
       {events.length === 0 ? (
         <div className="card p-12 text-center">
@@ -83,7 +84,7 @@ export default function EventsPage() {
           </p>
         </div>
       ) : (
-        <ul className="space-y-4">
+        <ul className="grid gap-5 xl:grid-cols-2">
           {events.map(event => (
             <EventListItem
               key={event.id}

@@ -1,0 +1,197 @@
+{
+  "time": "2026-09-06T12:41:24.312Z",
+  "internal": [
+    {
+      "route": "/",
+      "status": 200,
+      "redirect": null
+    },
+    {
+      "route": "/privacy-policy",
+      "status": 200,
+      "redirect": null
+    },
+    {
+      "route": "/terms-of-use",
+      "status": 200,
+      "redirect": null
+    },
+    {
+      "route": "/accessibility",
+      "status": 200,
+      "redirect": null
+    },
+    {
+      "route": "/auth/sign-in",
+      "status": 200,
+      "redirect": null
+    },
+    {
+      "route": "/auth/sign-up",
+      "status": 200,
+      "redirect": null
+    },
+    {
+      "route": "/auth/forgot",
+      "status": 200,
+      "redirect": null
+    },
+    {
+      "route": "/auth/reset",
+      "status": 200,
+      "redirect": null
+    },
+    {
+      "route": "/auth/callback",
+      "status": 200,
+      "redirect": null
+    },
+    {
+      "route": "/auth/auth-code-error",
+      "status": 200,
+      "redirect": null
+    },
+    {
+      "route": "/calendar",
+      "status": 200,
+      "redirect": null
+    },
+    {
+      "route": "/chat",
+      "status": 200,
+      "redirect": null
+    },
+    {
+      "route": "/hub",
+      "status": 307,
+      "redirect": "/auth/sign-in"
+    },
+    {
+      "route": "/community",
+      "status": 200,
+      "redirect": null
+    },
+    {
+      "route": "/events",
+      "status": 307,
+      "redirect": "/auth/sign-in"
+    },
+    {
+      "route": "/events/new",
+      "status": 307,
+      "redirect": "/auth/sign-in"
+    },
+    {
+      "route": "/resources",
+      "status": 307,
+      "redirect": "/auth/sign-in"
+    },
+    {
+      "route": "/resources/new",
+      "status": 307,
+      "redirect": "/auth/sign-in"
+    },
+    {
+      "route": "/feed",
+      "status": 200,
+      "redirect": null
+    },
+    {
+      "route": "/news",
+      "status": 200,
+      "redirect": null
+    },
+    {
+      "route": "/announcements",
+      "status": 200,
+      "redirect": null
+    },
+    {
+      "route": "/agenda",
+      "status": 200,
+      "redirect": null
+    },
+    {
+      "route": "/robot",
+      "status": 307,
+      "redirect": "/auth/sign-in"
+    },
+    {
+      "route": "/profile",
+      "status": 307,
+      "redirect": "/auth/sign-in"
+    },
+    {
+      "route": "/vote",
+      "status": 200,
+      "redirect": null
+    },
+    {
+      "route": "/vote/new",
+      "status": 200,
+      "redirect": null
+    },
+    {
+      "route": "/alerts",
+      "status": 307,
+      "redirect": "/profile"
+    },
+    {
+      "route": "/alerts/confirm",
+      "status": 200,
+      "redirect": null
+    },
+    {
+      "route": "/alerts/unsubscribe",
+      "status": 200,
+      "redirect": null
+    },
+    {
+      "route": "/alerts/unsubscribe/confirm",
+      "status": 200,
+      "redirect": null
+    },
+    {
+      "route": "/robots.txt",
+      "status": 200,
+      "redirect": null
+    },
+    {
+      "route": "/sitemap.xml",
+      "status": 200,
+      "redirect": null
+    },
+    {
+      "route": "/.well-known/security.txt",
+      "status": 200,
+      "redirect": null
+    },
+    {
+      "route": "/opengraph-image",
+      "status": 200,
+      "redirect": null
+    }
+  ],
+  "resourceLinks": [
+    {
+      "url": "https://proteinscape.streamlit.app/?utm_source=chatgpt.com",
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://tldr.tech/ai",
+      "status": 200,
+      "finalURL": "https://tldr.tech/ai"
+    },
+    {
+      "url": "https://huggingface.co/",
+      "status": 200,
+      "finalURL": "https://huggingface.co/"
+    },
+    {
+      "url": "https://chatgpt.com/",
+      "status": 403,
+      "finalURL": "https://chatgpt.com/"
+    }
+  ],
+  "scope": "Static route inventory plus all four resource URLs in the private read-only live snapshot; no member sessions or messages used. Dynamic records and content-generated URLs need authenticated coverage."
+}

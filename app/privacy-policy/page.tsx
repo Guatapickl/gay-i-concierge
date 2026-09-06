@@ -1,0 +1,31 @@
+import type { Metadata } from 'next';
+import { baseHtml } from '@/lib/legal/privacy-policy';
+export const metadata: Metadata = {title:'Privacy Policy',description:'What Gay I Club collects, how it is used, and how to request help with your data.',alternates:{canonical:'https://gayiclub.com/privacy-policy'}};
+export default function PrivacyPolicy() {
+ return <article className="legal-page"><p className="eyebrow">VibeShift AI · Effective 2026-09-06</p><h1>Privacy Policy</h1>
+ <p>Gay I Club is operated by VibeShift AI. The base policy below describes VibeShift AI project requests. The site addendum explains the additional information used by this community.</p>
+ <div dangerouslySetInnerHTML={{__html:baseHtml}}/>
+ <section><h2>How Gay I Club uses your information</h2>
+ <p>Gay I Club is for adults aged 18 and over. You can read public pages without creating an account. Member features require sign-in. Do not post another person&apos;s contact information, private messages, or sensitive personal details without their permission.</p>
+ <h2>Information and purposes</h2>
+ <ul>
+ <li><strong>Accounts:</strong> Firebase Authentication handles your email address, account identifier, password sign-in credentials or Google sign-in, verification, and reset requests. The app does not store your password in its profile database.</li>
+ <li><strong>Profiles:</strong> Your chosen name, AI experience, interests, and profile identifier support the member directory. Your account email and any previously supplied phone number are private account information. Other signed-in members can see your directory name, interests, experience, and join month and year when available. Your profile includes update times and your optional beta-program preference.</li>
+ <li><strong>Events and participation:</strong> We store event titles, dates, locations, descriptions, organizers, RSVPs, reminder preferences, meeting-date polls, ranked votes, agenda topics and votes, and related account identifiers and timestamps.</li>
+ <li><strong>Saved news:</strong> When you save an article, we store your account identifier, the article identifier and a timestamp so you can find it again. Saved-news records are private to you and account administrators.</li>
+ <li><strong>Community content:</strong> Channel messages, community posts, comments, reactions, announcements, and shared resources include your submitted text, links or media URLs, authorship, and timestamps. Content you share with the club is visible to the members who can access that feature.</li>
+ <li><strong>Email preferences:</strong> We store email addresses, opt-in and verification status, consent source and IP address, confirmation-token records and expiration times, unsubscribe requests, and email delivery queue/history. SMS delivery is not offered in this release; older phone and SMS preference records may remain from the previous version.</li>
+ <li><strong>AI features:</strong> Concierge messages you send and relevant club context go to OpenAI to generate replies. Invite and agenda drafting also use OpenAI. Administrator robot benchmark requests send prompts to the selected provider: OpenAI, Anthropic, or Google Gemini. Benchmark history includes the generated SVG, a default/custom prompt marker, model/provider, latency, scores, administrator identifier and timestamps. Avoid sending confidential information to these features.</li>
+ <li><strong>Feedback widget:</strong> A submission can include your note, optional email, screenshot, voice recording, page URL, browser/user agent, viewport, console errors, annotations and capture/widget versions. Cloudflare stores submission metadata and media in R2 with a received timestamp and country. Review the capture before sending and avoid including other members&apos; private information.</li>
+ <li><strong>Support:</strong> When you email support, we receive your address, message and attachments. Please send only information needed to resolve the issue.</li>
+ </ul>
+ <h2>Storage, logs, and retention</h2>
+ <p>Firebase maintains essential sign-in storage, and the server uses a session cookie lasting up to 14 days. Your browser stores theme choice, the email needed to finish an email-link sign-in, and feature preferences such as last-visited messages and event prompts. IP addresses are used for abuse controls and may be retained in alert consent records. Hosting and email providers process operational request and delivery logs.</p>
+ <p>Account records and club content remain until removed through account administration or a reviewed request. The current app does not automatically delete all stored records on a fixed schedule; an expired confirmation link does not mean its database record has been removed. Backups may retain earlier copies. Contact us for the retention or deletion details applicable to your request. We do not use advertising cookies or Google Analytics.</p>
+ <h2>Services that process information</h2>
+ <p>Firebase and Google Cloud provide hosting, authentication and database storage. Resend delivers application emails. Cloudflare manages this domain&apos;s DNS and hosts the VibeShift AI feedback relay and its R2 submission storage. OpenAI, Anthropic and Google Gemini process the AI inputs described above. Opening a Google Calendar export sends the selected event&apos;s title, time, description and location to Google Calendar. Remote images in member-shared content may contact the image host when loaded.</p>
+ <h2>Your choices and account requests</h2>
+ <p>Update your name, interests and communication preferences on your profile. Password reset and email-link sign-in are available on the sign-in pages. Use email confirmation and unsubscribe links to manage update subscriptions. For email-address changes, a copy of your data, or account deletion, contact <a href="mailto:praxis+gayiclub@vibeshiftai.com">praxis+gayiclub@vibeshiftai.com</a>. These requests require human review and identity checks; submitting a request does not immediately change or delete an account.</p>
+ <p>Questions or concerns about this addendum go to the same support address. Changes are published here with an updated effective date.</p>
+ </section></article>;
+}

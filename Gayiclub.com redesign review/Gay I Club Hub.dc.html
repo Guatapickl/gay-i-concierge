@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f7f7f5;color:#2a2d31;font-family:'Space Grotesk',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#3aa8b4;text-decoration:none}a:hover{color:#2b8992}
+::selection{background:oklch(0.75 0.15 190 / 0.35)}
+</style>
+</helmet>
+<div style="min-height:100vh;background:{{ t.bg }};color:{{ t.text }};display:flex">
+  <aside style="width:230px;flex-shrink:0;border-right:1px solid {{ t.line }};padding:24px 16px;display:flex;flex-direction:column;gap:14px;position:sticky;top:0;height:100vh;box-sizing:border-box">
+    <div style="padding:0 10px 10px">
+      <a href="Gay I Club Landing.dc.html" style="font-weight:700;font-size:16px;letter-spacing:-0.02em;color:{{ t.strong }}">Gay I Club</a>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:{{ t.faint }};letter-spacing:0.08em;margin-top:3px">COMMUNICATION HUB</div>
+    </div>
+    <a href="Gay I Club Internal.dc.html" style="padding:8px 10px;border-radius:6px;font-size:13.5px;font-weight:500;color:{{ t.muted }}" style-hover="color:{{ t.strong }}">← Dashboard</a>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.14em;color:{{ t.faint }};text-transform:uppercase;padding:0 10px">Channels</div>
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <sc-for list="{{ channels }}" as="c" hint-placeholder-count="5">
+        <a href="#" onClick="{{ c.select }}" style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-radius:6px;font-size:13.5px;font-weight:500;color:{{ c.color }};background:{{ c.bgSel }}" style-hover="color:{{ t.strong }}">
+          <span><span style="color:{{ t.faint }};font-family:'IBM Plex Mono',monospace">#</span> {{ c.name }}</span>
+          <sc-if value="{{ c.unread }}" hint-placeholder-val="{{ false }}"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:{{ t.accentText }};background:{{ t.badgeBg }};padding:2px 7px;border-radius:99px">{{ c.unread }}</span></sc-if>
+        </a>
+      </sc-for>
+    </div>
+  </aside>
+  <main style="flex:1;min-width:0;display:flex;flex-direction:column;height:100vh;box-sizing:border-box">
+    <div style="padding:18px 32px;border-bottom:1px solid {{ t.line }};display:flex;align-items:baseline;justify-content:space-between">
+      <div style="display:flex;align-items:baseline;gap:12px">
+        <h1 style="font-size:17px;font-weight:600;margin:0;color:{{ t.strong }}"><span style="color:{{ t.faint }};font-family:'IBM Plex Mono',monospace">#</span> {{ activeName }}</h1>
+        <span style="font-size:13px;color:{{ t.muted }}">{{ activeTopic }}</span>
+      </div>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;color:{{ t.faint }}">{{ memberCount }} MEMBERS</span>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:24px 32px;display:flex;flex-direction:column;gap:18px">
+      <sc-for list="{{ messages }}" as="m" hint-placeholder-count="4">
+        <div style="display:flex;gap:14px">
+          <span style="width:34px;height:34px;border-radius:50%;background:{{ m.avatarBg }};color:#fff;display:grid;place-items:center;font-size:12px;font-weight:700;flex-shrink:0">{{ m.initials }}</span>
+          <div style="min-width:0">
+            <div style="display:flex;align-items:baseline;gap:10px">
+              <span style="font-size:14px;font-weight:600;color:{{ t.strong }}">{{ m.author }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:{{ t.faint }}">{{ m.time }}</span>
+            </div>
+            <p style="margin:4px 0 0;font-size:14px;line-height:1.55;color:{{ t.text }};text-wrap:pretty">{{ m.text }}</p>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="padding:18px 32px;border-top:1px solid {{ t.line }}">
+      <div style="display:flex;gap:10px;border:1px solid {{ t.line2 }};border-radius:8px;padding:6px 6px 6px 16px;background:{{ t.card }};align-items:center">
+        <input value="{{ draft }}" onChange="{{ onDraft }}" placeholder="{{ placeholder }}" style="flex:1;border:none;outline:none;background:transparent;font-family:'Space Grotesk',sans-serif;font-size:14px;color:{{ t.strong }}"></input>
+        <button onClick="{{ send }}" style="background:{{ t.accent }};color:#fff;border:none;padding:9px 18px;border-radius:6px;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;cursor:pointer">Send</button>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'dark'|'light'&quot;}}">
+class Component extends DCLogic {
+  state = { active: 'model-releases', draft: '', extra: {} };
+  renderVals() {
+    const dark = (this.props.theme ?? 'light') !== 'light';
+    const themes = {
+      dark: { bg:'#0a0b0d', card:'#0e1013', text:'#e8eaed', strong:'#f2f4f6', muted:'#a9afb8', faint:'#5c626b', line:'#1c1e22', line2:'#2a2d33', accent:'oklch(0.55 0.13 190)', accentText:'#7fd8e0', badgeBg:'rgba(127,216,224,0.12)', sel:'#15181c' },
+      light:{ bg:'#f7f7f5', card:'#ffffff', text:'#2a2d31', strong:'#141619', muted:'#5a6068', faint:'#9aa0a8', line:'#e4e4e0', line2:'#d4d4cf', accent:'oklch(0.55 0.13 190)', accentText:'oklch(0.5 0.13 190)', badgeBg:'rgba(58,168,180,0.12)', sel:'#ecece8' }
+    };
+    const t = dark ? themes.dark : themes.light;
+    const chans = [
+      {name:'model-releases', unread:'14', topic:'New models, weights, evals', members:186},
+      {name:'paper-club', unread:'3', topic:'Weekly reading discussion', members:94},
+      {name:'workshops', unread:null, topic:'Hands-on sessions + materials', members:121},
+      {name:'nyc', unread:null, topic:'Local happenings and logistics', members:203},
+      {name:'off-topic', unread:null, topic:'Everything else', members:167}
+    ];
+    const active = chans.find(c => c.name === this.state.active);
+    const baseMsgs = {
+      'model-releases': [
+        {initials:'JM', avatarBg:'#3aa8b4', author:'Jamie', time:'10:42 AM', text:'The new open-weights drop this morning tops the reasoning benchmarks — eval thread incoming.'},
+        {initials:'PR', avatarBg:'#8b6bb8', author:'Priya', time:'10:51 AM', text:'Running it locally now. Quantized 8-bit fits on a single 4090, latency is very usable.'},
+        {initials:'DK', avatarBg:'#b86b6b', author:'Dev', time:'11:07 AM', text:'Anyone want to co-present a breakdown at the next meetup? I can cover the architecture changes.'},
+        {initials:'JM', avatarBg:'#3aa8b4', author:'Jamie', time:'11:12 AM', text:'In. Let\u2019s claim a slot on the agenda maker.'}
+      ],
+      'paper-club': [
+        {initials:'AR', avatarBg:'#6b9bb8', author:'Alex R.', time:'9:15 AM', text:'Thursday\u2019s paper is the Mixture-of-Agents deep dive — link and notes in Resources.'},
+        {initials:'PR', avatarBg:'#8b6bb8', author:'Priya', time:'9:40 AM', text:'Section 4\u2019s aggregation strategy is the interesting part, worth extra time.'}
+      ]
+    };
+    const msgs = (baseMsgs[this.state.active] ?? [{initials:'GC', avatarBg:'#3aa8b4', author:'Gay I Club', time:'Today', text:'Welcome to #' + this.state.active + '. Say hi!'}]).concat(this.state.extra[this.state.active] ?? []);
+    return {
+      t,
+      channels: chans.map(c => ({ ...c,
+        color: c.name === this.state.active ? t.strong : t.muted,
+        bgSel: c.name === this.state.active ? t.sel : 'transparent',
+        select: (e) => { e.preventDefault(); this.setState({ active: c.name }); }
+      })),
+      activeName: active.name, activeTopic: active.topic, memberCount: active.members,
+      messages: msgs,
+      draft: this.state.draft,
+      placeholder: 'Message #' + active.name,
+      onDraft: (e) => this.setState({ draft: e.target.value }),
+      send: () => {
+        const text = this.state.draft.trim(); if (!text) return;
+        const extra = { ...this.state.extra };
+        extra[this.state.active] = (extra[this.state.active] ?? []).concat([{initials:'AR', avatarBg:'#6b9bb8', author:'Alex R.', time:'Now', text}]);
+        this.setState({ extra, draft: '' });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -23,17 +23,27 @@ service cloud.firestore {
     }
 
     // ---- profiles: self-only, as in Supabase
-    // Members can see each other (directory, post bylines); only self can write.
+    // Private contact documents. Directory and bylines use the allowlisted server API.
     match /user_profiles/{userId} {
-      allow read: if signedIn();
+      allow read: if (signedIn() && userId == uid()) || isAdmin();
       allow create, update: if signedIn() && userId == uid();
       allow delete: if false;
     }
 
     // ---- public directory bits (community page) - keep readable to members
-    match /profiles/{id} { allow read: if signedIn(); allow create, update: if signedIn(); allow delete: if isAdmin(); }
+    match /profiles/{id} {
+      allow read: if owns('user_id') || isAdmin();
+      allow create: if willOwn('user_id');
+      allow update: if (owns('user_id') && willOwn('user_id')) || isAdmin();
+      allow delete: if isAdmin();
+    }
     match /interests/{id} { allow read: if true; allow write: if isAdmin(); }
-    match /user_interests/{id} { allow read: if signedIn(); allow write: if willOwn('user_id') || owns('user_id'); }
+    match /user_interests/{id} {
+      allow read: if signedIn();
+      allow create: if willOwn('user_id');
+      allow update: if owns('user_id') && willOwn('user_id');
+      allow delete: if owns('user_id');
+    }
 
     // ---- events: public read, admin write
     match /events/{eventId} {
@@ -51,7 +61,7 @@ service cloud.firestore {
 
     // ---- alerts: subscription state is edited only through API routes (Admin SDK)
     match /alerts_subscribers/{id} {
-      allow read: if signedIn();
+      allow read: if owns('user_id') || isAdmin();
       allow write: if false;
     }
     match /alerts_confirmations/{id} { allow read, write: if false; }
@@ -89,7 +99,7 @@ service cloud.firestore {
     // ---- news feed: ingest is server-side; members can save
     match /news_items/{id} { allow read: if signedIn(); allow write: if false; }
     match /news_saves/{id} {              // doc id = `${news_id}_${user_id}`
-      allow read: if signedIn();
+      allow read: if owns('user_id') || isAdmin();
       allow create: if willOwn('user_id');
       allow delete: if owns('user_id');
       allow update: if false;

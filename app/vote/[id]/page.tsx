@@ -224,7 +224,7 @@ export default function PollPage() {
             if (!o) return null;
             return (
               <div key={id} className="flex items-center gap-3 p-3 rounded-lg bg-surface-elevated border border-border">
-                <div className="w-7 h-7 rounded-full bg-primary-muted text-white text-[11px] font-extrabold flex items-center justify-center shrink-0">
+                <div className="w-7 h-7 rounded-full bg-primary-muted text-background text-[11px] font-extrabold flex items-center justify-center shrink-0">
                   {idx + 1}
                 </div>
                 <div className="flex-1 text-sm font-semibold text-foreground">{formatOption(o)}</div>

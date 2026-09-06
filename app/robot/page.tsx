@@ -212,22 +212,20 @@ export default function RobotBenchmarkPage() {
   // Map robots to their brand colors in the showcase gallery
   const getShowcaseAccent = (modelName: string) => {
     const lower = modelName.toLowerCase();
-    if (lower.includes('gemini')) return '#0099cc'; // google cyan
-    if (lower.includes('gpt') || lower.includes('codex')) return '#7c2fff'; // openai purple
-    return '#ff2d9b'; // anthropic pink as fallback / claude
+    if (lower.includes('gemini')) return '#327E78'; // google cyan
+    if (lower.includes('gpt') || lower.includes('codex')) return '#13796F'; // openai purple
+    return '#087F75'; // anthropic pink as fallback / claude
   };
 
   return (
-    <div className="space-y-8 animate-fade-in max-w-7xl mx-auto px-1 pb-12">
+    <div className="min-w-0 w-full space-y-8 animate-fade-in max-w-7xl mx-auto px-1 pb-12">
       {/* Header */}
-      <div className="card-tinted p-6 md:p-8 flex flex-wrap items-center justify-between gap-6 relative overflow-hidden">
+      <div className="card p-6 md:p-8 flex flex-wrap items-center justify-between gap-6 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-primary-subtle blur-[120px] rounded-full pointer-events-none -z-10" />
         <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-purple/5 blur-[90px] rounded-full pointer-events-none -z-10" />
-        
+
         <div className="space-y-2">
-          <div className="font-display font-extrabold text-2xl md:text-3xl text-foreground flex items-center gap-3">
-            <span className="inline-block animate-bounce">🤖</span> SVG Robot Benchmarking Hub
-          </div>
+          <h1 className="page-heading">Robot Benchmark</h1>
           <p className="text-sm text-foreground-muted max-w-3xl leading-relaxed">
             Compare generative capabilities of OpenAI, Anthropic, and Google on structural SVG code.
             Scoring evaluates element variety, color depth, anatomy markers, and payload complexity.
@@ -243,10 +241,10 @@ export default function RobotBenchmarkPage() {
               className="btn-brand inline-flex items-center gap-2.5 text-sm py-3 px-6 shadow-md cursor-pointer"
             >
               <Play className={`w-4 h-4 ${runningAll ? 'animate-pulse' : ''}`} />
-              {runningAll ? 'Running swarms…' : 'Benchmark all models'}
+              {runningAll ? 'Running models…' : 'Benchmark all models'}
             </motion.button>
           ) : (
-            <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface-soft border border-border text-xs font-semibold text-foreground-muted">
+            <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-surface-soft border border-border text-xs font-semibold text-foreground-muted">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               Viewing Mode
             </div>
@@ -255,10 +253,10 @@ export default function RobotBenchmarkPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-border">
+      <div className="grid grid-cols-2 min-w-0 border-b border-border">
         <button
           onClick={() => setActiveTab('live')}
-          className={`px-8 py-4 text-sm font-bold border-b-2 transition-all duration-300 flex items-center gap-2.5 -mb-[2px] cursor-pointer ${
+          className={`min-w-0 min-h-11 px-2 sm:px-8 py-3 sm:py-4 text-xs sm:text-sm font-bold border-b-2 transition-all duration-300 flex items-center justify-center gap-2 -mb-[2px] cursor-pointer ${
             activeTab === 'live'
               ? 'border-primary text-primary bg-surface-soft/60'
               : 'border-transparent text-foreground-muted hover:text-foreground hover:bg-surface-hover/50'
@@ -269,9 +267,9 @@ export default function RobotBenchmarkPage() {
         </button>
         <button
           onClick={() => setActiveTab('showcase')}
-          className={`px-8 py-4 text-sm font-bold border-b-2 transition-all duration-300 flex items-center gap-2.5 -mb-[2px] cursor-pointer ${
+          className={`min-w-0 min-h-11 px-2 sm:px-8 py-3 sm:py-4 text-xs sm:text-sm font-bold border-b-2 transition-all duration-300 flex items-center justify-center gap-2 -mb-[2px] cursor-pointer ${
             activeTab === 'showcase'
-              ? 'border-purple text-purple bg-surface-soft/60'
+              ? 'border-purple text-primary bg-surface-soft/60'
               : 'border-transparent text-foreground-muted hover:text-foreground hover:bg-surface-hover/50'
           }`}
         >
@@ -288,11 +286,11 @@ export default function RobotBenchmarkPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -15 }}
             transition={{ duration: 0.25 }}
-            className="space-y-8"
+            className="min-w-0 space-y-8"
           >
             {/* Prompt drawer */}
             <div className="card p-5 bg-surface/80 backdrop-blur-xs">
-              <div className="flex justify-between items-center">
+              <div className="flex flex-wrap gap-3 justify-between items-center">
                 <button
                   onClick={() => setShowPrompt(s => !s)}
                   className="text-xs font-bold text-foreground-muted tracking-[0.12em] font-mono inline-flex items-center gap-2 hover:text-foreground transition-colors cursor-pointer"
@@ -319,7 +317,7 @@ export default function RobotBenchmarkPage() {
                         <textarea
                           value={prompt}
                           onChange={(e) => setPrompt(e.target.value)}
-                          className="w-full h-[250px] text-[12px] text-foreground font-mono bg-surface-elevated border border-border rounded-xl p-4 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary resize-y leading-relaxed"
+                          className="w-full h-[250px] text-[12px] text-foreground font-mono bg-surface-elevated border border-border rounded-lg p-4 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary resize-y leading-relaxed"
                           placeholder="Enter custom benchmark prompt..."
                         />
                         <div className="flex justify-between items-center text-[11px] text-foreground-muted font-mono">
@@ -328,7 +326,7 @@ export default function RobotBenchmarkPage() {
                         </div>
                       </div>
                     ) : (
-                      <pre className="mt-4 text-[12px] text-foreground-muted whitespace-pre-wrap leading-relaxed font-mono bg-surface-elevated border border-border rounded-xl p-4 max-h-[300px] overflow-y-auto">
+                      <pre className="mt-4 break-words text-[12px] text-foreground-muted whitespace-pre-wrap leading-relaxed font-mono bg-surface-elevated border border-border rounded-lg p-4 max-h-[300px] overflow-y-auto">
                         {prompt || 'Loading prompt directives…'}
                       </pre>
                     )}
@@ -363,15 +361,15 @@ export default function RobotBenchmarkPage() {
                       style={{ borderLeft: `5px solid ${p.accent}` }}
                     >
                       {/* Dynamic ambient glow */}
-                      <div 
+                      <div
                         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                        style={{ background: `radial-gradient(circle at 50% -20%, ${p.accent}0a, transparent 65%)` }}
+                        style={{ background: 'var(--color-surface-elevated)' }}
                       />
                       <div className="z-10">
                         <div className="text-[11px] text-foreground-subtle uppercase tracking-[0.08em] font-mono">
                           {p.displayName}
                         </div>
-                        <div className="text-3xl font-black mt-2 font-display" style={{ color: p.accent }}>
+                        <div className="text-3xl font-semibold mt-2 font-display" style={{ color: p.accent }}>
                           {s ? `${s.avg_score}/100` : '—'}
                         </div>
                         <p className="text-[11px] text-foreground-muted mt-1">Average Rubric Rating</p>
@@ -394,7 +392,7 @@ export default function RobotBenchmarkPage() {
 
             {/* Model Live Grid */}
             <div className="space-y-4">
-              <h3 className="font-display font-extrabold text-sm uppercase tracking-wider text-foreground-muted flex items-center gap-2">
+              <h3 className="font-display font-semibold text-sm uppercase tracking-wider text-foreground-muted flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-primary" /> Live Model Swarm
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -413,8 +411,8 @@ export default function RobotBenchmarkPage() {
             {/* Leaderboard section */}
             <div className="space-y-4">
               <div className="border-t border-border pt-8">
-                <h3 className="font-display font-extrabold text-sm uppercase tracking-wider text-foreground-muted flex items-center gap-2">
-                  🏆 Community Leaderboard
+                <h3 className="font-display font-semibold text-sm uppercase tracking-wider text-foreground-muted flex items-center gap-2">
+                   Community Leaderboard
                 </h3>
                 <p className="text-xs text-foreground-subtle mt-1 leading-relaxed">
                   The highest scoring model runs recorded from the SVG benchmark.
@@ -424,91 +422,22 @@ export default function RobotBenchmarkPage() {
               {loadingStats ? (
                 <div className="py-16 text-center text-foreground-faint text-sm">
                   <RefreshCw className="w-7 h-7 animate-spin mx-auto mb-3 opacity-60 text-primary" />
-                  Decoding leaderboard matrix…
+                  Loading leaderboard…
                 </div>
               ) : leaderboard.length === 0 ? (
                 <div className="card p-10 text-center text-foreground-muted text-sm bg-surface/50">
-                  No benchmark runs have been saved yet. Click "Run" on any model above to seed the board!
+                  No benchmark runs have been saved yet. Run an available model to start the board.
                 </div>
               ) : (
-                <motion.div 
-                  initial="hidden"
-                  animate="show"
-                  variants={{
-                    hidden: { opacity: 0 },
-                    show: {
-                      opacity: 1,
-                      transition: { staggerChildren: 0.05 }
-                    }
-                  }}
-                  className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
-                >
-                  {leaderboard.map((run, idx) => {
-                    const p = providers.find(prov => prov.id === run.provider);
-                    const accent = p?.accent || '#7c2fff';
-                    return (
-                      <motion.div
-                        variants={{
-                          hidden: { opacity: 0, y: 10 },
-                          show: { opacity: 1, y: 0 }
-                        }}
-                        key={run.id}
-                        onClick={() => setSelectedRun(run)}
-                        className="card cursor-pointer group flex flex-col overflow-hidden bg-surface transition-all duration-300 hover:scale-[1.015] hover:border-border-strong hover:shadow-md"
-                        style={{
-                          borderColor: `${accent}22`,
-                        }}
-                      >
-                        <div 
-                          className="aspect-square flex items-center justify-center relative p-5 transition-colors"
-                          style={{ background: 'radial-gradient(circle, rgba(250,245,255,0.7) 0%, rgba(255,255,255,1) 100%)' }}
-                        >
-                          <span className="absolute top-3 left-3 z-10 w-7 h-7 rounded-full bg-white/95 shadow-xs text-xs font-black flex items-center justify-center text-foreground border border-border">
-                            {idx + 1}
-                          </span>
-                          <span
-                            className="absolute top-3 right-3 text-[10px] px-2.5 py-0.5 rounded-full font-bold border font-mono"
-                            style={{
-                              color: accent,
-                              borderColor: `${accent}40`,
-                              background: `${accent}0b`,
-                            }}
-                          >
-                            ★ {run.average}
-                          </span>
-                          
-                          {/* Ambient glow on hover */}
-                          <div 
-                            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                            style={{ background: `radial-gradient(circle at 50% 50%, ${accent}06, transparent 75%)` }}
-                          />
-
-                          <div
-                            className="w-[85%] h-[85%] flex items-center justify-center transition-transform duration-500 group-hover:scale-105"
-                            dangerouslySetInnerHTML={{ __html: run.svg }}
-                          />
-                        </div>
-                        <div className="p-4 bg-surface-elevated/70 border-t border-border flex flex-col justify-between flex-1 space-y-3">
-                          <div>
-                            <div className="font-bold text-[14px] truncate text-foreground group-hover:text-primary-muted transition-colors">
-                              {p?.displayName || run.provider}
-                            </div>
-                            <div className="text-[10px] text-foreground-subtle font-mono truncate mt-0.5">
-                              {run.model_id}
-                            </div>
-                          </div>
-                          <div className="pt-2.5 border-t border-border-subtle flex items-center justify-between text-[10px] text-foreground-muted">
-                            <span className="flex items-center gap-1 font-semibold truncate text-foreground-muted">
-                              <User className="w-3.5 h-3.5 text-foreground-faint shrink-0" />
-                              {run.creator_name}
-                            </span>
-                            <span className="shrink-0 font-mono text-foreground-faint">{formatDate(run.created_at)}</span>
-                          </div>
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </motion.div>
+                <div className="card min-w-0 max-w-full overflow-x-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead className="bg-surface-elevated text-foreground-muted text-xs font-mono uppercase"><tr><th scope="col" className="p-4">Rank</th><th scope="col" className="p-4">Output</th><th scope="col" className="p-4">Model</th><th scope="col" className="p-4">Submitted by</th><th scope="col" className="p-4">Score</th></tr></thead>
+                    <tbody className="divide-y divide-border">{leaderboard.map((run, idx) => {
+                      const provider = providers.find(item => item.id === run.provider);
+                      return <tr key={run.id} className="hover:bg-surface-hover"><td className="p-4 font-mono text-foreground-muted">{String(idx + 1).padStart(2, '0')}</td><td className="p-3"><button onClick={() => setSelectedRun(run)} aria-label={`Inspect robot by ${provider?.displayName || run.provider}`} className="w-16 h-16 p-2 rounded-md border border-border bg-surface-elevated [&_svg]:w-full [&_svg]:h-full" dangerouslySetInnerHTML={{ __html: run.svg }} /></td><td className="p-4"><button onClick={() => setSelectedRun(run)} className="font-display font-semibold text-foreground hover:text-primary text-left">{provider?.displayName || run.provider}</button><p className="text-xs text-foreground-muted font-mono mt-1">{run.model_id}</p></td><td className="p-4 text-foreground-muted">{run.creator_name}<p className="text-xs font-mono mt-1">{formatDate(run.created_at)}</p></td><td className="p-4 text-primary font-display font-semibold text-xl">{run.average}</td></tr>;
+                    })}</tbody>
+                  </table>
+                </div>
               )}
             </div>
           </motion.div>
@@ -520,11 +449,11 @@ export default function RobotBenchmarkPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -15 }}
             transition={{ duration: 0.25 }}
-            className="space-y-6"
+            className="min-w-0 space-y-6"
           >
             <div className="border-b border-border pb-4">
-              <h3 className="font-display font-extrabold text-sm uppercase tracking-wider text-foreground-muted flex items-center gap-2">
-                <Award className="w-4.5 h-4.5 text-purple" /> Flagship Showcase Gallery
+              <h3 className="font-display font-semibold text-sm uppercase tracking-wider text-foreground-muted flex items-center gap-2">
+                <Award className="w-4.5 h-4.5 text-primary" /> Flagship Showcase Gallery
               </h3>
               <p className="text-xs text-foreground-subtle mt-1 leading-relaxed">
                 Carefully engineered static SVG robot components demonstrating visual craftsmanship.
@@ -536,42 +465,42 @@ export default function RobotBenchmarkPage() {
                 const Component = r.component;
                 const accent = getShowcaseAccent(r.model);
                 return (
-                  <motion.div 
-                    key={r.id} 
+                  <motion.div
+                    key={r.id}
                     whileHover={{ scale: 1.015, y: -2 }}
-                    className="card overflow-hidden flex flex-col bg-surface group transition-all duration-300 hover:shadow-lg"
+                    className="card min-w-0 overflow-hidden flex flex-col bg-surface group transition-all duration-300 hover:shadow-lg"
                     style={{ borderColor: `${accent}25` }}
                   >
                     <div className="p-4 bg-surface-elevated/70 border-b border-border flex items-center justify-between">
                       <div>
-                        <div className="font-display font-bold text-sm text-foreground group-hover:text-primary-muted transition-colors">{r.name}</div>
+                        <div className="font-display font-bold text-sm text-foreground break-words group-hover:text-primary-muted transition-colors">{r.name}</div>
                         <div className="text-[11px] text-foreground-muted font-mono mt-0.5">
                           Model · {r.model}
                         </div>
                       </div>
-                      <span 
+                      <span
                         className="text-[9px] font-bold uppercase font-mono tracking-wider px-2 py-0.5 rounded border"
                         style={{ color: accent, borderColor: `${accent}40`, background: `${accent}0b` }}
                       >
                         FLAGSHIP
                       </span>
                     </div>
-                    
-                    <div 
+
+                    <div
                       className="aspect-square flex items-center justify-center p-8 border-b border-border relative overflow-hidden"
-                      style={{ background: 'radial-gradient(circle, rgba(250,245,255,0.4) 0%, rgba(255,255,255,1) 100%)' }}
+                      style={{ background: 'var(--color-surface-elevated)' }}
                     >
                       {/* Ambient card glow */}
-                      <div 
+                      <div
                         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                        style={{ background: `radial-gradient(circle at 50% 50%, ${accent}06, transparent 75%)` }}
+                        style={{ background: 'var(--color-surface-elevated)' }}
                       />
 
                       <div className="w-[85%] h-[85%] flex items-center justify-center transition-transform duration-500 group-hover:scale-105 relative z-10">
                         <Component className="w-full h-full max-h-full" />
                       </div>
                     </div>
-                    
+
                     <div className="p-3.5 bg-surface-elevated/50 text-center flex-1 flex flex-col justify-end">
                       <span className="text-[10px] font-bold text-foreground-faint font-mono tracking-wider">
                         SERIAL: {r.id.toUpperCase()}
@@ -604,46 +533,47 @@ export default function RobotBenchmarkPage() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
               transition={{ type: 'spring', duration: 0.4 }}
-              className="bg-surface rounded-2xl border border-border max-w-4xl w-full max-h-[90vh] overflow-y-auto flex flex-col shadow-2xl relative z-10"
+              className="bg-surface rounded-lg border border-border max-w-4xl w-full max-h-[90vh] overflow-y-auto flex flex-col shadow-2xl relative z-10"
             >
               <button
                 onClick={() => setSelectedRun(null)}
-                className="absolute top-4 right-4 p-2 rounded-xl border border-border hover:bg-surface-hover text-foreground-muted hover:text-foreground z-25 transition-colors cursor-pointer"
+                aria-label="Close robot details"
+                className="absolute top-4 right-4 p-2 rounded-lg border border-border hover:bg-surface-hover text-foreground-muted hover:text-foreground z-25 transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
 
               <div className="grid grid-cols-1 md:grid-cols-2">
                 {/* Left Panel: SVG Render */}
-                <div 
+                <div
                   className="aspect-square flex items-center justify-center p-8 border-b md:border-b-0 md:border-r border-border relative overflow-hidden"
-                  style={{ background: 'radial-gradient(circle, #fcfaff 0%, #ffffff 100%)' }}
+                  style={{ background: 'var(--color-surface-elevated)' }}
                 >
                   <div
                     className="w-[90%] h-[90%] flex items-center justify-center relative z-10"
                     dangerouslySetInnerHTML={{ __html: selectedRun.svg }}
                   />
-                  <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#e0d5fa_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
+
                 </div>
 
                 {/* Right Panel: Scoring & Metadata */}
                 <div className="p-8 flex flex-col justify-between h-full space-y-6">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span 
+                      <span
                         className="text-[10px] px-2.5 py-0.5 rounded-full font-bold border uppercase tracking-wider font-mono"
                         style={{
-                          color: providers.find(p => p.id === selectedRun.provider)?.accent || '#ff2d9b',
-                          borderColor: `${providers.find(p => p.id === selectedRun.provider)?.accent}40` || '#ff2d9b40',
-                          background: `${providers.find(p => p.id === selectedRun.provider)?.accent}0b` || '#ff2d9b0b'
+                          color: providers.find(p => p.id === selectedRun.provider)?.accent || '#087F75',
+                          borderColor: `${providers.find(p => p.id === selectedRun.provider)?.accent}40` || '#087F7540',
+                          background: `${providers.find(p => p.id === selectedRun.provider)?.accent}0b` || '#087F750b'
                         }}
                       >
                         {selectedRun.provider}
                       </span>
                       <span className="text-sm font-bold text-foreground font-display">Score: {selectedRun.average}/100</span>
                     </div>
-                    
-                    <h2 className="text-2xl font-display font-extrabold text-foreground mt-3 leading-tight">
+
+                    <h2 className="text-2xl font-display font-semibold text-foreground mt-3 leading-tight">
                       {providers.find(p => p.id === selectedRun.provider)?.displayName || selectedRun.provider}
                     </h2>
                     <p className="text-xs text-foreground-subtle font-mono mt-1">
@@ -651,10 +581,10 @@ export default function RobotBenchmarkPage() {
                     </p>
 
                     <div className="mt-6 space-y-4">
-                      <ScoreBar label="Complexity (Element count)" value={selectedRun.scores.complexity} accent="#ff2d9b" />
-                      <ScoreBar label="Palette (Color count)" value={selectedRun.scores.palette} accent="#7c2fff" />
-                      <ScoreBar label="Anatomy (Required markers)" value={selectedRun.scores.anatomy} accent="#0099cc" />
-                      <ScoreBar label="Craft (Payload weight)" value={selectedRun.scores.craft} accent="#e0007a" />
+                      <ScoreBar label="Complexity (Element count)" value={selectedRun.scores.complexity} accent="#087F75" />
+                      <ScoreBar label="Palette (Color count)" value={selectedRun.scores.palette} accent="#13796F" />
+                      <ScoreBar label="Anatomy (Required markers)" value={selectedRun.scores.anatomy} accent="#327E78" />
+                      <ScoreBar label="Craft (Payload weight)" value={selectedRun.scores.craft} accent="#087F75" />
                     </div>
                   </div>
 
@@ -722,16 +652,16 @@ function ModelCard({
 
   return (
     <div
-      className="card overflow-hidden flex flex-col group relative bg-surface border-border transition-all duration-300 hover:scale-[1.015] hover:border-border-strong hover:shadow-md"
+      className="card min-w-0 overflow-hidden flex flex-col group relative bg-surface border-border transition-all duration-300 hover:scale-[1.015] hover:border-border-strong hover:shadow-md"
       style={{
         borderColor: isOk ? `${accent}55` : undefined,
         boxShadow: isOk ? `0 4px 20px ${accent}0d` : undefined,
       }}
     >
       {/* Ambient card glow on hover */}
-      <div 
+      <div
         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-        style={{ background: `radial-gradient(circle at 50% -20%, ${accent}0a, transparent 65%)` }}
+        style={{ background: 'var(--color-surface-elevated)' }}
       />
 
       <header className="px-5 py-4 border-b border-border bg-surface-elevated/70 flex items-center justify-between relative z-10">
@@ -749,7 +679,7 @@ function ModelCard({
             {provider.badge}
           </span>
           {result.state === 'ok' && (
-            <span className="text-sm font-extrabold font-mono" style={{ color: accent }}>
+            <span className="text-sm font-semibold font-mono" style={{ color: accent }}>
               ★ {result.average}
             </span>
           )}
@@ -758,7 +688,7 @@ function ModelCard({
 
       <div
         className="aspect-square w-full flex items-center justify-center relative overflow-hidden border-b border-border"
-        style={{ background: 'radial-gradient(circle, rgba(250,245,255,0.4) 0%, rgba(255,255,255,1) 100%)' }}
+        style={{ background: 'var(--color-surface-elevated)' }}
       >
         {isLoading && (
           <div className="text-center relative z-10">
@@ -774,7 +704,7 @@ function ModelCard({
         )}
         {result.state === 'idle' && (
           <div className="text-center text-foreground-faint relative z-10">
-            <div className="text-4xl opacity-30 animate-pulse">🤖</div>
+            <div className="text-4xl opacity-30 animate-pulse"></div>
             <p className="text-xs mt-3 font-mono">{provider.available ? 'Ready to Benchmark' : 'No API Key Configured'}</p>
           </div>
         )}
@@ -806,10 +736,10 @@ function ModelCard({
             whileTap={{ scale: 0.985 }}
             onClick={onRun}
             disabled={isLoading || !provider.available}
-            className="w-full inline-flex items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-sm cursor-pointer"
+            className="w-full inline-flex items-center justify-center gap-2 rounded-lg py-2.5 text-xs font-bold text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-sm cursor-pointer"
             style={{
               background: provider.available
-                ? `linear-gradient(135deg, ${accent}, ${accent}dd)`
+                ? accent
                 : 'var(--color-border)',
               color: provider.available ? '#ffffff' : 'var(--color-foreground-faint)',
             }}
@@ -829,7 +759,7 @@ function ModelCard({
             )}
           </motion.button>
         ) : (
-          <div className="w-full text-center py-2.5 px-4 rounded-xl border border-dashed border-border text-[11px] text-foreground-faint bg-surface-soft font-mono">
+          <div className="w-full text-center py-2.5 px-4 rounded-lg border border-dashed border-border text-[11px] text-foreground-faint bg-surface-soft font-mono">
             ★ Generation Restricted to Admins
           </div>
         )}
@@ -852,7 +782,7 @@ function ScoreBar({ label, value, accent }: { label: string; value: number; acce
           transition={{ duration: 0.8, ease: 'easeOut' }}
           className="h-full rounded-full"
           style={{
-            background: `linear-gradient(90deg, ${accent}, #7c2fff)`,
+            background: accent,
           }}
         />
       </div>

@@ -17,7 +17,7 @@ const MONTH_NAMES = [
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 // Map recurring color hint → consistent visual marker per series.
-const SERIES_PALETTE = ['#e0007a', '#7c3aed', '#0099cc', '#007a4a', '#c05200', '#ff2d9b', '#7c2fff'];
+const SERIES_PALETTE = ['#087F75', '#13796F', '#327E78', '#347D72', '#56756F', '#087F75', '#13796F'];
 
 function colorForEvent(event: Event, seriesIndex: Map<string, number>) {
   if (event.series_id) {
@@ -115,23 +115,24 @@ export default function CalendarPage() {
   if (loading) return <LoadingSpinner text="Loading calendar..." className="py-12" />;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 animate-fade-in">
+    <div className="space-y-8 animate-fade-in">
+      <header><p className="eyebrow mb-2">Meet, learn, connect</p><h1 className="page-heading">Meeting calendar</h1></header>
       {/* Calendar grid */}
       <div>
         <div className="flex items-center justify-between mb-5">
           <button
             onClick={goPrevMonth}
-            className="w-9 h-9 rounded-lg bg-surface-elevated border border-border-subtle text-purple flex items-center justify-center hover:border-border-strong transition-colors"
+            className="w-11 h-11 rounded-lg bg-surface-elevated border border-border-subtle text-primary flex items-center justify-center hover:border-border-strong transition-colors"
             aria-label="Previous month"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <h2 className="font-display font-bold text-lg text-foreground tracking-wide">
+          <h2 className="section-heading">
             {MONTH_NAMES[month]} {year}
           </h2>
           <button
             onClick={goNextMonth}
-            className="w-9 h-9 rounded-lg bg-surface-elevated border border-border-subtle text-purple flex items-center justify-center hover:border-border-strong transition-colors"
+            className="w-11 h-11 rounded-lg bg-surface-elevated border border-border-subtle text-primary flex items-center justify-center hover:border-border-strong transition-colors"
             aria-label="Next month"
           >
             <ChevronRight className="w-5 h-5" />
@@ -151,23 +152,25 @@ export default function CalendarPage() {
         </div>
 
         {/* Cells */}
-        <div className="grid grid-cols-7 gap-1">
+        <div className="grid grid-cols-7 gap-px border border-border bg-border rounded-lg overflow-hidden">
           {cells.map((day, i) => {
             const dayEvents = day ? eventsByDay.get(day) || [] : [];
             const sel = day === selected;
             const t = day ? isToday(day) : false;
+            if (!day) return <div key={i} aria-hidden="true" className="min-h-[80px] md:min-h-[120px] bg-surface-elevated" />;
             return (
               <button
                 key={i}
                 onClick={() => day && setSelected(sel ? null : day)}
-                disabled={!day}
-                className={`min-h-[68px] md:min-h-[88px] p-1.5 rounded-lg text-left transition-all ${
+                aria-label={`${new Date(year, month, day).toLocaleDateString(undefined, { dateStyle: 'full' })}, ${dayEvents.length} ${dayEvents.length === 1 ? 'event' : 'events'}`}
+                aria-pressed={sel}
+                className={`min-h-[80px] md:min-h-[120px] p-2 text-left transition-all ${
                   !day
-                    ? 'bg-transparent cursor-default'
+                    ? 'bg-surface-elevated cursor-default'
                     : sel
                       ? 'bg-surface-soft border-[1.5px] border-primary'
                       : t
-                        ? 'bg-[#f5f0ff] border-[1.5px] border-[#c4a0f8]'
+                        ? 'bg-surface-soft ring-1 ring-inset ring-primary'
                         : 'bg-surface border-[1.5px] border-border hover:border-border-strong'
                 }`}
               >
@@ -175,7 +178,7 @@ export default function CalendarPage() {
                   <>
                     <div
                       className={`text-xs text-right ${
-                        t ? 'font-extrabold text-purple' : 'font-medium text-[#3a2050]'
+                        t ? 'font-semibold text-primary' : 'font-medium text-foreground'
                       }`}
                     >
                       {day}
@@ -184,9 +187,11 @@ export default function CalendarPage() {
                       {dayEvents.slice(0, 2).map(e => (
                         <div
                           key={e.id}
-                          className="h-1 rounded-sm"
-                          style={{ background: colorForEvent(e, seriesIndex) }}
-                        />
+                          className="rounded-sm bg-surface-soft text-primary text-[10px] p-1 truncate"
+                          title={e.title}
+                        >
+                          <span className="hidden sm:block truncate">{e.title}</span><span className="block">{new Date(e.event_datetime).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}</span>
+                        </div>
                       ))}
                       {dayEvents.length > 2 && (
                         <div className="text-[9px] text-center text-foreground-subtle">
@@ -218,7 +223,7 @@ export default function CalendarPage() {
             ? `${MONTH_NAMES[month].toUpperCase()} ${selected} EVENTS`
             : 'UPCOMING EVENTS'}
         </div>
-        <div className="space-y-2.5">
+        <div className="space-y-3">
           {sidebarEvents.length === 0 ? (
             <p className="text-foreground-faint text-sm py-3">
               {selected ? 'No events on this day.' : 'No upcoming events.'}
@@ -235,24 +240,24 @@ export default function CalendarPage() {
                 <Link
                   key={e.id}
                   href={`/events/${e.id}`}
-                  className="block bg-surface rounded-lg p-3 hover:border-border-strong transition-colors"
+                  className="card flex flex-wrap items-center justify-between gap-4 p-5 hover:border-border-strong transition-colors"
                   style={{
                     border: '1.5px solid var(--color-border)',
                     borderLeftWidth: 4,
                     borderLeftColor: colorForEvent(e, seriesIndex),
-                    boxShadow: '0 1px 8px rgba(200,150,255,0.07)',
+
                   }}
                 >
-                  <div className="font-bold text-sm text-foreground mb-0.5">
+                  <div className="flex gap-4 items-center"><div className="text-center min-w-12"><span className="eyebrow block">{d.toLocaleDateString(undefined, { month: 'short' })}</span><span className="text-2xl font-display">{d.getDate()}</span></div><div className="font-semibold text-base text-foreground">
                     {e.title}
-                  </div>
+                  </div></div>
                   <div className="text-xs text-foreground-subtle">
                     {time}
                     {e.location ? ` · ${e.location}` : ''}
                   </div>
                   {recurrence && (
                     <div className="text-[10px] text-foreground-faint mt-1 font-mono uppercase tracking-wide">
-                      🔁 {recurrence}
+                      {recurrence}
                     </div>
                   )}
                 </Link>

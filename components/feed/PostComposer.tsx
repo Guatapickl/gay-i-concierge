@@ -44,7 +44,7 @@ export default function PostComposer({ userId, isAdmin, upcomingEvents, onPosted
   }
 
   return (
-    <div className="card-elevated p-5 space-y-4 animate-fade-in">
+    <div className="card p-5 space-y-4 animate-fade-in">
       <FormInput
         type="text"
         value={title}

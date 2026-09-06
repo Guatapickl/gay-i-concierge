@@ -55,3 +55,6 @@ functions/node_modules/
 service-account*.json
 users.csv
 users.json
+
+# Isolated production-like emulator verification build
+/.next-audit/

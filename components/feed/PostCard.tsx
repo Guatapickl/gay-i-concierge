@@ -7,7 +7,7 @@ import type { FeedPost, PostComment } from '@/types/supabase';
 import { getComments, createComment, toggleReaction, deletePost } from '@/lib/posts';
 import { Button, FormTextarea } from '@/components/ui';
 
-const QUICK_REACTIONS = ['👍', '🎉', '🔥', '❤️', '🤖', '🧠'];
+const QUICK_REACTIONS = ['👍', '🎉', 'Trending', '❤️', '', '🧠'];
 
 type Props = {
   post: FeedPost;

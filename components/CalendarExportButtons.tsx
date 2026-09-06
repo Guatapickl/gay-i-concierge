@@ -22,10 +22,9 @@ const CalendarExportButtons: React.FC<CalendarExportButtonsProps> = ({ event }) 
         href={googleCalendarUrl(event)}
         target="_blank"
         rel="noopener noreferrer"
+        className="btn-secondary text-sm px-3 py-2 inline-flex items-center justify-center"
       >
-        <Button variant="outline" size="sm">
-          Add to Google Calendar
-        </Button>
+        Add to Google Calendar
       </a>
     </>
   );

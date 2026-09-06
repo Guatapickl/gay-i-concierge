@@ -162,10 +162,10 @@ export default function EventDetailsPage() {
       </button>
 
       {/* Hero card */}
-      <div className="card-tinted p-6 md:p-8 relative overflow-hidden">
+      <div className="card p-6 md:p-8 relative overflow-hidden">
         <div
           className="absolute -top-32 -right-20 w-72 h-72 rounded-full blur-3xl pointer-events-none"
-          style={{ background: 'radial-gradient(circle, rgba(255,45,155,0.18), transparent 70%)' }}
+          style={{ background: 'var(--color-surface-elevated)' }}
         />
         <div className="relative space-y-4">
           {/* Badges */}
@@ -174,7 +174,7 @@ export default function EventDetailsPage() {
               <span className="badge">Past event</span>
             )}
             {recurrence && (
-              <span className="badge badge-purple">
+              <span className="badge badge-primary">
                 <Repeat className="w-3 h-3" />
                 {recurrence}
               </span>
@@ -188,7 +188,7 @@ export default function EventDetailsPage() {
           </div>
 
           {/* Title */}
-          <h1 className="text-display-md font-display font-bold text-foreground tracking-tight">
+          <h1 className="page-heading tracking-tight">
             {event.title}
           </h1>
 

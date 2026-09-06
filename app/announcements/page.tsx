@@ -139,9 +139,9 @@ export default function AnnouncementsPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
+    <div className="max-w-4xl mx-auto space-y-6 animate-fade-in"><header><p className="eyebrow mb-2">From the organizers</p><h1 className="page-heading">Announcements</h1></header>
       {isAdmin ? (
-        <section className="card-elevated p-5 space-y-4">
+        <section className="card p-6 md:p-8 space-y-4">
           <div className="flex items-center gap-2 text-primary">
             <Megaphone className="w-5 h-5" />
             <h2 className="font-display font-bold text-lg text-foreground">
@@ -194,7 +194,7 @@ export default function AnnouncementsPage() {
             const wasEdited = updated.getTime() - created.getTime() > 1000;
 
             return (
-              <article key={announcement.id} className="card p-5 space-y-4">
+              <article key={announcement.id} className="card p-6 md:p-8 space-y-4">
                 <header className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">

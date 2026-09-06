@@ -1,0 +1,11 @@
+
+> gay-i-concierge@0.1.0 start
+> next start --port 3107
+
+   ▲ Next.js 16.0.10
+   - Local:         http://localhost:3107
+   - Network:       http://127.0.2.2:3107
+
+ ✓ Starting...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ✓ Ready in 203ms

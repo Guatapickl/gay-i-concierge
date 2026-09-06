@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f7f7f5;color:#2a2d31;font-family:'Space Grotesk',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#3aa8b4;text-decoration:none}a:hover{color:#2b8992}
+::selection{background:oklch(0.75 0.15 190 / 0.35)}
+</style>
+</helmet>
+<div style="min-height:100vh;background:{{ t.bg }};color:{{ t.text }}">
+  <nav style="display:flex;align-items:center;justify-content:space-between;padding:18px 40px;border-bottom:1px solid {{ t.line }}">
+    <div style="display:flex;align-items:baseline;gap:20px">
+      <a href="Gay I Club Internal.dc.html" style="font-size:13.5px;font-weight:500;color:{{ t.muted }}" style-hover="color:{{ t.strong }}">← Dashboard</a>
+      <div style="display:flex;align-items:baseline;gap:12px">
+        <a href="Gay I Club Landing.dc.html" style="font-weight:700;font-size:16px;letter-spacing:-0.02em;color:{{ t.strong }}">Gay I Club</a>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:{{ t.faint }};letter-spacing:0.08em">ROBOT BENCHMARK</span>
+      </div>
+    </div>
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;color:{{ t.faint }}">COMMUNITY LEADERBOARD</span>
+  </nav>
+  <main style="max-width:920px;margin:0 auto;padding:40px">
+    <div style="display:grid;grid-template-columns:1fr 300px;gap:24px;align-items:stretch;margin-bottom:28px">
+      <div style="display:flex;flex-direction:column;justify-content:center">
+        <h1 style="font-size:26px;font-weight:600;letter-spacing:-0.02em;margin:0 0 6px;color:{{ t.strong }}">Robot Benchmark</h1>
+        <p style="margin:0 0 16px;font-size:14px;color:{{ t.muted }};max-width:560px;text-wrap:pretty">Each model gets the same prompt — "generate an SVG of a robot" — and members score the results. Submit a run in #model-releases; scores refresh nightly.</p>
+        <div style="display:flex;gap:24px">
+          <div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.12em;color:{{ t.faint }}">PROMPT</div><div style="font-size:13.5px;font-weight:600;color:{{ t.strong }};margin-top:2px">"an SVG of a robot"</div></div>
+          <div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.12em;color:{{ t.faint }}">RUNS</div><div style="font-size:13.5px;font-weight:600;color:{{ t.strong }};margin-top:2px">214</div></div>
+          <div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.12em;color:{{ t.faint }}">SCORING</div><div style="font-size:13.5px;font-weight:600;color:{{ t.strong }};margin-top:2px">Member vote</div></div>
+        </div>
+      </div>
+      <div style="height:190px;border:1px solid {{ t.line }};border-radius:12px;overflow:hidden;background:{{ t.card }};display:grid;place-items:center">
+        <div style="text-align:center">
+          <div data-robot-svg-slot="leader" style="width:120px;height:120px;margin:0 auto;border:1px dashed {{ t.line2 }};border-radius:8px"></div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.1em;color:{{ t.faint }};margin-top:8px">CURRENT LEADER'S ROBOT</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:24px">
+      <sc-for list="{{ tasks }}" as="k" hint-placeholder-count="3">
+        <button onClick="{{ k.select }}" style="border:1px solid {{ k.border }};background:{{ k.bg }};color:{{ k.color }};padding:7px 16px;border-radius:99px;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:500;cursor:pointer">{{ k.name }}</button>
+      </sc-for>
+    </div>
+    <div style="border:1px solid {{ t.line }};border-radius:12px;background:{{ t.card }};overflow:hidden">
+      <div style="display:grid;grid-template-columns:52px 72px 1.6fr 1fr 100px 130px;gap:12px;padding:12px 22px;border-bottom:1px solid {{ t.line }};font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.12em;color:{{ t.faint }};text-transform:uppercase">
+        <span>Rank</span><span>Output</span><span>Model</span><span>Submitted by</span><span style="text-align:right">Score</span><span style="text-align:right">Trend</span>
+      </div>
+      <sc-for list="{{ rows }}" as="r" hint-placeholder-count="6">
+        <div style="display:grid;grid-template-columns:52px 72px 1.6fr 1fr 100px 130px;gap:12px;padding:14px 22px;border-top:1px solid {{ t.line }};align-items:center">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:{{ r.rankColor }};font-weight:{{ r.rankWeight }}">{{ r.rank }}</span>
+          <div data-robot-svg-slot="{{ r.model }}" style="width:56px;height:56px;border:1px solid {{ t.line }};border-radius:8px;background:{{ t.bg }}"></div>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:{{ t.strong }}">{{ r.model }}</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:{{ t.faint }};margin-top:1px">{{ r.variant }}</div>
+          </div>
+          <span style="font-size:13px;color:{{ t.muted }}">{{ r.by }}</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:{{ t.strong }};text-align:right;font-weight:500">{{ r.score }}</span>
+          <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px">
+            <div style="width:64px;height:4px;background:{{ t.line }};border-radius:99px;overflow:hidden"><div style="height:100%;width:{{ r.pct }};background:{{ t.accent }};border-radius:99px"></div></div>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:{{ r.deltaColor }};width:36px;text-align:right">{{ r.delta }}</span>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <p style="margin:16px 0 0;font-family:'IBM Plex Mono',monospace;font-size:11px;color:{{ t.faint }};letter-spacing:0.06em">LAST REFRESH: SEP 6 · 03:00 ET · 214 RUNS TOTAL</p>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'dark'|'light'&quot;}}">
+class Component extends DCLogic {
+  state = { task: '"A robot"' };
+  renderVals() {
+    const dark = (this.props.theme ?? 'light') !== 'light';
+    const themes = {
+      dark: { bg:'#0a0b0d', card:'#0e1013', text:'#e8eaed', strong:'#f2f4f6', muted:'#a9afb8', faint:'#5c626b', line:'#1c1e22', line2:'#2a2d33', accent:'oklch(0.75 0.15 190)', accentText:'#7fd8e0', sel:'#f2f4f6', selText:'#0a0b0d' },
+      light:{ bg:'#f7f7f5', card:'#ffffff', text:'#2a2d31', strong:'#141619', muted:'#5a6068', faint:'#9aa0a8', line:'#e4e4e0', line2:'#d4d4cf', accent:'oklch(0.55 0.13 190)', accentText:'oklch(0.5 0.13 190)', sel:'#141619', selText:'#f7f7f5' }
+    };
+    const t = dark ? themes.dark : themes.light;
+    const data = {
+      '"A robot"': [
+        {model:'Claude Sonnet 4.5', variant:'API · TEMP 0', by:'Jamie', score:'87.4', pct:'87%', delta:'+1.2'},
+        {model:'GPT-5', variant:'API · TEMP 0', by:'Dev', score:'86.1', pct:'86%', delta:'+0.4'},
+        {model:'Qwen3-72B', variant:'LOCAL · 8-BIT', by:'Priya', score:'81.9', pct:'82%', delta:'+2.8'},
+        {model:'Llama 4 Maverick', variant:'LOCAL · FP16', by:'Sam', score:'78.3', pct:'78%', delta:'-0.6'},
+        {model:'Gemini 2.5 Pro', variant:'API · TEMP 0', by:'Marcus', score:'84.7', pct:'85%', delta:'+0.9'},
+        {model:'DeepSeek-V3.2', variant:'API', by:'Priya', score:'80.2', pct:'80%', delta:'+1.5'}
+      ],
+      '"A robot riding the subway"': [
+        {model:'GPT-5', variant:'API · HIGH EFFORT', by:'Dev', score:'91.3', pct:'91%', delta:'+0.7'},
+        {model:'Claude Sonnet 4.5', variant:'API · EXTENDED', by:'Jamie', score:'90.8', pct:'91%', delta:'+1.1'},
+        {model:'Gemini 2.5 Pro', variant:'API', by:'Marcus', score:'89.2', pct:'89%', delta:'+0.3'},
+        {model:'DeepSeek-V3.2', variant:'API', by:'Priya', score:'87.6', pct:'88%', delta:'+2.1'},
+        {model:'Qwen3-72B', variant:'LOCAL · 8-BIT', by:'Priya', score:'83.4', pct:'83%', delta:'+1.9'}
+      ],
+      '"A robot self-portrait"': [
+        {model:'Gemini 2.5 Pro', variant:'API', by:'Marcus', score:'88.9', pct:'89%', delta:'+0.5'},
+        {model:'Claude Sonnet 4.5', variant:'API', by:'Jamie', score:'87.2', pct:'87%', delta:'+0.8'},
+        {model:'GPT-5', variant:'API', by:'Dev', score:'86.8', pct:'87%', delta:'-0.2'},
+        {model:'Qwen3-VL', variant:'LOCAL · 8-BIT', by:'Sam', score:'79.1', pct:'79%', delta:'+3.4'}
+      ]
+    };
+    const rows = [...data[this.state.task]].sort((a,b) => parseFloat(b.score) - parseFloat(a.score));
+    // SVG previews intentionally left empty — dev: inject each model's generated
+    // SVG into the [data-robot-svg-slot] element (keyed by model name; "leader" for the hero).
+    return {
+      t,
+      tasks: Object.keys(data).map(name => {
+        const on = name === this.state.task;
+        return { name, select: () => this.setState({task: name}),
+          border: on ? t.sel : t.line2, bg: on ? t.sel : 'transparent', color: on ? t.selText : t.muted };
+      }),
+      rows: rows.map((r, i) => ({ ...r,
+        rank: String(i+1).padStart(2,'0'),
+        rankColor: i === 0 ? t.accentText : t.faint,
+        rankWeight: i === 0 ? 600 : 400,
+        deltaColor: r.delta.startsWith('-') ? '#c05555' : t.accentText
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -6,8 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "test:lint": "next lint",
+    "lint": "eslint .",
+    "test:lint": "eslint .",
     "test:type": "tsc --noEmit",
     "test:smoke": "node scripts/smoke-tests.mjs",
     "test": "npm run test:lint && npm run test:type && npm run test:smoke && npm run build",
@@ -21,7 +21,6 @@
     "@tsparticles/engine": "^3.8.1",
     "@tsparticles/react": "^3.0.0",
     "@tsparticles/slim": "^3.8.1",
-    "clsx": "^2.1.1",
     "firebase": "^11.10.0",
     "firebase-admin": "^13.10.0",
     "framer-motion": "^11.0.0",
@@ -29,11 +28,9 @@
     "next": "^16.0.10",
     "openai": "^5.0.1",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "tailwind-merge": "^3.3.0"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -44,5 +41,6 @@
     "typescript": "^5",
     "vite": "^6.1.6",
     "vitest": "^3.2.4"
-  }
+  },
+  "author": "VibeShift AI"
 }

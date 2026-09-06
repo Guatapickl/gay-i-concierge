@@ -26,19 +26,19 @@ const EXPERIENCE_CONFIG: Record<string, { label: string; description: string; co
   beginner: {
     label: 'Beginner',
     description: 'Exploring the fundamentals of AI & ML',
-    color: '#0099cc',
+    color: '#327E78',
     icon: <Zap className="w-4 h-4" />,
   },
   intermediate: {
     label: 'Intermediate',
     description: 'Building projects and diving deeper into AI',
-    color: '#7c2fff',
+    color: '#13796F',
     icon: <Zap className="w-4 h-4" />,
   },
   advanced: {
     label: 'Advanced',
     description: 'Pushing the frontier of AI technology',
-    color: '#ff2d9b',
+    color: '#087F75',
     icon: <Sparkles className="w-4 h-4" />,
   },
 };
@@ -56,14 +56,14 @@ function getInitials(name: string | null): string {
 
 function hashColor(id: string): string {
   const colors = [
-    'linear-gradient(135deg, #ff2d9b, #7c2fff)',
-    'linear-gradient(135deg, #7c2fff, #0099cc)',
-    'linear-gradient(135deg, #0099cc, #00cc88)',
-    'linear-gradient(135deg, #ff2d9b, #ff6b35)',
-    'linear-gradient(135deg, #7c3aed, #ec4899)',
-    'linear-gradient(135deg, #0ea5e9, #8b5cf6)',
-    'linear-gradient(135deg, #f59e0b, #ef4444)',
-    'linear-gradient(135deg, #10b981, #3b82f6)',
+    '#087F75',
+    '#087F75',
+    '#087F75',
+    '#087F75',
+    '#087F75',
+    '#087F75',
+    '#087F75',
+    '#087F75',
   ];
   let hash = 0;
   for (let i = 0; i < id.length; i++) {
@@ -121,8 +121,8 @@ export default function MemberProfilePage() {
           <ArrowLeft className="w-4 h-4" />
           Back to directory
         </Link>
-        <div className="card-elevated p-8 text-center">
-          <div className="text-4xl mb-3">🔍</div>
+        <div className="card p-8 text-center">
+          <div className="text-4xl mb-3"></div>
           <p className="text-foreground-muted font-medium">Member not found</p>
           <p className="text-sm text-foreground-subtle mt-1">
             This profile may have been removed or the link is invalid.
@@ -136,15 +136,16 @@ export default function MemberProfilePage() {
   const avatarBg = hashColor(member.id);
   const exp = EXPERIENCE_CONFIG[member.experience_level ?? 'none'] ?? EXPERIENCE_CONFIG.none;
   const joinDate = new Date(member.created_at);
-  const joinFormatted = joinDate.toLocaleDateString(undefined, {
+  const hasJoinDate = Boolean(member.created_at) && Number.isFinite(joinDate.getTime());
+  const joinFormatted = hasJoinDate ? joinDate.toLocaleDateString(undefined, {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
-  });
-  const memberSince = joinDate.toLocaleDateString(undefined, {
+  }) : null;
+  const memberSince = hasJoinDate ? joinDate.toLocaleDateString(undefined, {
     year: 'numeric',
     month: 'long',
-  });
+  }) : null;
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
@@ -158,22 +159,22 @@ export default function MemberProfilePage() {
       </Link>
 
       {/* Profile hero card */}
-      <div className="card-tinted p-8 relative overflow-hidden">
+      <div className="card p-8 relative overflow-hidden">
         {/* Decorative gradient blob */}
         <div
           className="absolute -top-32 -right-24 w-80 h-80 rounded-full blur-3xl pointer-events-none"
-          style={{ background: 'radial-gradient(circle, rgba(255,45,155,0.15), transparent 70%)' }}
+          style={{ background: 'var(--color-surface-elevated)' }}
         />
         <div
           className="absolute -bottom-20 -left-20 w-60 h-60 rounded-full blur-3xl pointer-events-none"
-          style={{ background: 'radial-gradient(circle, rgba(124,47,255,0.12), transparent 70%)' }}
+          style={{ background: 'var(--color-surface-elevated)' }}
         />
 
         <div className="relative">
           <div className="flex flex-col sm:flex-row items-start gap-6">
             {/* Large avatar */}
             <div
-              className="w-20 h-20 rounded-2xl flex items-center justify-center text-white font-display font-bold text-2xl shrink-0 shadow-medium"
+              className="w-20 h-20 rounded-lg flex items-center justify-center text-white font-display font-bold text-2xl shrink-0 shadow-medium"
               style={{ background: avatarBg }}
             >
               {initials}
@@ -197,10 +198,10 @@ export default function MemberProfilePage() {
                       {exp.icon}
                       {exp.label}
                     </span>
-                    <span className="badge">
+                    {hasJoinDate && <span className="badge">
                       <Calendar className="w-3 h-3" />
                       Member since {memberSince}
-                    </span>
+                    </span>}
                   </div>
                 </div>
 
@@ -222,13 +223,13 @@ export default function MemberProfilePage() {
       {/* Info panels */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Experience card */}
-        <div className="card-elevated p-5">
+        <div className="card p-5">
           <h2 className="text-xs font-bold text-foreground-faint tracking-[0.12em] uppercase mb-4 font-mono">
             AI Experience
           </h2>
           <div className="flex items-center gap-3 mb-3">
             <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center"
+              className="w-10 h-10 rounded-lg flex items-center justify-center"
               style={{
                 background: `${exp.color}15`,
                 border: `1.5px solid ${exp.color}33`,
@@ -257,7 +258,7 @@ export default function MemberProfilePage() {
                     : member.experience_level === 'intermediate' ? '66%'
                     : member.experience_level === 'beginner' ? '33%'
                     : '8%',
-                  background: `linear-gradient(90deg, ${exp.color}88, ${exp.color})`,
+                  background: exp.color,
                 }}
               />
             </div>
@@ -265,12 +266,12 @@ export default function MemberProfilePage() {
         </div>
 
         {/* Member since card */}
-        <div className="card-elevated p-5">
+        {hasJoinDate && <div className="card p-5">
           <h2 className="text-xs font-bold text-foreground-faint tracking-[0.12em] uppercase mb-4 font-mono">
             Membership
           </h2>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-surface-elevated border border-border text-foreground-muted">
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-surface-elevated border border-border text-foreground-muted">
               <Clock className="w-4 h-4" />
             </div>
             <div>
@@ -282,12 +283,12 @@ export default function MemberProfilePage() {
               </p>
             </div>
           </div>
-        </div>
+        </div>}
       </div>
 
       {/* Interests section */}
       {member.interests && member.interests.length > 0 && (
-        <div className="card-elevated p-5">
+        <div className="card p-5">
           <h2 className="text-xs font-bold text-foreground-faint tracking-[0.12em] uppercase mb-4 font-mono flex items-center gap-2">
             <Sparkles className="w-3.5 h-3.5" />
             Interests & Topics

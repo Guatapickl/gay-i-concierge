@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f7f7f5;color:#2a2d31;font-family:'Space Grotesk',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#3aa8b4;text-decoration:none}a:hover{color:#2b8992}
+::selection{background:oklch(0.75 0.15 190 / 0.35)}
+</style>
+</helmet>
+<div style="min-height:100vh;background:{{ t.bg }};color:{{ t.text }}">
+  <nav style="display:flex;align-items:center;justify-content:space-between;padding:18px 40px;border-bottom:1px solid {{ t.line }}">
+    <div style="display:flex;align-items:baseline;gap:20px">
+      <a href="Gay I Club Internal.dc.html" style="font-size:13.5px;font-weight:500;color:{{ t.muted }}" style-hover="color:{{ t.strong }}">← Dashboard</a>
+      <div style="display:flex;align-items:baseline;gap:12px">
+        <a href="Gay I Club Landing.dc.html" style="font-weight:700;font-size:16px;letter-spacing:-0.02em;color:{{ t.strong }}">Gay I Club</a>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:{{ t.faint }};letter-spacing:0.08em">MEETING CALENDAR</span>
+      </div>
+    </div>
+  </nav>
+  <main style="max-width:1040px;margin:0 auto;padding:40px">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:28px">
+      <h1 style="font-size:26px;font-weight:600;letter-spacing:-0.02em;margin:0;color:{{ t.strong }}">September 2026</h1>
+      <a href="#" style="border:1px solid {{ t.line2 }};color:{{ t.text }};padding:9px 18px;border-radius:6px;font-size:13px;font-weight:500">Export to calendar</a>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);border:1px solid {{ t.line }};border-radius:12px;overflow:hidden;background:{{ t.line }};gap:1px">
+      <sc-for list="{{ dows }}" as="d" hint-placeholder-count="7">
+        <div style="background:{{ t.card }};padding:10px 12px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.12em;color:{{ t.faint }};text-transform:uppercase">{{ d }}</div>
+      </sc-for>
+      <sc-for list="{{ days }}" as="d" hint-placeholder-count="35">
+        <div style="background:{{ t.card }};min-height:88px;padding:10px 12px;opacity:{{ d.opacity }}">
+          <div style="font-size:12.5px;font-weight:{{ d.weight }};color:{{ d.numColor }}">{{ d.num }}</div>
+          <sc-if value="{{ d.event }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:8px;border-left:2px solid {{ t.accent }};padding:4px 8px;background:{{ t.badgeBg }};border-radius:0 5px 5px 0">
+              <div style="font-size:11.5px;font-weight:600;color:{{ t.strong }};line-height:1.3">{{ d.event }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:{{ t.accentText }};margin-top:2px">{{ d.time }}</div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+    <h2 style="font-size:15px;font-weight:600;margin:40px 0 14px;color:{{ t.strong }}">Upcoming</h2>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <sc-for list="{{ upcoming }}" as="e" hint-placeholder-count="3">
+        <div style="display:flex;gap:18px;align-items:center;border:1px solid {{ t.line }};border-radius:10px;background:{{ t.card }};padding:16px 20px">
+          <div style="border:1px solid {{ t.line2 }};border-radius:8px;padding:8px 13px;text-align:center;flex-shrink:0">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:0.12em;color:{{ t.accentText }}">{{ e.mon }}</div>
+            <div style="font-size:20px;font-weight:600;color:{{ t.strong }};line-height:1.1">{{ e.day }}</div>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:15px;font-weight:600;color:{{ t.strong }};letter-spacing:-0.01em">{{ e.title }}</div>
+            <div style="font-size:13px;color:{{ t.muted }};margin-top:3px">{{ e.meta }}</div>
+          </div>
+          <a href="#" style="background:{{ t.strong }};color:{{ t.bg }};padding:8px 16px;border-radius:6px;font-size:13px;font-weight:600;flex-shrink:0">RSVP</a>
+        </div>
+      </sc-for>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'dark'|'light'&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const dark = (this.props.theme ?? 'light') !== 'light';
+    const themes = {
+      dark: { bg:'#0a0b0d', card:'#0e1013', text:'#e8eaed', strong:'#f2f4f6', muted:'#a9afb8', faint:'#5c626b', line:'#1c1e22', line2:'#2a2d33', accent:'oklch(0.75 0.15 190)', accentText:'#7fd8e0', badgeBg:'rgba(127,216,224,0.08)' },
+      light:{ bg:'#f7f7f5', card:'#ffffff', text:'#2a2d31', strong:'#141619', muted:'#5a6068', faint:'#9aa0a8', line:'#e4e4e0', line2:'#d4d4cf', accent:'oklch(0.55 0.13 190)', accentText:'oklch(0.5 0.13 190)', badgeBg:'rgba(58,168,180,0.07)' }
+    };
+    const t = dark ? themes.dark : themes.light;
+    const events = { 11:{event:'Paper Club: Mixture-of-Agents', time:'7:00 PM'}, 18:{event:'Workshop: Agent Tooling', time:'6:30 PM'}, 26:{event:'Monthly Social', time:'8:00 PM'} };
+    const days = [];
+    for (let i = 30; i <= 31; i++) days.push({num:i, opacity:0.4, weight:400, numColor:t.faint});
+    for (let i = 1; i <= 30; i++) {
+      const e = events[i];
+      days.push({num:i, opacity:1, weight: i===4?600:400, numColor: i===4?t.accentText:t.muted, event:e?.event ?? null, time:e?.time ?? null});
+    }
+    for (let i = 1; i <= 3; i++) days.push({num:i, opacity:0.4, weight:400, numColor:t.faint});
+    return {
+      t, dows:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], days,
+      upcoming: [
+        {mon:'SEP', day:'11', title:'Paper Club: Mixture-of-Agents Deep Dive', meta:'Thu 7:00 PM · Flatiron · 18 going'},
+        {mon:'SEP', day:'18', title:'Workshop: Agent Tooling in Practice', meta:'Fri 6:30 PM · Chelsea · 24 going'},
+        {mon:'SEP', day:'26', title:'Monthly Social', meta:'Sat 8:00 PM · East Village · 41 going'}
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

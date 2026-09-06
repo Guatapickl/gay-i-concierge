@@ -7,7 +7,8 @@ interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
   ({ error, label, className = '', id, ...props }, ref) => {
-    const inputId = id || props.name;
+    const generatedId = React.useId();
+    const inputId = id || props.name || generatedId;
 
     return (
       <div className="space-y-1.5">
@@ -22,6 +23,7 @@ const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
         <input
           ref={ref}
           id={inputId}
+          aria-label={props['aria-label'] || (!label ? props.placeholder : undefined)}
           className={`
             w-full px-3 py-2.5
             bg-surface border border-border rounded-lg

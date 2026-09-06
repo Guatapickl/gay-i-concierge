@@ -36,7 +36,7 @@ const EventListItem: React.FC<EventListItemProps> = ({
   });
 
   return (
-    <li className="card p-5 hover:border-primary/30 transition-all duration-200">
+    <li className="card p-6 h-full hover:border-primary/30 transition-colors">
       <div className="flex flex-col md:flex-row md:items-start gap-4">
         {/* Date Badge */}
         <div className="hidden md:flex flex-col items-center justify-center w-16 h-16 bg-surface-elevated border border-border rounded-lg shrink-0">
@@ -51,7 +51,7 @@ const EventListItem: React.FC<EventListItemProps> = ({
         {/* Content */}
         <div className="flex-1 min-w-0">
           <Link href={`/events/${event.id}`}>
-            <h3 className="text-lg font-semibold text-foreground hover:text-primary transition-colors mb-2">
+            <h3 className="text-xl font-display font-semibold text-foreground hover:text-primary transition-colors mb-2">
               {event.title}
             </h3>
           </Link>

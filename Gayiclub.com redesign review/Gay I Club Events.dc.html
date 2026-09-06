@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f7f7f5;color:#2a2d31;font-family:'Space Grotesk',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#3aa8b4;text-decoration:none}a:hover{color:#2b8992}
+::selection{background:oklch(0.75 0.15 190 / 0.35)}
+</style>
+</helmet>
+<div style="min-height:100vh;background:{{ t.bg }};color:{{ t.text }}">
+  <nav style="display:flex;align-items:center;justify-content:space-between;padding:18px 40px;border-bottom:1px solid {{ t.line }}">
+    <div style="display:flex;align-items:baseline;gap:20px">
+      <a href="Gay I Club Internal.dc.html" style="font-size:13.5px;font-weight:500;color:{{ t.muted }}" style-hover="color:{{ t.strong }}">← Dashboard</a>
+      <div style="display:flex;align-items:baseline;gap:12px">
+        <a href="Gay I Club Landing.dc.html" style="font-weight:700;font-size:16px;letter-spacing:-0.02em;color:{{ t.strong }}">Gay I Club</a>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:{{ t.faint }};letter-spacing:0.08em">EVENTS</span>
+      </div>
+    </div>
+    <a href="Gay I Club Calendar.dc.html" style="font-size:13.5px;font-weight:500">Calendar view →</a>
+  </nav>
+  <main style="max-width:920px;margin:0 auto;padding:40px">
+    <h1 style="font-size:26px;font-weight:600;letter-spacing:-0.02em;margin:0 0 28px;color:{{ t.strong }}">Upcoming events</h1>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px">
+      <sc-for list="{{ events }}" as="e" hint-placeholder-count="4">
+        <div style="border:1px solid {{ t.line }};border-radius:12px;background:{{ t.card }};padding:24px;display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.12em;color:{{ t.accentText }};text-transform:uppercase">{{ e.type }}</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:{{ t.faint }}">{{ e.date }}</span>
+          </div>
+          <div style="font-size:17px;font-weight:600;color:{{ t.strong }};letter-spacing:-0.015em;line-height:1.3">{{ e.title }}</div>
+          <p style="margin:0;font-size:13.5px;line-height:1.55;color:{{ t.muted }};text-wrap:pretty;flex:1">{{ e.desc }}</p>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid {{ t.line }}">
+            <span style="font-size:12.5px;color:{{ t.muted }}">{{ e.meta }}</span>
+            <a href="#" style="background:{{ t.strong }};color:{{ t.bg }};padding:7px 15px;border-radius:6px;font-size:12.5px;font-weight:600">RSVP</a>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <h2 style="font-size:15px;font-weight:600;margin:44px 0 14px;color:{{ t.strong }}">Past events</h2>
+    <div style="display:flex;flex-direction:column">
+      <sc-for list="{{ past }}" as="e" hint-placeholder-count="3">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:13px 0;border-top:1px solid {{ t.line }}">
+          <div style="display:flex;gap:14px;align-items:baseline">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:{{ t.faint }};width:52px">{{ e.date }}</span>
+            <span style="font-size:14px;font-weight:500;color:{{ t.text }}">{{ e.title }}</span>
+          </div>
+          <a href="Gay I Club Resources.dc.html" style="font-size:12.5px;font-weight:500">Materials →</a>
+        </div>
+      </sc-for>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'dark'|'light'&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const dark = (this.props.theme ?? 'light') !== 'light';
+    const themes = {
+      dark: { bg:'#0a0b0d', card:'#0e1013', text:'#e8eaed', strong:'#f2f4f6', muted:'#a9afb8', faint:'#5c626b', line:'#1c1e22', accent:'oklch(0.75 0.15 190)', accentText:'#7fd8e0' },
+      light:{ bg:'#f7f7f5', card:'#ffffff', text:'#2a2d31', strong:'#141619', muted:'#5a6068', faint:'#9aa0a8', line:'#e4e4e0', accent:'oklch(0.55 0.13 190)', accentText:'oklch(0.5 0.13 190)' }
+    };
+    return {
+      t: dark ? themes.dark : themes.light,
+      events: [
+        {type:'Paper Club', date:'SEP 11', title:'Mixture-of-Agents Deep Dive', desc:'Layered aggregation of open models vs. single frontier models. Read sections 1\u20134 beforehand; notes in Resources.', meta:'Flatiron · 18 going'},
+        {type:'Workshop', date:'SEP 18', title:'Agent Tooling in Practice', desc:'Hands-on session building tool-use agents. Bring a laptop; starter repo provided.', meta:'Chelsea · 24 going'},
+        {type:'Social', date:'SEP 26', title:'Monthly Social', desc:'No agenda, just the community. First round on the club.', meta:'East Village · 41 going'},
+        {type:'Paper Club', date:'OCT 2', title:'Long-Horizon Agent Evals', desc:'Covering the new agentic benchmark suite and what it means for practical agent work.', meta:'Flatiron · 7 going'}
+      ],
+      past: [
+        {date:'AUG 28', title:'Workshop: Fine-tuning on a Budget'},
+        {date:'AUG 21', title:'Paper Club: Sparse Autoencoders for Interpretability'},
+        {date:'AUG 14', title:'Monthly Social'}
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

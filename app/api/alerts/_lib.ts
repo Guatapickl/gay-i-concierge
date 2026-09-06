@@ -18,6 +18,7 @@ export type Action = 'subscribe' | 'unsubscribe';
 export type ConfirmationRow = {
   id: string;
   token: string;
+  user_id?: string | null;
   action: Action;
   channel: Channel;
   email: string | null;
@@ -36,6 +37,7 @@ export async function createAlertToken(args: {
   email?: string | null;
   phone?: string | null;
   ttlHours: number;
+  user_id?: string | null;
 }): Promise<string> {
   const token = generateToken();
   await adminDb()
@@ -44,6 +46,7 @@ export async function createAlertToken(args: {
     .set(
       adminPayloadOf({
         token,
+        user_id: args.user_id ?? null,
         action: args.action,
         channel: args.channel,
         email: args.email ?? null,
@@ -133,7 +136,7 @@ export async function consumeAlertToken(args: {
       await upsertSubscriber(
         { email: row.email },
         subscribing
-          ? { email_opt_in: true, email_opt_in_at: now, email_opt_out_at: null, ...consent }
+          ? { ...(row.user_id ? { user_id: row.user_id } : {}), email_opt_in: true, email_opt_in_at: now, email_opt_out_at: null, ...consent }
           : { email_opt_in: false, email_opt_out_at: now, ...consent },
         tx,
         db,

@@ -1,0 +1,611 @@
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:18 GMT
+content-type: text/html; charset=utf-8
+location: https://share.streamlit.io/-/auth/app?redirect_uri=https%3A%2F%2Fproteinscape.streamlit.app%2F%3Futm_source%3Dchatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+cache-control: no-cache="Set-Cookie"
+content-type: text/html; charset=utf-8
+location: https://proteinscape.streamlit.app/-/login?payload=MTc4ODY5ODUzOXxSMlBaUEdxYm5XN1p5X3BHVWZCUk1rbUNTSUlkV2xfWHRkdmF4cGlHdzVENnRmcjhIR041NFJCLVZuZXpoVTJHWG14LXR6SkI0WEpyWDBjb2NlTHF1Y01ZVDhyTVdjRjNVeklGU1pIRXJxeVlNVVBGb2dMQnlVSmZCMHB0UHdHdG5yLUJpaXNJNk1RNU04cE8xX1FUaERsNTlzYms5Vm51QWpIbEdBRnQ1U0thaDEyMDdOYlpjS3VLUDMzX2hhVlZNemZRQ0NFQWcyc1I4SExxb09LX082ejMtQ0NYWXRLT1M4NWRyV3FfY3Vqb2xnNGhkZTFNallBZFJsTXluSVhWM09NTzNZdjFRWHA5NmFoSG1EM0VCNXB6RTFTRFEtaEpEZmRubDVGclo5U3Fsa3dCX1dHeGE5VlVNMThtajZ4cnJ1VkRJQnhDRTBWWVRld3VYZ3JrYktWcmJyQ1ZPc250Q0tsb1RQeFNzZmV1SVZWbC1VVVlnQW5FSDNPLVZEeWc0X0k2dk1aMlVudzNPbU85MWVZWFp4c1BKbm5iNEY2cVprUEpmRXBIVzQtb2VJc1E5WWtLMzJhWjM3V1FtSEhlbzNuRXphZ0hjdjFIQWEzWGpaajA5TjVSNDI4UFozd3VlVVUzaUpKZkM0QmtrekJsc2RXVjBvVEJHalVDd1lmR2hYOGI4RWE2dWFTWVZ1WjM1N0RDNUV0cDNOZVhBZ25DTTRydkszbC1iM3YwQWl2bC1Yd1dXUT09fIQtVRUAL6wnmXL6-LJ_7xoPNbQVOS0qwWqJ48fP1mZI
+set-cookie: [redacted]
+set-cookie: [redacted]
+vary: Cookie,Cookie
+date: Sun, 06 Sep 2026 12:42:19 GMT
+server: _
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:19 GMT
+content-type: text/html; charset=utf-8
+cache-control: no-cache="Set-Cookie"
+location: https://proteinscape.streamlit.app/?utm_source=chatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:20 GMT
+content-type: text/html; charset=utf-8
+location: https://share.streamlit.io/-/auth/app?redirect_uri=https%3A%2F%2Fproteinscape.streamlit.app%2F%3Futm_source%3Dchatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+cache-control: no-cache="Set-Cookie"
+content-type: text/html; charset=utf-8
+location: https://proteinscape.streamlit.app/-/login?payload=MTc4ODY5ODU0MHxGX1kwcEREa0dMU1N4ZWtGVE80UlpEZ2VpdXc1ZTR2VnpZNnE4UXJHSU8tMjAzY3VYNl8xN1FXa0xCWFRNNGtkWGR3UVBjTE84MVBhdXRmWUFGYlV2Y0dPOWVZTkZiRWVacjRMTWpXcW5DMEhGZE51dEdCak5xRUNDU2J4U2cza3U4U2VRSl9HekNjUWJXU2hHQzF5Y0JlLTVianBEUjl4aUxpRDR2eS14VUpXVE11MVppbUwtdUVzWTZPbTcyQ2dDUlZ5QkVraHNQdkphajAzYW1SZXVPamdHMU94YWowdjFVblJwd1NGVm9xVWxTQkxXNl93cEJrcEp1ZmNxb0ZDa0NKaVljSWhKZTBLQ1Vsbk9rMXR2X0JaeDZIaTdFRjZfaHhBcHNPaXFodWVCWEVHTTZLeGZKWTh6c1RQbGpub3RMQ1FNNk9BdVdaOWRpY1dPdDNvU0sxTzB5Y2hWQ1I0SFlNMVRQUXZvc2JRMkQtY1Y3SXBQMDI2MmpBZHgyUW1ZNUdFZUVpMlpyR1k2T3lNeHVCVElIZTJUdkNXaWIxR3Z2NmtvM3VkTkw5RmhaZEdhYzk5aTgtbTFfRzd3b0xpUWN2Q1VIRkYwQXNaVmFOb1RkaElRUHNrbFA4SzI2RWJFXzFoby1GLXRuSVA5S294MXJ5Ym8wUS1iZ1llbVZlZ00yVy1sZEJ3a2FiMzhyc1IyaENwSWJfaW8wNTFLa2JKOUQ1WGRQdHJIT2F6NXlaM0thQVJuZz09fNXOgzZvK2oN
+  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:02 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:02 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:02 --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:--  0:00:02 --:--:--     0
+Zh89rce0kWXZkojqL56BbxOoL7Fa6xsz
+set-cookie: [redacted]
+set-cookie: [redacted]
+vary: Cookie,Cookie
+date: Sun, 06 Sep 2026 12:42:20 GMT
+server: _
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:20 GMT
+content-type: text/html; charset=utf-8
+cache-control: no-cache="Set-Cookie"
+location: https://proteinscape.streamlit.app/?utm_source=chatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:20 GMT
+content-type: text/html; charset=utf-8
+location: https://share.streamlit.io/-/auth/app?redirect_uri=https%3A%2F%2Fproteinscape.streamlit.app%2F%3Futm_source%3Dchatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+cache-control: no-cache="Set-Cookie"
+content-type: text/html; charset=utf-8
+location: https://proteinscape.streamlit.app/-/login?payload=MTc4ODY5ODU0MHxYa1lQLXR6cmY0SW5uNk1WeEVQYmp2eFJVUWVuZ0lQTms2T2FibUV3YU1IY2xjUUZzLVVDOWN1eWVxZF9ETzQ0c3lPZ0VBUlhvTXNzOFJFVjVGRGJxd21iT1ZOUzV2RDQyanNCUVB1Tjdsb2VQMFZMb1hrTkxIQUNYakw3cmNqdmdjbGpCSTZXNy1zTDQzcUxQZFdHUm05dlNwa2ZoenVoVlB4TlhrbFNNNURQdFpoVUwzY3c2Rl96VTFxUGlHbUw3U0ZpYml0ZmhqYWxsUE5HbVBFU0RyQ0thckxWRk5ranMybzI4RmdxR0w2ZW5RUk84WE9EcG5nem5IblFvSnRlY0I4NzNfYWN1MVRlaG5GeVVkRmJSRW05R0VTRmZ1UUVEbDU0bTZoV3o5QnBmVC05U1VQV1pZdVd0OHB6THhOS0E2cUtNV2kta2JNVHc4VnN2b2NLYWZ6OTJQSW1WeG1lVDVzRXc5eng0QkI5WFE5OHpJbWFmaHo3QThzeDJiOHhUbm90eEZfTF9fS2pwcjktT1lmV3RjakMzVG1wQlVneEdUdnBybmpnTmdMWnRnREJHOGhwdlhBWGJCZFBqOC1VeWhoSEhIWU5acGNjRjlZdC03NzB4NVdjNVpDM1c0aHdjeFo3WEhUN1hpT05YUnk3MllpWUJpWTlGSHRLYncwUk9LYVM5dzVIYi1uMEZfM25zVEd3VkNIaUxEXzZYdTBHUWlwSTBIQUZQRWpiRWk1TWNIM2dyUT09fE7_aju6h9mzMBIvR_Yo0ymmWz2imGwnGAzwT_5crY1u
+set-cookie: [redacted]
+set-cookie: [redacted]
+vary: Cookie,Cookie
+date: Sun, 06 Sep 2026 12:42:20 GMT
+server: _
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:21 GMT
+content-type: text/html; charset=utf-8
+cache-control: no-cache="Set-Cookie"
+location: https://proteinscape.streamlit.app/?utm_source=chatgpt.com
+set-cookie: [redacted]
+  0     0    0     0    0     0      0      0 --:--:--  0:00:02 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:02 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:02 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:03 --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:--  0:00:03 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:03 --:--:--     0
+NuaUlQZVE9PXzZXwm4yVbk8sv-ABIYugdYTOXLQkMKmGj5YkdAp6FplA==; Path=/; HttpOnly; Secure; SameSite=Lax
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:21 GMT
+content-type: text/html; charset=utf-8
+location: https://share.streamlit.io/-/auth/app?redirect_uri=https%3A%2F%2Fproteinscape.streamlit.app%2F%3Futm_source%3Dchatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+cache-control: no-cache="Set-Cookie"
+content-type: text/html; charset=utf-8
+location: https://proteinscape.streamlit.app/-/login?payload=MTc4ODY5ODU0MXxZQy13ZzEwVmd5WUJINzJpMEtLaEprb2JfUi11a0RJc1Z0bkVrNi12aEhnTGpaaWozbjJvdkFmMHpIWnNPMUYtSlM0SGFxQ3U1ZTlDbGFSUzlfLWw1X0ZHMHZteWRVcnlhVXBmN1UwSkxTWmhCdHQ3M0R3d3FOYU1WT1VRV0F6anhQX1BOUTA0TEVHem84amEwMDYtM1ZubFN3UWtnSnlIU2RRVnJHbHd1R3JHS2RDUVNRcGRtSnVIOV9YRlBVZDhVYm5YZ193MFA1eFJuM1d4bEVZY29HaWI0cnJweWxmRFpGWG9FUkpIOGVIT3JBTGFPT01md002RnJLcjlQNzFkQ1FzbFVjSEh2Zkk0ZklUVzVndVpPQ3JHMHRtUF9xMXhSdmpaSzFLTjNfdDdKNkZaT1pyQ21qX2JPRlNfXzAyOGtWbUVPVE5wZ2kwcVMxUmgyTDM2RElGSmVpeWRQdVN6RzFwOXM2ZjBvOFR1X0ZGd1cxdGR1WEJJMEdGNTNtN1AwVDF0LXpUeDNQVmxEUmRQcHctRThsSEpTbC1CQlVKckJ4WHN5V01BejdVLTM0bXgzU0NwVWg2OURXYjc3RjBTYWM5OWJoa1FZX2tZeTF1LVpWaHdUenA3cmVpd0xiSGR2WmtFVVVNVTlnVjNrUGlLdFV3enB4Z0FOWGYwN2Z6WWtKbzk4eUpQX2psNEZuNm9EdldkLUhEdGtaM0g0ZnRqMGQzSklvX2dVbTkxakhPQ29tTms2QT09fJRbBaNGLudbL_VQR8X_JJdK5DWcITRJgcfyoQOPUFZD
+set-cookie: [redacted]
+set-cookie: [redacted]
+vary: Cookie,Cookie
+date: Sun, 06 Sep 2026 12:42:21 GMT
+server: _
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:21 GMT
+content-type: text/html; charset=utf-8
+cache-control: no-cache="Set-Cookie"
+location: https://proteinscape.streamlit.app/?utm_source=chatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:22 GMT
+content-type: text/html; charset=utf-8
+location: https://share.streamlit.io/-/auth/app?redirect_uri=https%3A%2F%2Fproteinscape.streamlit.app%2F%3Futm_source%3Dchatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+cache-control: no-cache="Set-Cookie"
+content-type: text/html; charset=utf-8
+location: https://proteinscape.streamlit.app/-/login?payload=MTc4ODY5ODU0MnxrVXpvN05YdlZjcHIxWDVieWZCZndaTmpvVWM1dk1nMzRldEpkcTBIWmp0RVlXbDV4dWpKMVRORUVpeUxhV3NUY1V0SW0wSmxRaW0wZ2ptZjZXZHBnTVlGRGI1S1FqeFRpRi1kNllZOFoxQ29RN2pVdmZZWnA5TTAzTEl1X01jT0Q2dXZKZnNnMkFCZlBNSVB0Q2s0cmpjMHI5MEFDZ0ZwbmpITkZiNW1PYlZMbU80Y2dabThEN0tFYjZVZ1ZITnZadmotZ3dBbDFIUk5fY2h3R1VOSnhoUXVwU2R6a2RDV3B5YkJDR0U3TEs1Y19DTGtWdDZrWGE5Q0k4cWVfNzFDVzUtcGt6Uk10M3FHd2VqZlpGd084M0JuRGhuZ2dEUXE1OTNLbFRpSEdjVW4ya1ZKOHVHNzdlQmxjd3RhR3J5TTVxM2Nnank4anpZcXhQVE9FU2FjS2hwUFIxTEZWdjJ2YnlPR3BoQkpJV2ZmR2JIdW5RYm0xeGE3Y204S3RDT0JVdnZycm9qQkFHdHQzN3hYR0tPWVRGS1I3UXBTMk5xci10elctMEVZYkVWRThUajRES296eWZ0dC1wYmhZeFROaDRNX1NJb3kyX3d2WTdfU
+  0     0    0     0    0     0      0      0 --:--:--  0:00:03 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:04 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:04 --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:--  0:00:04 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:04 --:--:--     0
+zBtTHh4LXlRM1VNRmpfczlreF9qZWNUUGhyd1ZEOF90cWN5UDNTR3BMSDg2WGxBM3JhZEJSNFVuVlU2aFptVUpCV3plN0F2NmZDLXhpcFdKbU5hSVlsaUFUc2NzQVdkeGlZdjBYZz09fHNwfmvYWhpNbduGIFXOzgAIGVczF4xDQ_HgZ8ehWHRm
+set-cookie: [redacted]
+set-cookie: [redacted]
+vary: Cookie,Cookie
+date: Sun, 06 Sep 2026 12:42:22 GMT
+server: _
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:22 GMT
+content-type: text/html; charset=utf-8
+cache-control: no-cache="Set-Cookie"
+location: https://proteinscape.streamlit.app/?utm_source=chatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:23 GMT
+content-type: text/html; charset=utf-8
+location: https://share.streamlit.io/-/auth/app?redirect_uri=https%3A%2F%2Fproteinscape.streamlit.app%2F%3Futm_source%3Dchatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+cache-control: no-cache="Set-Cookie"
+content-type: text/html; charset=utf-8
+location: https://proteinscape.streamlit.app/-/login?payload=MTc4ODY5ODU0M3w4Y3FBRjRkNUU2VzhfempKVk1FaWRxRlNBTk5NR0N0ZndCcmNrZVlYZnczdW5rS29GNmdYRjBxRGNZSUxLZElDNFNrXzFNR3VUb21xTG9RVXVTblh1M1NtUVR6YmRGd1hKMlNkakczTXNvaHRwMHpwRFZlTFFWT2owVUJMNjZacXFkNUJxMXYzV3ltWTVmX05na09hci1sc18xeVV2OS1YajJsX0wyS3BhZjFPMEhvRV8xRERmdTE0cEd1VWxKMEU3QTlhS01PYjNnSGVXVndxdFBtTmtXNTN1cTJkRVV0clR1dk9ObnpiQXRFWE9WYmdlRWtrQnJtWWhNVmhHcmd4ZWtuUTlBVTNWMXlJU1JITEZiTzJfenV0RldUaWZ2TjN4OUpDTUltTE5tTDAwcnN5UGZaeF9lR2J5c1JjcnByaERCUmMzSG11TlFNdjFYWnUtSDkyV2FPU0RaX3JzakhvcHFXYldRTnE0aEc0WERUa1hKRkU1Y3c1b0R5SVBzY2MxdlhkNDZuSW5WT1V2X3hxdFdHR2NkTkxWM3gyWjk2ampraVRnT2NMTG90TlI0akR3c2NoTEdNTjdQa0hacDhKelJ6bmczSVNZcHBkTW1iQ1NsQkR5czN4dkkyU29CdWVaZzIweGxQRkpzQWR6NFh0dmxEUS1CQXdXQmNjNkNUTXRtZUdsX3M5dTVEQmJ3ZmQ0dmI4VUVzaHEzLWg2WEFxeUFOeklCUEFqTHdMNUYweTZWZjBwZz09fHaNIQlkTWNcyGRuLdAarvkApzvFFE2b_sOn3hlCXCy7
+set-cookie: [redacted]
+set-cookie: [redacted]
+vary: Cookie,Cookie
+date: Sun, 06 Sep 2026 12:42:23 GMT
+server: _
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:23 GMT
+content-type: text/html; charset=utf-8
+cache-control: no-cache="Set-Cookie"
+location: https://proteinscape.streamlit.app/?utm_source=chatgpt.com
+set-cookie: [redacted]
+  0     0    0     0    0     0      0      0 --:--:--  0:00:04 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:05 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:05 --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:--  0:00:05 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:05 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:05 --:--:--     0
+xM25fWlVndVhiMzZkb1JJM0NxbnE1R3JkNGx2UVN2QkQ1dWhLUUxnU0duR1lkdlZJTjFmcFJzRWdJRG5LSWhvR01OMjFQS3NBd3RmME1LRVVadWViUkRYUG1pR2FjdTlZU2RINFg0elU5emlCc1c2OUg0YnFXQ3c9PXzyzvuZYA-o764sLZWCJsBJOqDEl62K0zoC8uoUqqCO1Q==; Path=/; HttpOnly; Secure; SameSite=Lax
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:23 GMT
+content-type: text/html; charset=utf-8
+location: https://share.streamlit.io/-/auth/app?redirect_uri=https%3A%2F%2Fproteinscape.streamlit.app%2F%3Futm_source%3Dchatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+cache-control: no-cache="Set-Cookie"
+content-type: text/html; charset=utf-8
+location: https://proteinscape.streamlit.app/-/login?payload=MTc4ODY5ODU0M3xNTVFBU2FaMzY3M1huYVZBUmIwODZKeEZlamNMZDhudU8wNzhiZ3pxYWlFZjZLTGJCZ0dBa0JjWjUtYm50VzBzYVJrY2R5eTlQc3lyUmlxYm1IZ0VyTW56Ykx2cFBFa1BPY25YQ1BDUHVLOENfcVc3aERlakFBRzFyNEhWdEIyTXdKb0F2Y0Y0dHVmYkNrNzNMelRUeVhUOEk0OHhxb3hEYTM2ZG43aGRzcG9hengxWkg5WmtDazlFRDluTzVlSDJfMHpiS29JcUZUbzltMHlXQ1lNNVZKNUxQRG1pZFRmSmdQbWpaMUNxNmlTOEZBZllkYmh6ckxXaXVPU0lzNzA1am55TTF0MGVLZmgwaVU5Wkg3NUZuUWlUMm5vSWJFaXYyYzBXeVpyb2I1NjNyZE9hSV81Z2hkSXQ1UVVWdGFPVV9xdk5pX1ByOEwzUGFEOHdtRVRNMlgzZ2JTSXo3MFQwMlVNMGxpYnZpUEVoUHE2dUp6Sk5oaW53RjNmLUI0NlZicUhHWlhuMUIyeS1xdVZwbVI3Nlh0aTAtazJrMEVwV2UyR0plbHNLek5iN056V1ZUdFZibkpFb21rSmhiSjl1d1JqVnhUampwRWJjTHUxbmpYUGZkY292VEF0SWY2cmh4c3hxVlY3WVhqNVkxRVNoTk5NajlVVy15dU9hLXpMS3V4YktpOExmUXZzd2podlZjWTdOQVRvWmwwNjZza0hwcFBReEMtZnFkc0pCSEExVTZ2U09Ndz09fFzqOuNh4qMLSlzmLvc_SJgu4BjxJ-JeZdF3NE88-S-Q
+set-cookie: [redacted]
+set-cookie: [redacted]
+vary: Cookie,Cookie
+date: Sun, 06 Sep 2026 12:42:23 GMT
+server: _
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:24 GMT
+content-type: text/html; charset=utf-8
+cache-control: no-cache="Set-Cookie"
+location: https://proteinscape.streamlit.app/?utm_source=chatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:24 GMT
+content-type: text/html; charset=utf-8
+location: https://share.streamlit.io/-/auth/app?redirect_uri=https%3A%2F%2Fproteinscape.streamlit.app%2F%3Futm_source%3Dchatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+cache-control: no-cache="Set-Cookie"
+content-type: text/html; charset=utf-8
+location: https://proteinscape.streamlit.app/-/login?payload=MTc4ODY5ODU0NHw4ejdVZ0dfb2J5ZVRuSGlPMTJ0YU9kUmd1VV9IbjExUzRpMTV1R09qMGp3c0pjN1VuZFFNY055V0Vrd1hvdlg5bFA2cXp1X0N5NmdjX0ZYUThDUlRMZXZCVnFxcEUtb3dOZXNMYUpSM1ZXdk1wWVE3T2tkREJYYjh1QXA5c0V3alM5dVRYekkxYl8tc19rNmxxeHlMRjAtOHJVekoxM3REM0JqZ2lFYkZGbUJMTHZoNng2QUFjSF9oRTlkNlRGaXN3WDdLbklIQXRFaTZnYnFrcFh1SVRvQXBNZ3VaVUw2Y0liOVR3RW4tTmEwUXowbUtoZEZKWGZKLTRuQ0RLclN5dTV0dk9XWTgtd2M4NVRFTWVISEQxS0ZnTWdsMjBNLWhIYk41R2ZtbVB4WlZRdWFwelhxX2RWWmk4V04xQktTbmtvSnpSTjdpdEppLUFwYTMzZzl1MXFzVzFjS0lWUE
+  0     0    0     0    0     0      0      0 --:--:--  0:00:06 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:06 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:06 --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:--  0:00:06 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:06 --:--:--     0
+9icXMwejR4MF9nTVlWRUxuV2pxblRhdmtRNUQ0bVJRcDUzNVFZSlZJcU82LXZ2a2c2b0c4NmNfZDQ0RUI5Q1J6YlFJdW0yYXQtM0piNzBXY0ZfaVFqUk5uSjI0SVZFcU41bWg1ODV5NEo2RUhCWGI5NTJXdTlQc1lCREdrYnc0bUpTdWFUWWM4Ni1CTzhDVG5KV3NLcElLYzFyNDAzbnlYSVA4R0tmTk91eFh0VW1JU216SEF1bkNHWE9WeGZmaHZySzdvcERBRUhNYlBmSGlUcUNMcF9nZz09fAMbminY8d_UUTY1fGTpU1U94-qGgzw-oCMseAfq0RfM
+set-cookie: [redacted]
+set-cookie: [redacted]
+vary: Cookie,Cookie
+date: Sun, 06 Sep 2026 12:42:24 GMT
+server: _
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:24 GMT
+content-type: text/html; charset=utf-8
+cache-control: no-cache="Set-Cookie"
+location: https://proteinscape.streamlit.app/?utm_source=chatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:25 GMT
+content-type: text/html; charset=utf-8
+location: https://share.streamlit.io/-/auth/app?redirect_uri=https%3A%2F%2Fproteinscape.streamlit.app%2F%3Futm_source%3Dchatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+cache-control: no-cache="Set-Cookie"
+content-type: text/html; charset=utf-8
+location: https://proteinscape.streamlit.app/-/login?payload=MTc4ODY5ODU0NXxKRjhkZFVCMG9RTnUyWkl0blVTUXZhOXFGRFYwUGRuMHBkbkVZZ2pPS2p5TzVaZHl1S3BiamV2WHhBNmZVX3lLSnYyZHNiNDN2UHVmRG9DT3BKVTJQTVA3SVctUmd2THh1MWNqaWlpRk85TGRvT0RoVkRIdFVmd0ZNMlplM2ZwRGtLNjZ5UzZNQzczSy1YQjIxRDJQcHlURHdQRTgwWm02SERvT2hRZE13TVRyTTNwYkQ5MjVUWl9xRmFpVi04N3E0XzluOEVIbnNKQXloS2ptNzgxT1BpVlM5RTZJUkI4YTB4WTJldmI4TEcwVG1HRFhsSThXajdXdEZtSDMydHVtYkxWRm91ZGdwalVHcnZCczV3LUZlN3lZOGtsRDEyU2lzNGo3b0d0Y3FHa1lEaXRxUEJzSVBiVFFKaFZvWHhUVGtMWGh5c0ExSklCbS1UZDk4TzlTczRVeDR6VVczUEhBbzVJX0RhVXk5WjQyNzAzeFl3MlEyekFDcXlNY0hBcGRkUHJJRzhVR2hzR2lFT0JZajYzUVhNZjlMZUdKLXBwMkwwTUJRSnZQeEZlMElPeW9TUjcwc2lBWFZSZWw3cUhCbl9SaDZrRHB0aXBndEJfUy03V2RhUWxkYVgySTNDZjVKS0RfbHhNZ2FCX2tvT3A2NmYzby1kbkxZS0E2eldQSFBHY2tZMzk5LTRUcjhMbTRRUkV0WFN1UGdfbEJYTVVwR3pUYXFlYU92VGpkd0s5b3BRQmQ2Zz09fL5-AhlUwrYIDEIOa00EOYtlCRG3wSS31ejeq527RZCJ
+set-cookie: [redacted]
+set-cookie: [redacted]
+vary: Cookie,Cookie
+date: Sun, 06 Sep 2026 12:42:25 GMT
+server: _
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:25 GMT
+content-type: text/html; charset=utf-8
+cache-control: no-cache="Set-Cookie"
+location: https://proteinscape.streamlit.app/?utm_so
+  0     0    0     0    0     0      0      0 --:--:--  0:00:07 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:07 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:07 --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:--  0:00:07 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:07 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:08 --:--:--     0
+urce=chatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:25 GMT
+content-type: text/html; charset=utf-8
+location: https://share.streamlit.io/-/auth/app?redirect_uri=https%3A%2F%2Fproteinscape.streamlit.app%2F%3Futm_source%3Dchatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+cache-control: no-cache="Set-Cookie"
+content-type: text/html; charset=utf-8
+location: https://proteinscape.streamlit.app/-/login?payload=MTc4ODY5ODU0NnxJekV3V0hjTW5GSGhLVWtoeGZIVGhxTnBudmlfRWV6dUMzckpXdXJ5bXlUNFEzMk1ZcHFIZm1DaFFpbTFoMFVoS0I5UkV2Z3ZZejE2WnUxdFNMQXpKYnRITWFwTjlrbzBJdy03UlBodmRhMkl6OWRIVVZlTUNfMG91MHI3VF85UE1rMnBUdHdTSWJRM1N1cFZJbFZFSlpzc0dSUjd1anM1bDVfTENlMGUzWWpsQjRkQlVROGs1dDgwVlYwbHBCbjNZZzN3ZkZCQ2pmczFqZmJybEdwd3hzbWljZFdYdTVoOHl5dE1sU1FoemU1OTBKSmFBWkM3YmpLa05nbjVDSDd2dVF1VmY2cndLMW1yTV94MVJKWHhYRC1MT1Q3MC1Uc3loLXR0aGJWLTdtemJrX0xrWkpRd0lXcjV3NlAxWDZqVjRwNkROLTM1UHhJWm9IR1JvZWtEZktfTHM0SUl5eGlNQmRoWVNZRG1oS0xSTm1wbFVHWS02ektIamlzSjlTeWdRRGdzLVFuMXpSWUJLcnlqZ1M4Mm44ejUzNkVPaDNMQ0FpQmdSYzl6QU5XcEFWYXdlTHExQ2VUREVhUmd5R0t5ekdZbGRYQnE4ZnI1QmJzSkkxcHVZLXhmRlNlT2MwVGRJZG9CV04wcHM3RGFzX2wtX19GS05fLVZyQ21ZcEFvZjhkbzVaak9FRmFCUGJYQ25ablR4b1QwRGJ4ZXlCWjVMcWM5NHZBb1hlejNyMnkydFFWTi1qUT09fMZgvY9EJZ2c33NpNFT7dOFs5nzJyAuj4jFi3bS_ZjPU
+set-cookie: [redacted]
+set-cookie: [redacted]
+vary: Cookie,Cookie
+date: Sun, 06 Sep 2026 12:42:26 GMT
+server: _
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:26 GMT
+content-type: text/html; charset=utf-8
+cache-control: no-cache="Set-Cookie"
+location: https://proteinscape.streamlit.app/?utm_source=chatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:26 GMT
+content-type: text/html; charset=utf-8
+location: https://share.streamlit.io/-/auth/app?redirect_uri=https%3A%2F%2Fproteinscape.streamlit.app%2F%3Futm_source%3Dchatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+cache-control: no-cache="Set-Cookie"
+content-type: text/html; charset=utf-8
+location: https://proteinscape.streamlit.app/-/login?payload=MTc4ODY5ODU0NnxSUjN0R3BJeFhHa1dERWJRS2dvT3JiNklxTEkyTUYxek5fNEFxeXNCenA0TkZnaGV3Wi12ZV9TRGkzMGtCZXVoVmlTeUEzSEFsbXVoMVlXVnpYUWZadXRhZXJ6eXktZWJyQTB5azR0VExsOHk3Ync0Ym0tY2JlUmIxYXZBRE5IdWh5RC1obUl6LUw1anRlX2FiT1JablVUYkhqYWdVYi1NMFF0cVBqNWdySkh5RU1wNjhLRmt1Q3dVWngtZG5DYUJiUzR0VGpkYVVjTVlmWFFIdE11RVk2dEJVNGdhbGdod2ZsUjhsMTZRSDZId1Y
+  0     0    0     0    0     0      0      0 --:--:--  0:00:08 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:08 --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:--  0:00:08 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:08 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:08 --:--:--     0
+3c0JQMWFMSkRkV0pIU3U3UjdlT2VBdTI3bmFyU0l3MnBJbFZKRE8yZ3dyYVlUZGJ4UG0xM05GUUI5WFNfRUN1M2FDMnhrc29sTW83Q24tVU1JeDhXS2RjNGpBU2hDRlJnWGgzSXctNnJCU3Q0d1dabW1sQWw4UEVIVVhsVjgyS1k2RFR6YUlrdWVTbjZVU05PeVotQlRWLUZTTkFSTGtzYnptQmdSMC1SNDZHWEVmSjNzeDJLelBTZ1RWclJlREU5OG5zQ2NrZERjQVd6cjliN3lMWFFGd0M2dDNzRURycEJjRWJubjdyS2tLSHNvY0xCRFFVS1dtbU0tZEpaMUhyY1FQWHFIc0NOajVVNUJsYjNsVmtWdWdSUTF0V19TeHVHQUlTRDN3REdrU2xDdVRQc0Vvb2Ezb1hqQkxtM09MX0hBbGhBaVJkUT09fOM4mrlZ_YN2AE_cQJTDGG7-jIVecNUy3-oND9M0_1AU
+set-cookie: [redacted]
+set-cookie: [redacted]
+vary: Cookie,Cookie
+date: Sun, 06 Sep 2026 12:42:26 GMT
+server: _
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:27 GMT
+content-type: text/html; charset=utf-8
+cache-control: no-cache="Set-Cookie"
+location: https://proteinscape.streamlit.app/?utm_source=chatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:27 GMT
+content-type: text/html; charset=utf-8
+location: https://share.streamlit.io/-/auth/app?redirect_uri=https%3A%2F%2Fproteinscape.streamlit.app%2F%3Futm_source%3Dchatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+cache-control: no-cache="Set-Cookie"
+content-type: text/html; charset=utf-8
+location: https://proteinscape.streamlit.app/-/login?payload=MTc4ODY5ODU0N3xPbElNTmpHbkdDTlBmY0xYZzlQOVdTcWIyNWRvSFhXRUZJNGp3NnBoM2xubGZPNm5GdVNSdmE3QkxfRG9Vb3otVDlMLV9laHo3TURHSHRCYWlGWmtqa0tXbnI0UWZyUDhLOUFWeC15M1dwTTZrY0tHTlhJX2d5R0g4ZjJUWG1iMjNYX1VPUGItNVZKQ1hPWE5IWFVMZTI0QXQ2SlJ5dGVHSmc4WEZ4NmM5SmJxODNHNU82d3l0dVJ2NWIwa19XX09iQmRtQXBNeEM3c3VoaHJyWUhUSDRlZE9ncVlzVEYzNWFpYnRrR2VybEl3a2xNNXItcUg0eWNEU1UybEQ3NHlaanhWU2NCVzRXREpIbERQSllTMy0zV0RpNnhCWUhiRV90dU1rcW1BeExnM213NmdtekhPOTFndVBaRWdBS1J1Y2hMbzdOc3VkQm5JZFFVZDVuajlwdWoySUtOOS1RSXdNczQtZVJzWkc0UzVWODlPZW9iX3NIM0llVDZ4Si1oZ3djalUtNVkzT2ljc0xRRWV2VmxIOEUxVnc5ZkRFQjNseVpUcENIZjB5bnlfYjdCTDloSkNUYjNEYXRCa1RBalVnbnlESjduaVNFYWVyNVllcjhJQmZOZEx0eEg0b21jR2ozaFJGY2JuYXJ4ZFc3c2Rzd1JwVXZHLVYyRnY0aEJMWnUyN2pndkRaeTBRbmNkYlNaZmN2anozVjJVcXZHVjUzX2s2LWtwaThFOVV4SDN5Slp5em5ZQT09fI5OO0eq528oQPSKMLj6yfVExpL21PbqRw09CSnNwrsK
+set-cookie: [redacted]
+set-cookie: [redacted]
+vary: Cookie,Cookie
+date: Sun, 06 Sep 2026 12:42:27 GMT
+server: _
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Se
+  0     0    0     0    0     0      0      0 --:--:--  0:00:09 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:09 --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:--  0:00:09 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:09 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:09 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:10 --:--:--     0
+p 2026 12:42:27 GMT
+content-type: text/html; charset=utf-8
+cache-control: no-cache="Set-Cookie"
+location: https://proteinscape.streamlit.app/?utm_source=chatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:28 GMT
+content-type: text/html; charset=utf-8
+location: https://share.streamlit.io/-/auth/app?redirect_uri=https%3A%2F%2Fproteinscape.streamlit.app%2F%3Futm_source%3Dchatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+cache-control: no-cache="Set-Cookie"
+content-type: text/html; charset=utf-8
+location: https://proteinscape.streamlit.app/-/login?payload=MTc4ODY5ODU0OHxrTFpmNS02SnRkWkVSWlNablRQcVFFQ2FsNm9iWWFDaXJva1V0Q3ZGTUlGYjlibEFnZ2xsOHBaRWlJbDhYRUszQnZDWXppcTJWRmtWUTFIbTJoMFl4eEdUTWtSZmMtUS03Y0w2Z3Y0MzNDaEk0Y2M3aFpmQXJvSkE0QTlnZDZtUG1HSTZXZlFTZE5Gd3VQLVpZdGtYUDRmbmRCRm5EUkFBaGxVU052SHhYQVlUOGFMYzNDOUhiSmozak9HM1FxYTJFQ1Vic0o4MzRDWW5oVVJrVXNoNDF4UUFOZC1DVjh2R3N5eFF0QXFxc0N1VDR1Qy1UQ0JMbTZnc3U0SXpyc3Z2OVlYTkdqUVc1UWJGVkFtNVFDY3JVbGl2c09mT1VQYVlsLTA4R2g5WnRzR2RQbnY4ZjAtTW95azYzVXo3STNFcG9ObkF5UlpXR1RqR1dtOEo2VlFfckNHeWNIOFYyU0VYdGxkdHl1Ym01cVllMjdPc1B0ckxDbk9DeFhZc0h1T2dSOVJySFFBekhwQV8wLXYzejYwcHJHV1JnSEhiSVZkdXd1Tl9zWmxEU0RJTzQzdmdsZFAwX1RNYTNfUmZqNzNLT0xGU1JRZUU2dFlveWdXNjE0cEdITTA0YnQxRFpjVGRWRlY2d3NScVlvZU1ES0k4dmRBUFhKMlc3V1pyZGhaZ1NoMVBtUEdkT0RVNUxJV0U4d19sYldGTzRyQW1yM0xIY2R2QU1RZkdnWXpZMF9MbGhFalh0UT09fOC7WIS7xYkvUVchsx-jNHh7e73OY8TecV_MGY73pZBt
+set-cookie: [redacted]
+set-cookie: [redacted]
+vary: Cookie,Cookie
+date: Sun, 06 Sep 2026 12:42:28 GMT
+server: _
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:28 GMT
+content-type: text/html; charset=utf-8
+cache-control: no-cache="Set-Cookie"
+location: https://proteinscape.streamlit.app/?utm_source=chatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:28 GMT
+content-type: text/html; charset=utf-8
+location: https://share.streamlit.io/-/auth/app?redirect_uri=https%3A%2F%2Fproteinscape.streamlit.app%2F%3Futm_source%3Dchatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+cache-control: no-cache="Set-Cookie"
+content-type: text/html; charset=utf-8
+location: https://proteinscape.streamlit.app/-/login?payload=MTc4ODY5ODU0OHxJLTJpWXFHMk90UGZtVkxIVG1SNlJPdXpDQ3FCSmxUUFhYVVByUWxTcHFFQzktUG83MjVCWThOd05KMkZyS2wwZVhFaEZUSnd5NGVyNFVRNDlEZTFtSkkzODVrQ0lfRFQzQmRlRXR1d1dyUDZndHZoMXJZcUgtX1otWTdC
+  0     0    0     0    0     0      0      0 --:--:--  0:00:10 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:10 --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:--  0:00:10 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:10 --:--:--     0
+ODR3Sk82OTVESVNpSUhDTHpRejIwVWRaTHZBeWhzSHd2bUxYZHdQRVYzellCSW9qUlg2bDRpNzVzLThaVk5mb2lIRTc1S1JuRGV6QVBPZ3hIMHhjejlvNnA2YXFvVkI4OUo5WnlHT3RrbEhYb25RMkt1ZWIwUnVZd2lBMC1JcUExZW5qRTd4SEM0TERMRDAtMWNDcGVMS0Y2ZWptLUN4blg5UE1sN1R1QXkxRzBheDlweUF5NExnRXgzM3hBelh2b09nOVhyMXd6bnVWd0dYdzBCdFNwSktsRG1GZFMxenFuUTNHNWpBX3RkVTdXdzZaNFdscXI4ZzlERmFtQzlseVlFWkhhSEdiTDFPUFdvcmtYYlJEMFphQXoxSE1MU0k0VGRpSXpaVjFnSS1DMEhvMGJfUUVSZmV4aWp1MmJaNXJhOXhwU29ybG1kd0xtVjV3TnM2YmZzdzJ6SFRhelBDWDJLR1d5cmJubGs2WFJYQVJfUkJFVF9CU19pdlA3WWRWaXBxQnFKQzZQWks2dzZpc0tLaGZ6Y0pWS291N1RYdFVjWi15d2dBek1XYWVvVHVGYm9YbC1mYmQyUT09fN0BETFYMKMbO7qIR80xCHEtNW5rk74KwjFIbN9v0GbS
+set-cookie: [redacted]
+set-cookie: [redacted]
+vary: Cookie,Cookie
+date: Sun, 06 Sep 2026 12:42:28 GMT
+server: _
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:29 GMT
+content-type: text/html; charset=utf-8
+cache-control: no-cache="Set-Cookie"
+location: https://proteinscape.streamlit.app/?utm_source=chatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:29 GMT
+content-type: text/html; charset=utf-8
+location: https://share.streamlit.io/-/auth/app?redirect_uri=https%3A%2F%2Fproteinscape.streamlit.app%2F%3Futm_source%3Dchatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+cache-control: no-cache="Set-Cookie"
+content-type: text/html; charset=utf-8
+location: https://proteinscape.streamlit.app/-/login?payload=MTc4ODY5ODU0OXxBRmR4Ym00T3Q0OG94OWVxTTdMRVFLR1lHRDdKRHlIbjNSWjl3SG0tSk92M2dLQ2c4UmN0U0lpb092NVBiNjM5UlI2VFJpd0RlMFhSb2NldWNPRzlGWC1rbFN4TTFEdUxpYUd6M2ZIMmF3bmhyRUY4OEZJNi1KQ2FaaTlPWjc2alJ6RUlFZWwwdXEtVWNGYzFXdHc4aUxqREJZZEVGMlJxWFNqMXZtSEM4QThSdWYzUVF1aDBzWkk1QnEwNTNaT1FUS3NPYnpGbGxMTngtc0dZeVVxWkwyQUZXelA4eTVIS0hvRVAzbTRnN3FYd1JCTk95akJxVlJZQk9rNHJCcjB1SldGWV8yYVphV0JsS1d5Vk05YWkzN1dxZGdKT2hyQURWUDhFcnZrWnVPdmpyZFhjQzlSTE9YTUhFN2Rsa1dLbjd0TjlWZElfVHY3R0luZjkxRFBhWUZySXNvTWhTSzM1b2hCMEFDMDZOcGl3a2xJUEdDMXhfanZaT3hLalE3b3FCaTRlZWlQaUx2T1dGNWQyeGVUSkFGbmZ4U1duTmNYcXNQQkZoSEJhYjN5NUZ3Q0UwQXhXRlNYMWlRLTRfcVpfal9zbDBPOGVRRlZ5ZXhnaks1TG1qWDNpSW52Nm9Ldk5YZG53WGZ6NWZPNm1pUTVOOG1neGsxRi00cGxjTE5fLVg0ZWFJX21EOWNqUVplM3lmMDNuRm9fVUplVHFxMGd4VHkzQlVLcVh4em05bEhzb2N5U0RXZz09fEUqquNRlY7oVlgX8SePSadaZ97VARL4rGqmkniztOOm
+set-cookie: [redacted]
+set-cookie: [redacted]
+  0     0    0     0    0     0      0      0 --:--:--  0:00:10 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:11 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:11 --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:--  0:00:11 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:11 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:11 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:12 --:--:--     0
+pOnly; Secure; SameSite=Lax
+vary: Cookie,Cookie
+date: Sun, 06 Sep 2026 12:42:29 GMT
+server: _
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:29 GMT
+content-type: text/html; charset=utf-8
+cache-control: no-cache="Set-Cookie"
+location: https://proteinscape.streamlit.app/?utm_source=chatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:29 GMT
+content-type: text/html; charset=utf-8
+location: https://share.streamlit.io/-/auth/app?redirect_uri=https%3A%2F%2Fproteinscape.streamlit.app%2F%3Futm_source%3Dchatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+cache-control: no-cache="Set-Cookie"
+content-type: text/html; charset=utf-8
+location: https://proteinscape.streamlit.app/-/login?payload=MTc4ODY5ODU1MHxIeURIc2xmTWNVNVpseDBIelQ0OEVXTmszei1YejdBQlpSMm1sWmk0dzFHbk9uYUZvNTU0TGZDbmR4RmY1R3VJUFFhTFJqLU9sOS1fVGJBVlJ4NEVxWHRHdElXQzBjZ2E2cFU1M2xXSVVOUUJBWjNxYnlyVExoWW4weU51elQ0SUFibDRBRkdLcTR2d3NQWXJjR3hXV1Vzb1ZJc3lXdjJoU0d3Y0h3WVF1aU9wdHk0Y0UtSHhRWGF0S2FQcnhzb1NJTDVrbUtlRmV2MnNYd3NvNE03bl9XTHlMYlFvX1pqM0IyQTEyOWdRYVRMMTZaZG5DWFJFQTJfemxLbjNLX0ctekxmMHBuUzNYa1JyYnZvb21LalUzRFExVWlKeVlEUzFSUUNuM25fSTd0a21DM3FvQXpsSTFsMzZGT0lMVFMwMFk0VnJOM3p4dnFXZUxlSkhXYTZmdmxaZmM0NEZtc3hZNll4Vkl2al80Q2JLMkxPbEIyQkE1RXZoSXpNa01hQTRQZFZWbG9OTzgzU0prOVFzXzRSUjhUTDhLWnpuVy02SFFYZ3FfYlBkUEtLV3B2ZEcxc0tJajBtcHFIdFFjOEdhMjUzX2FzcmhFYUxYZXVXclJybmxFMk1Ud09COUx6WUY1VnRxUVI1VUw2Ymd6VXVyeGJ4T2tLYVJJdlNBU05IWGl2NUJ2UHdicTZQMThEVTU1LW4tYnREZG5EaXFyVm9OYmpmb1FNeDVjZHkzOTFxMUExTEMwZz09fFeOs7wdy3X3Qn9BaGQbafdSMy7c9gCo-u89al4VRh3G
+set-cookie: [redacted]
+set-cookie: [redacted]
+vary: Cookie,Cookie
+date: Sun, 06 Sep 2026 12:42:30 GMT
+server: _
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:30 GMT
+content-type: text/html; charset=utf-8
+cache-control: no-cache="Set-Cookie"
+location: https://proteinscape.streamlit.app/?utm_source=chatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:30 GMT
+content-type: text/html; charset=utf-8
+location: https://share.streamlit.io/-/auth/app?redirect_uri=https%3A%2F%2Fproteinscape.streamlit.app%2F%3Futm_source%3Dchatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+HTTP/2 303
+cache-control: no-cache="Set-Cookie"
+content-type: text/html; charset=utf-8
+location: https://proteinscape.streamlit.app/-/login?payload=MTc4ODY5ODU1MHxsRnlkX1JQVG9fc
+  0     0    0     0    0     0      0      0 --:--:--  0:00:12 --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:--  0:00:12 --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:--  0:00:12 --:--:--     0
+curl: (47) Maximum (50) redirects followed
+Go1dXJTVG10cHNKVGhTZGhGN3dyZUptRm93cnJZMXYzZFZEUVI0bFBCYzJIZHRwU1dnNktrSWg5Mm5lM1NJM3ZNS0UySnowM19Ec0RPTkJkVWdzQnhVWW44U1lOY0dRbVgzdi0yMmpzam1mVHVPVnVvZlF1cTFGVEt4SUZJODRxWjhxdGhVcVJZcGVHVlc0Z0psdEFnb2lNMzFablh0eENiMWdLNC1ZTUVxa05nSnhLWGpPTENrc216bkZYMU1WOWRXcVlOX1NQWi1NZzNPOFJ6Z1NJZFBETl9IVUxKMVFJYWZTczk4cVFwMlByaEdOZGJNb0g5ZUFvQmlQWjdjRGlpWi1Ma3ZEbDZBb1N3RmFMMW1xS2MzVkpaWFMzZVQydTQwV0Q1V3ZfbHlnUENDTml2V1lTdEhXVjNJVFE0X2tKcXRBRy1hdVZ1ZlFFMXc2MnNDalJGdXRZRlV5cjJYTm5PN3U4YXg4ZF8waWJIOXowLURtTVlTSm0wZVd3UmVtcWhqMU5OcHR5bnhibUNtSG1ZNnBaSGtzYUFweGRJaVFqNDBqRlhkSnV0Q19DZF9KS2VFdk5xai1EV3RKdFhXa3dqVnFNQ3l1YlRpalNySkRIN3o0Sk1xQWhSV2Z4WTBkdXlVZHFwSmpRTGpQSVUxdHYwN2pGeGhLaEVsLW9EdzMzUFhWSk9SRzF2ZGxPb0pEVXVZTmJMN3d0Y1c3T2hoTFZqcmN5M0FBNWtjUT09fCX2UGEGkosEbi7Gp2rQrpIjfoIafEXf_cyzJ4_70qNv
+set-cookie: [redacted]
+set-cookie: [redacted]
+vary: Cookie,Cookie
+date: Sun, 06 Sep 2026 12:42:30 GMT
+server: _
+
+HTTP/2 303
+server: nginx/1.31.3
+date: Sun, 06 Sep 2026 12:42:31 GMT
+content-type: text/html; charset=utf-8
+cache-control: no-cache="Set-Cookie"
+location: https://proteinscape.streamlit.app/?utm_source=chatgpt.com
+set-cookie: [redacted]
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000

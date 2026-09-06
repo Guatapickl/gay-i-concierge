@@ -51,7 +51,7 @@ export default function ResourcesPage() {
   if (!userId) {
     return (
       <div className="max-w-3xl mx-auto animate-fade-in">
-        <h1 className="text-display-md font-display font-bold text-foreground mb-4">
+        <h1 className="page-heading mb-4">
           Resources
         </h1>
         <Alert variant="info">
@@ -66,7 +66,7 @@ export default function ResourcesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-display-md font-display font-bold text-foreground">
+          <h1 className="page-heading">
             Resources
           </h1>
           <p className="text-foreground-muted mt-1">
@@ -90,7 +90,7 @@ export default function ResourcesPage() {
               onClick={() => setCategory('')}
               className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
                 !category
-                  ? 'bg-primary text-background'
+                  ? 'bg-primary text-white'
                   : 'bg-surface border border-border text-foreground-muted hover:text-foreground hover:border-foreground-subtle'
               }`}
             >
@@ -102,7 +102,7 @@ export default function ResourcesPage() {
                 onClick={() => setCategory(c)}
                 className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
                   category === c
-                    ? 'bg-primary text-background'
+                    ? 'bg-primary text-white'
                     : 'bg-surface border border-border text-foreground-muted hover:text-foreground hover:border-foreground-subtle'
                 }`}
               >
@@ -112,6 +112,7 @@ export default function ResourcesPage() {
           </div>
           {category && (
             <button
+              aria-label="Clear category filter"
               onClick={() => setCategory('')}
               className="p-1.5 text-foreground-subtle hover:text-foreground transition-colors"
             >
@@ -130,9 +131,9 @@ export default function ResourcesPage() {
           </p>
         </div>
       ) : (
-        <ul className="space-y-4">
-          {filtered.map(r => (
-            <li key={r.id} className="card p-5 hover:border-primary/30 transition-all duration-200">
+        <div className="space-y-8">{Array.from(new Set(filtered.map(resource => resource.category || 'Uncategorized'))).sort().map(group => <section key={group}><h2 className="eyebrow mb-3">{group}</h2><ul className="card divide-y divide-border">
+          {filtered.filter(resource => (resource.category || 'Uncategorized') === group).map(r => (
+            <li key={r.id} className="p-5 hover:bg-surface-hover transition-colors">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <a
@@ -178,7 +179,7 @@ export default function ResourcesPage() {
               </div>
             </li>
           ))}
-        </ul>
+        </ul></section>)}</div>
       )}
     </div>
   );

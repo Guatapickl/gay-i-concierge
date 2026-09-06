@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { X, MessageCircle } from "lucide-react";
 import ChatWindow from "@/components/ChatWindow";
 
 export default function ChatModalProvider() {
+  const dialog = useRef<HTMLDivElement>(null);
+  const launcher = useRef<HTMLButtonElement>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [hasOpened, setHasOpened] = useState(false);
 
@@ -15,12 +17,18 @@ export default function ChatModalProvider() {
 
   const close = useCallback(() => {
     setIsChatOpen(false);
+    launcher.current?.focus();
   }, []);
 
   /* Escape to close */
   useEffect(() => {
     if (!isChatOpen) return;
+    dialog.current?.querySelector<HTMLElement>('button')?.focus();
     const handler = (e: KeyboardEvent) => {
+      if(e.key === "Tab") {
+        const els=dialog.current?.querySelectorAll<HTMLElement>('button:not([disabled]), input:not([disabled]), textarea:not([disabled]), a[href]');
+        if(els?.length){if(e.shiftKey&&document.activeElement===els[0]){e.preventDefault();els[els.length-1].focus();}else if(!e.shiftKey&&document.activeElement===els[els.length-1]){e.preventDefault();els[0].focus();}}
+      }
       if (e.key === "Escape") close();
     };
     window.addEventListener("keydown", handler);
@@ -31,6 +39,7 @@ export default function ChatModalProvider() {
     <>
       {/* Floating action button */}
       <button
+        ref={launcher}
         onClick={open}
         className="chat-fab"
         aria-label="Open AIlex Concierge"
@@ -53,7 +62,7 @@ export default function ChatModalProvider() {
             if (e.target === e.currentTarget) close();
           }}
         >
-          <div className="chat-modal">
+          <div ref={dialog} className="chat-modal" role="dialog" aria-modal="true" aria-label="AIlex Concierge">
             {/* Header */}
             <div className="chat-modal-header">
               <div className="flex items-center gap-3">
@@ -69,8 +78,8 @@ export default function ChatModalProvider() {
               </div>
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1.5 mr-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 shadow-[0_0_4px_rgba(74,222,128,0.6)]" />
-                  <span className="text-[10px] text-foreground-faint font-mono">online</span>
+
+                  <span className="text-xs text-foreground-faint font-mono">AI assistant</span>
                 </div>
                 <button
                   onClick={close}

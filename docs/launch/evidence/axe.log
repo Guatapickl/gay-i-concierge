@@ -1,0 +1,34 @@
+[1mRunning axe-core 4.11.0 in chrome-headless[22m
+[1m[22m
+[1mTesting [4m[34mhttp://localhost:3107[39m[24m[22m ... please wait, this may take a minute.
+[32m 0 violations found![39m
+[1m[22m
+[1mTesting [4m[34mhttp://localhost:3107/auth/sign-in[39m[24m[22m ... please wait, this may take a minute.
+
+[31m[1m  Violation of "link-in-text-block" with 1 occurrences![22m[39m
+[31m[1m[22m[39m    Ensure links are distinguished from surrounding text in a way that does not rely on color. Correct invalid elements at:
+     - .text-primary
+    For details, see: [4m[34mhttps://dequeuniversity.com/rules/axe/4.11/link-in-text-block[39m[24m
+[31m[1m[22m[39m
+[31m[1m1 Accessibility issues detected.[22m[39m
+[1m[22m
+[1mTesting [4m[34mhttp://localhost:3107/auth/sign-up[39m[24m[22m ... please wait, this may take a minute.
+
+[31m[1m  Violation of "link-in-text-block" with 1 occurrences![22m[39m
+[31m[1m[22m[39m    Ensure links are distinguished from surrounding text in a way that does not rely on color. Correct invalid elements at:
+     - .text-primary
+    For details, see: [4m[34mhttps://dequeuniversity.com/rules/axe/4.11/link-in-text-block[39m[24m
+[31m[1m[22m[39m
+[31m[1m1 Accessibility issues detected.[22m[39m
+[1m[22m
+[1mTesting [4m[34mhttp://localhost:3107/privacy-policy[39m[24m[22m ... please wait, this may take a minute.
+[32m 0 violations found![39m
+[1m[22m
+[1mTesting [4m[34mhttp://localhost:3107/terms-of-use[39m[24m[22m ... please wait, this may take a minute.
+[32m 0 violations found![39m
+[1m[22m
+[1mTesting [4m[34mhttp://localhost:3107/accessibility[39m[24m[22m ... please wait, this may take a minute.
+[32m 0 violations found![39m
+[1mTesting complete of 6 pages[22m
+[1m[22m
+Saved file at /Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/docs/launch/evidence/axe-public.json

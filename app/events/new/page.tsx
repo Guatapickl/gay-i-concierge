@@ -36,7 +36,7 @@ export default function NewEventPage() {
   return (
     <div className="max-w-2xl mx-auto animate-fade-in">
       <div className="mb-6">
-        <h1 className="text-display-md font-display font-bold text-foreground">
+        <h1 className="page-heading">
           New Event
         </h1>
         <p className="text-foreground-muted mt-1">

@@ -55,7 +55,7 @@ export default function EditEventPage() {
   return (
     <div className="max-w-2xl mx-auto animate-fade-in">
       <div className="mb-6">
-        <h1 className="text-display-md font-display font-bold text-foreground">
+        <h1 className="page-heading">
           Edit Event
         </h1>
         {seriesId && recurrenceLabel && (
@@ -169,7 +169,7 @@ export default function EditEventPage() {
             placeholder="Recap, decisions, action items… (markdown supported)"
           />
           <p className="mt-2 text-xs text-foreground-subtle">
-            Add notes after the meeting; they'll show on the event page and feed into recap posts.
+            Add notes after the meeting; they&apos;ll show on the event page and feed into recap posts.
           </p>
         </div>
 

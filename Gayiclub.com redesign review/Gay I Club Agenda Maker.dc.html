@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f7f7f5;color:#2a2d31;font-family:'Space Grotesk',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#3aa8b4;text-decoration:none}a:hover{color:#2b8992}
+::selection{background:oklch(0.75 0.15 190 / 0.35)}
+</style>
+</helmet>
+<div style="min-height:100vh;background:{{ t.bg }};color:{{ t.text }}">
+  <nav style="display:flex;align-items:center;justify-content:space-between;padding:18px 40px;border-bottom:1px solid {{ t.line }}">
+    <div style="display:flex;align-items:baseline;gap:20px">
+      <a href="Gay I Club Internal.dc.html" style="font-size:13.5px;font-weight:500;color:{{ t.muted }}" style-hover="color:{{ t.strong }}">← Dashboard</a>
+      <div style="display:flex;align-items:baseline;gap:12px">
+        <a href="Gay I Club Landing.dc.html" style="font-weight:700;font-size:16px;letter-spacing:-0.02em;color:{{ t.strong }}">Gay I Club</a>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:{{ t.faint }};letter-spacing:0.08em">AGENDA MAKER</span>
+      </div>
+    </div>
+  </nav>
+  <main style="max-width:760px;margin:0 auto;padding:40px">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px">
+      <h1 style="font-size:26px;font-weight:600;letter-spacing:-0.02em;margin:0;color:{{ t.strong }}">Paper Club: Mixture-of-Agents Deep Dive</h1>
+    </div>
+    <p style="margin:0 0 28px;font-size:14px;color:{{ t.muted }}">Thu Sep 11 · 7:00 PM · Flatiron · Total {{ totalMin }} min</p>
+    <div style="border:1px solid {{ t.line }};border-radius:12px;background:{{ t.card }};overflow:hidden;margin-bottom:20px">
+      <sc-for list="{{ items }}" as="it" hint-placeholder-count="4">
+        <div style="display:flex;gap:16px;align-items:center;padding:16px 22px;border-top:1px solid {{ t.line }}">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:{{ t.accentText }};width:58px;flex-shrink:0">{{ it.start }}</span>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14.5px;font-weight:600;color:{{ t.strong }}">{{ it.title }}</div>
+            <div style="font-size:12.5px;color:{{ t.muted }};margin-top:2px">{{ it.owner }}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+            <button onClick="{{ it.minus }}" style="width:26px;height:26px;border:1px solid {{ t.line2 }};background:transparent;color:{{ t.muted }};border-radius:6px;cursor:pointer;font-size:14px;line-height:1">−</button>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:{{ t.text }};width:46px;text-align:center">{{ it.min }} min</span>
+            <button onClick="{{ it.plus }}" style="width:26px;height:26px;border:1px solid {{ t.line2 }};background:transparent;color:{{ t.muted }};border-radius:6px;cursor:pointer;font-size:14px;line-height:1">+</button>
+            <button onClick="{{ it.remove }}" title="Remove" style="width:26px;height:26px;border:none;background:transparent;color:{{ t.faint }};cursor:pointer;font-size:14px;line-height:1" style-hover="color:#c05555">×</button>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="border:1px solid {{ t.line }};border-radius:12px;background:{{ t.card }};padding:20px 22px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.14em;color:{{ t.faint }};text-transform:uppercase;margin-bottom:14px">Add agenda item</div>
+      <div style="display:grid;grid-template-columns:2fr 1fr 110px;gap:10px;margin-bottom:12px">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:500;color:{{ t.muted }};margin-bottom:5px">Title</label>
+          <input value="{{ draft }}" onChange="{{ onDraft }}" placeholder="e.g. Lightning demos" style="width:100%;box-sizing:border-box;border:1px solid {{ t.line2 }};border-radius:8px;padding:10px 14px;background:{{ t.bg }};font-family:'Space Grotesk',sans-serif;font-size:14px;color:{{ t.strong }};outline:none"></input>
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:500;color:{{ t.muted }};margin-bottom:5px">Owner</label>
+          <input value="{{ draftOwner }}" onChange="{{ onDraftOwner }}" placeholder="Who's leading" style="width:100%;box-sizing:border-box;border:1px solid {{ t.line2 }};border-radius:8px;padding:10px 14px;background:{{ t.bg }};font-family:'Space Grotesk',sans-serif;font-size:14px;color:{{ t.strong }};outline:none"></input>
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:500;color:{{ t.muted }};margin-bottom:5px">Duration</label>
+          <select value="{{ draftMin }}" onChange="{{ onDraftMin }}" style="width:100%;box-sizing:border-box;border:1px solid {{ t.line2 }};border-radius:8px;padding:10px 10px;background:{{ t.bg }};font-family:'Space Grotesk',sans-serif;font-size:14px;color:{{ t.strong }};outline:none">
+            <option value="5">5 min</option>
+            <option value="10">10 min</option>
+            <option value="15">15 min</option>
+            <option value="20">20 min</option>
+            <option value="25">25 min</option>
+            <option value="30">30 min</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;font-weight:500;color:{{ t.muted }};margin-bottom:5px">Notes <span style="color:{{ t.faint }};font-weight:400">(optional)</span></label>
+        <input value="{{ draftNotes }}" onChange="{{ onDraftNotes }}" placeholder="Links, prep, or context for this item" style="width:100%;box-sizing:border-box;border:1px solid {{ t.line2 }};border-radius:8px;padding:10px 14px;background:{{ t.bg }};font-family:'Space Grotesk',sans-serif;font-size:14px;color:{{ t.strong }};outline:none"></input>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:14px">
+        <button onClick="{{ add }}" style="background:{{ t.strong }};color:{{ t.bg }};border:none;padding:11px 22px;border-radius:8px;font-family:'Space Grotesk',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer">Add item</button>
+        <button onClick="{{ share }}" style="border:1px solid {{ t.line2 }};background:transparent;color:{{ t.text }};padding:11px 22px;border-radius:8px;font-family:'Space Grotesk',sans-serif;font-size:13.5px;font-weight:500;cursor:pointer">{{ shareLabel }}</button>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'dark'|'light'&quot;}}">
+class Component extends DCLogic {
+  state = {
+    items: [
+      {title:'Arrivals + intros', owner:'Everyone', min:10},
+      {title:'Paper overview: architecture + method', owner:'Dev', min:20},
+      {title:'Section 4: aggregation strategy discussion', owner:'Priya', min:25},
+      {title:'Open questions + next paper vote', owner:'Alex R.', min:15}
+    ],
+    draft: '', draftOwner: '', draftMin: '10', draftNotes: '', shared: false
+  };
+  renderVals() {
+    const dark = (this.props.theme ?? 'light') !== 'light';
+    const themes = {
+      dark: { bg:'#0a0b0d', card:'#0e1013', text:'#e8eaed', strong:'#f2f4f6', muted:'#a9afb8', faint:'#5c626b', line:'#1c1e22', line2:'#2a2d33', accentText:'#7fd8e0' },
+      light:{ bg:'#f7f7f5', card:'#ffffff', text:'#2a2d31', strong:'#141619', muted:'#5a6068', faint:'#9aa0a8', line:'#e4e4e0', line2:'#d4d4cf', accentText:'oklch(0.5 0.13 190)' }
+    };
+    const t = dark ? themes.dark : themes.light;
+    let clock = 19 * 60; // 7:00 PM
+    const fmt = m => { const h = Math.floor(m/60), mm = m%60; const h12 = ((h-1)%12)+1; return h12 + ':' + String(mm).padStart(2,'0'); };
+    const upd = (i, fn) => { const items = this.state.items.map((it,j) => j===i ? fn(it) : it).filter(Boolean); this.setState({items}); };
+    return {
+      t,
+      totalMin: this.state.items.reduce((s,it) => s+it.min, 0),
+      items: this.state.items.map((it, i) => {
+        const start = fmt(clock); clock += it.min;
+        return { ...it, start,
+          plus: () => upd(i, x => ({...x, min: x.min+5})),
+          minus: () => upd(i, x => x.min > 5 ? {...x, min: x.min-5} : x),
+          remove: () => upd(i, () => null)
+        };
+      }),
+      draft: this.state.draft,
+      draftOwner: this.state.draftOwner,
+      draftMin: this.state.draftMin,
+      draftNotes: this.state.draftNotes,
+      onDraft: e => this.setState({draft: e.target.value}),
+      onDraftOwner: e => this.setState({draftOwner: e.target.value}),
+      onDraftMin: e => this.setState({draftMin: e.target.value}),
+      onDraftNotes: e => this.setState({draftNotes: e.target.value}),
+      add: () => { const title = this.state.draft.trim(); if (!title) return;
+        const owner = this.state.draftOwner.trim() || 'Unassigned';
+        const notes = this.state.draftNotes.trim();
+        this.setState({items: this.state.items.concat([{title, owner: notes ? owner + ' · ' + notes : owner, min: parseInt(this.state.draftMin, 10)}]), draft:'', draftOwner:'', draftNotes:''}); },
+      share: () => { this.setState({shared: true}); setTimeout(() => this.setState({shared: false}), 1800); },
+      shareLabel: this.state.shared ? 'Shared ✓' : 'Share to #paper-club'
+    };
+  }
+}
+</script>
+</body>
+</html>

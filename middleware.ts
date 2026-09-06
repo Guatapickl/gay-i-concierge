@@ -9,7 +9,7 @@ const SESSION_COOKIE = '__session'
 const protectedRoutes = ['/hub', '/profile', '/events', '/resources', '/robot']
 
 export function middleware(request: NextRequest) {
-    const isProtectedRoute = protectedRoutes.some(route => request.nextUrl.pathname.startsWith(route))
+    const isProtectedRoute = protectedRoutes.some(route => request.nextUrl.pathname === route || request.nextUrl.pathname.startsWith(route + '/'))
     const hasSession = !!request.cookies.get(SESSION_COOKIE)?.value
 
     if (!hasSession && isProtectedRoute) {
@@ -19,7 +19,12 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(url)
     }
 
-    return NextResponse.next()
+    const response = NextResponse.next()
+    const hostname = (request.headers.get('host') || request.nextUrl.hostname).split(':')[0].toLowerCase()
+    if (hostname !== 'gayiclub.com' && hostname !== 'www.gayiclub.com') {
+        response.headers.set('X-Robots-Tag', 'noindex, nofollow')
+    }
+    return response
 }
 
 export const config = {

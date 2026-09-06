@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f7f7f5;color:#2a2d31;font-family:'Space Grotesk',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#3aa8b4;text-decoration:none}a:hover{color:#2b8992}
+</style>
+</helmet>
+<div style="max-width:880px;margin:0 auto;padding:56px 40px">
+  <div style="margin-bottom:48px">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.14em;color:#9aa0a8;margin-bottom:10px">GAY I CLUB · STYLE GUIDE · SEP 2026</div>
+    <h1 style="font-size:34px;font-weight:600;letter-spacing:-0.025em;margin:0;color:#141619">Design system reference</h1>
+    <p style="margin:10px 0 0;font-size:15px;color:#5a6068;max-width:540px;text-wrap:pretty">Everything a developer needs to build the redesigned gayiclub.com. All values below are used verbatim in the mockup files.</p>
+  </div>
+
+  <h2 style="font-size:14px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#9aa0a8;margin:0 0 16px;font-family:'IBM Plex Mono',monospace">01 · Typography</h2>
+  <div style="border:1px solid #e4e4e0;border-radius:12px;background:#fff;padding:28px;margin-bottom:40px">
+    <div style="font-size:40px;font-weight:600;letter-spacing:-0.03em;color:#141619;line-height:1.05">Space Grotesk</div>
+    <div style="font-size:14px;color:#5a6068;margin:6px 0 20px">Headings, body, UI — weights 400 / 500 / 600 / 700. Headline letter-spacing −0.02 to −0.035em.</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:20px;color:#141619">IBM Plex Mono</div>
+    <div style="font-size:14px;color:#5a6068;margin:6px 0 20px">Labels, timestamps, badges, metadata — weights 400 / 500. Uppercase with 0.08–0.14em letter-spacing.</div>
+    <div style="border-top:1px solid #e4e4e0;padding-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px">
+      <sc-for list="{{ typeScale }}" as="ts" hint-placeholder-count="5">
+        <div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#9aa0a8">{{ ts.label }}</div>
+          <div style="font-size:14px;font-weight:500;color:#141619;margin-top:2px">{{ ts.value }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <h2 style="font-size:14px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#9aa0a8;margin:0 0 16px;font-family:'IBM Plex Mono',monospace">02 · Color</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:40px">
+    <div style="border:1px solid #e4e4e0;border-radius:12px;background:#fff;overflow:hidden">
+      <div style="padding:14px 20px;border-bottom:1px solid #e4e4e0;font-size:13px;font-weight:600;color:#141619">Light theme</div>
+      <sc-for list="{{ lightColors }}" as="c" hint-placeholder-count="6">
+        <div style="display:flex;align-items:center;gap:14px;padding:10px 20px;border-top:1px solid #f0f0ed">
+          <span style="width:36px;height:36px;border-radius:8px;background:{{ c.val }};border:1px solid #e4e4e0;flex-shrink:0"></span>
+          <div style="min-width:0">
+            <div style="font-size:13px;font-weight:600;color:#141619">{{ c.name }}</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5a6068">{{ c.val }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="border:1px solid #e4e4e0;border-radius:12px;background:#0a0b0d;overflow:hidden">
+      <div style="padding:14px 20px;border-bottom:1px solid #1c1e22;font-size:13px;font-weight:600;color:#f2f4f6">Dark theme</div>
+      <sc-for list="{{ darkColors }}" as="c" hint-placeholder-count="6">
+        <div style="display:flex;align-items:center;gap:14px;padding:10px 20px;border-top:1px solid #15181c">
+          <span style="width:36px;height:36px;border-radius:8px;background:{{ c.val }};border:1px solid #2a2d33;flex-shrink:0"></span>
+          <div style="min-width:0">
+            <div style="font-size:13px;font-weight:600;color:#f2f4f6">{{ c.name }}</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#a9afb8">{{ c.val }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <h2 style="font-size:14px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#9aa0a8;margin:0 0 16px;font-family:'IBM Plex Mono',monospace">03 · Components</h2>
+  <div style="border:1px solid #e4e4e0;border-radius:12px;background:#fff;padding:28px;margin-bottom:40px;display:flex;flex-direction:column;gap:24px">
+    <div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#9aa0a8;margin-bottom:10px">BUTTONS — radius 6–8px, weight 600</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+        <span style="background:#141619;color:#f7f7f5;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600">Primary</span>
+        <span style="border:1px solid #d4d4cf;color:#2a2d31;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:500">Secondary</span>
+        <span style="background:oklch(0.55 0.13 190);color:#fff;padding:9px 18px;border-radius:6px;font-size:13.5px;font-weight:600">Accent (Sign in / Send)</span>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#9aa0a8;margin-bottom:10px">BADGES + CHIPS — mono font, pill radius</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:oklch(0.5 0.13 190);background:rgba(58,168,180,0.12);padding:3px 9px;border-radius:99px">14</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:0.12em;color:#f7f7f5;background:oklch(0.55 0.13 190);padding:3px 9px;border-radius:99px">NEW</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:oklch(0.5 0.13 190);border:1px solid #e4e4e0;padding:3px 9px;border-radius:99px">retrieval</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#f7f7f5;background:#141619;border:1px solid #141619;padding:7px 15px;border-radius:99px">#model-releases</span>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#9aa0a8;margin-bottom:10px">CARD — 1px border, radius 12px, white on #f7f7f5</div>
+      <div style="border:1px solid #e4e4e0;border-radius:12px;background:#fff;padding:20px;max-width:340px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.12em;color:oklch(0.5 0.13 190);margin-bottom:8px">LABEL</div>
+        <div style="font-size:15px;font-weight:600;color:#141619">Card title</div>
+        <p style="margin:5px 0 0;font-size:13px;line-height:1.55;color:#5a6068">Supporting copy sits at 13–14.5px with muted ink.</p>
+      </div>
+    </div>
+  </div>
+
+  <h2 style="font-size:14px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#9aa0a8;margin:0 0 16px;font-family:'IBM Plex Mono',monospace">04 · Rules of thumb</h2>
+  <div style="border:1px solid #e4e4e0;border-radius:12px;background:#fff;padding:28px;margin-bottom:40px">
+    <sc-for list="{{ rules }}" as="r" hint-placeholder-count="6">
+      <div style="display:flex;gap:14px;padding:9px 0;font-size:14px;line-height:1.55;color:#2a2d31">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:oklch(0.5 0.13 190);flex-shrink:0;padding-top:2px">—</span>
+        <span style="text-wrap:pretty">{{ r }}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <h2 style="font-size:14px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#9aa0a8;margin:0 0 16px;font-family:'IBM Plex Mono',monospace">05 · Screen index</h2>
+  <div style="border:1px solid #e4e4e0;border-radius:12px;background:#fff;overflow:hidden;margin-bottom:56px">
+    <sc-for list="{{ screens }}" as="s" hint-placeholder-count="8">
+      <a href="{{ s.file }}" style="display:flex;justify-content:space-between;align-items:center;padding:14px 22px;border-top:1px solid #f0f0ed;color:#2a2d31" style-hover="background:#fafaf8">
+        <span style="font-size:14px;font-weight:600;color:#141619">{{ s.name }}</span>
+        <span style="font-size:12.5px;color:#9aa0a8">{{ s.note }}</span>
+      </a>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      typeScale: [
+        {label:'HERO H1', value:'clamp(44–80px) / 600'},
+        {label:'PAGE H1', value:'26–28px / 600'},
+        {label:'CARD TITLE', value:'15–18px / 600'},
+        {label:'BODY', value:'13.5–16px / 400'},
+        {label:'MONO LABEL', value:'10–12px / uppercase'}
+      ],
+      lightColors: [
+        {name:'Background', val:'#f7f7f5'},
+        {name:'Card', val:'#ffffff'},
+        {name:'Ink strong', val:'#141619'},
+        {name:'Ink body', val:'#2a2d31'},
+        {name:'Ink muted', val:'#5a6068'},
+        {name:'Line', val:'#e4e4e0'},
+        {name:'Accent', val:'oklch(0.55 0.13 190)'},
+        {name:'Accent text', val:'oklch(0.5 0.13 190)'}
+      ],
+      darkColors: [
+        {name:'Background', val:'#0a0b0d'},
+        {name:'Card', val:'#0e1013'},
+        {name:'Ink strong', val:'#f2f4f6'},
+        {name:'Ink body', val:'#e8eaed'},
+        {name:'Ink muted', val:'#a9afb8'},
+        {name:'Line', val:'#1c1e22'},
+        {name:'Accent', val:'oklch(0.75 0.15 190)'},
+        {name:'Accent text', val:'#7fd8e0'}
+      ],
+      rules: [
+        'One accent color only (teal). No rainbow gradients, no emoji — identity is carried by type and the accent.',
+        'Mono font marks all metadata: timestamps, counts, labels, badges. Uppercase + letter-spacing.',
+        'Borders over shadows: 1px lines define cards and tables; shadows only on the mobile device frames.',
+        'Radii: 6px small controls, 8px buttons/inputs, 12px cards, 99px pills.',
+        'Hit targets ≥44px on mobile; body text never below 12px.',
+        'Dark theme is a token swap, not a redesign — every screen exposes a theme prop with both palettes.',
+        'Verbatim brand language: "Gay people exploring the AI frontier", "NYC · EST. 2024".'
+      ],
+      screens: [
+        {file:'Gay I Club Landing.dc.html', name:'Landing', note:'public · light/dark toggle'},
+        {file:'Gay I Club Internal.dc.html', name:'Dashboard', note:'signed-in home + sidebar nav'},
+        {file:'Gay I Club Hub.dc.html', name:'Communication Hub', note:'channels + messaging'},
+        {file:'Gay I Club Calendar.dc.html', name:'Meeting Calendar', note:'month grid + upcoming'},
+        {file:'Gay I Club Events.dc.html', name:'Events', note:'cards + past events'},
+        {file:'Gay I Club News Feed.dc.html', name:'News Feed', note:'filterable digest'},
+        {file:'Gay I Club Resources.dc.html', name:'Resources', note:'grouped library'},
+        {file:'Gay I Club Community.dc.html', name:'Community', note:'member directory + search'},
+        {file:'Gay I Club Community Feed.dc.html', name:'Community Feed', note:'posts + upvotes'},
+        {file:'Gay I Club Announcements.dc.html', name:'Announcements', note:'organizer posts'},
+        {file:'Gay I Club Agenda Maker.dc.html', name:'Agenda Maker', note:'editable agenda + time math'},
+        {file:'Gay I Club Robot Benchmark.dc.html', name:'Robot Benchmark', note:'SVG slots for dev injection'},
+        {file:'Gay I Club Mobile.dc.html', name:'Mobile pass', note:'4 key screens @ 390px'}
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

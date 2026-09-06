@@ -24,7 +24,7 @@ env:
     value: 1:692568338842:web:431417ac41fa188e2a0a23
     availability: [BUILD, RUNTIME]
   - variable: EMAIL_FROM
-    value: "Gay I Club <noreply@gayiclub.com>"
+    value: "VibeShift AI Support <noreply@gayiclub.com>"
   - variable: RESEND_API_KEY
     secret: RESEND_API_KEY
   - variable: CRON_SECRET

@@ -45,7 +45,7 @@ export default function SignUpPage() {
             Create an account
           </h1>
           <p className="text-sm text-foreground-muted mt-1">
-            Join the Gay I Club community
+            Join the Gay I Club community · Adults 18+
           </p>
         </div>
 
@@ -72,6 +72,7 @@ export default function SignUpPage() {
             placeholder="Confirm password"
             required
           />
+          <p className="text-xs text-foreground-muted">By creating an account, you confirm you are 18 or older and agree to the <Link className="underline" href="/terms-of-use">Terms of Use</Link>. Read our <Link className="underline" href="/privacy-policy">Privacy Policy</Link> to understand how your information is used.</p>
           <Button type="submit" disabled={loading} variant="primary" fullWidth>
             {loading ? 'Creating account...' : 'Create Account'}
           </Button>
@@ -79,7 +80,7 @@ export default function SignUpPage() {
 
         <p className="text-center text-sm text-foreground-muted">
           Already have an account?{' '}
-          <Link href="/auth/sign-in" className="text-primary hover:text-primary-muted transition-colors">
+          <Link href="/auth/sign-in" className="text-primary underline underline-offset-4 hover:text-primary-muted transition-colors">
             Sign in
           </Link>
         </p>

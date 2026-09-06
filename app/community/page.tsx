@@ -4,17 +4,16 @@ import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { Search, Users, Sparkles, ArrowRight, Filter } from 'lucide-react';
 import { currentUser } from '@/lib/firebase/authClient';
-import { listRows } from '@/lib/firebase/db';
-import { orderBy } from 'firebase/firestore';
+import { getDirectoryMembers } from '@/lib/directory';
 import { LoadingSpinner } from '@/components/ui';
 import InviteCard from '@/components/InviteCard';
 import type { DirectoryMember } from '@/lib/directory';
 
 const EXPERIENCE_LABELS: Record<string, { label: string; color: string }> = {
   none: { label: 'New to AI', color: '#a8a29e' },
-  beginner: { label: 'Beginner', color: '#0099cc' },
-  intermediate: { label: 'Intermediate', color: '#7c2fff' },
-  advanced: { label: 'Advanced', color: '#ff2d9b' },
+  beginner: { label: 'Beginner', color: '#327E78' },
+  intermediate: { label: 'Intermediate', color: '#13796F' },
+  advanced: { label: 'Advanced', color: '#087F75' },
 };
 
 function getInitials(name: string | null): string {
@@ -30,14 +29,14 @@ function getInitials(name: string | null): string {
 
 function hashColor(id: string): string {
   const colors = [
-    'linear-gradient(135deg, #ff2d9b, #7c2fff)',
-    'linear-gradient(135deg, #7c2fff, #0099cc)',
-    'linear-gradient(135deg, #0099cc, #00cc88)',
-    'linear-gradient(135deg, #ff2d9b, #ff6b35)',
-    'linear-gradient(135deg, #7c3aed, #ec4899)',
-    'linear-gradient(135deg, #0ea5e9, #8b5cf6)',
-    'linear-gradient(135deg, #f59e0b, #ef4444)',
-    'linear-gradient(135deg, #10b981, #3b82f6)',
+    '#087F75',
+    '#087F75',
+    '#087F75',
+    '#087F75',
+    '#087F75',
+    '#087F75',
+    '#087F75',
+    '#087F75',
   ];
   let hash = 0;
   for (let i = 0; i < id.length; i++) {
@@ -66,7 +65,7 @@ export default function CommunityPage() {
       // Fetch all member profiles
       let data: DirectoryMember[] = [];
       try {
-        data = await listRows<DirectoryMember>('user_profiles', orderBy('created_at', 'desc'));
+        data = await getDirectoryMembers();
       } catch (error) {
         console.error('Error fetching directory:', error instanceof Error ? error.message : String(error));
       }
@@ -111,21 +110,15 @@ export default function CommunityPage() {
   return (
     <div className="space-y-7 animate-fade-in">
       {/* Hero header */}
-      <div className="card-tinted p-6 relative overflow-hidden">
-        <div
-          className="absolute -top-24 -right-16 w-64 h-64 rounded-full blur-3xl pointer-events-none"
-          style={{ background: 'radial-gradient(circle, rgba(124,47,255,0.18), transparent 70%)' }}
-        />
+      <div className="pb-3 relative">
         <div className="relative">
           <div className="flex items-center gap-2 mb-3">
-            <span className="badge badge-purple">
+            <span className="badge badge-primary">
               <Users className="w-3 h-3" />
               {members.length} {members.length === 1 ? 'member' : 'members'}
             </span>
           </div>
-          <h2 className="text-2xl font-display font-extrabold text-foreground mb-1.5 tracking-tight">
-            Member Directory
-          </h2>
+          <h1 className="page-heading mb-3">Member directory</h1>
           <p className="text-foreground-muted max-w-xl">
             Connect with fellow members of the Gay I Club community. Browse profiles,
             discover shared interests, and find your next AI collaborator.
@@ -143,7 +136,7 @@ export default function CommunityPage() {
               placeholder="Search by name or interest..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="input-field w-full pl-10 text-sm"
+              aria-label="Search members" className="input-field w-full pl-10 text-sm"
             />
           </div>
           <button
@@ -218,8 +211,8 @@ export default function CommunityPage() {
 
       {/* Members grid */}
       {filtered.length === 0 ? (
-        <div className="card-elevated p-8 text-center">
-          <div className="text-4xl mb-3">🔍</div>
+        <div className="card p-8 text-center">
+          <div className="text-4xl mb-3"></div>
           <p className="text-foreground-muted font-medium">No members found</p>
           <p className="text-sm text-foreground-subtle mt-1">
             Try adjusting your search or filters.
@@ -234,7 +227,7 @@ export default function CommunityPage() {
       )}
 
       {/* Invite section */}
-      <div className="card-elevated p-5">
+      <div className="card p-5">
         <div className="flex items-center gap-2 mb-3">
           <Sparkles className="w-5 h-5 text-primary" />
           <h3 className="text-base font-display font-bold text-foreground">Grow the Community</h3>
@@ -252,10 +245,11 @@ function MemberCard({ member }: { member: DirectoryMember }) {
   const initials = getInitials(member.full_name);
   const avatarBg = hashColor(member.id);
   const exp = EXPERIENCE_LABELS[member.experience_level ?? 'none'] ?? EXPERIENCE_LABELS.none;
-  const joinDate = new Date(member.created_at).toLocaleDateString(undefined, {
+  const createdAt = new Date(member.created_at);
+  const joinDate = member.created_at && Number.isFinite(createdAt.getTime()) ? createdAt.toLocaleDateString(undefined, {
     year: 'numeric',
     month: 'short',
-  });
+  }) : null;
 
   return (
     <Link
@@ -265,7 +259,7 @@ function MemberCard({ member }: { member: DirectoryMember }) {
       <div className="flex items-start gap-3.5 mb-3">
         {/* Avatar */}
         <div
-          className="w-12 h-12 rounded-full flex items-center justify-center text-white font-display font-bold text-sm shrink-0 shadow-soft group-hover:scale-105 transition-transform"
+          className="w-12 h-12 rounded-md flex items-center justify-center text-white font-display font-bold text-sm shrink-0 shadow-soft group-hover:scale-105 transition-transform"
           style={{ background: avatarBg }}
         >
           {initials}
@@ -285,10 +279,10 @@ function MemberCard({ member }: { member: DirectoryMember }) {
             >
               {exp.label}
             </span>
-            <span className="text-foreground-faint text-[11px]">·</span>
-            <span className="text-foreground-faint text-[11px] font-mono">
-              Joined {joinDate}
-            </span>
+            {joinDate && <>
+              <span className="text-foreground-faint text-[11px]">·</span>
+              <span className="text-foreground-faint text-[11px] font-mono">Joined {joinDate}</span>
+            </>}
           </div>
         </div>
       </div>

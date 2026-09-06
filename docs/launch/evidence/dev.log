@@ -1,0 +1,53 @@
+
+> gay-i-concierge@0.1.0 dev
+> next dev --turbopack --port 3106
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   ▲ Next.js 16.0.10 (Turbopack)
+   - Local:         http://localhost:3106
+   - Network:       http://127.0.2.2:3106
+   - Environments: .env
+
+ ✓ Starting...
+ ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+ ✓ Ready in 1780ms
+ GET / 200 in 1694ms (compile: 1421ms, proxy.ts: 29ms, render: 245ms)
+ GET / 200 in 117ms (compile: 27ms, proxy.ts: 12ms, render: 78ms)
+ ✓ Compiled in 26ms
+ GET / 200 in 99ms (compile: 29ms, proxy.ts: 1627µs, render: 69ms)
+ ✓ Compiled in 0ms
+ GET / 200 in 120ms (compile: 26ms, proxy.ts: 3ms, render: 92ms)
+ GET / 200 in 147ms (compile: 4ms, proxy.ts: 37ms, render: 107ms)
+ ✓ Compiled in 22ms
+ ⚠ Found a change in next.config.ts. Restarting the server to apply the changes...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   ▲ Next.js 16.0.10 (Turbopack)
+   - Local:         http://localhost:3106
+   - Network:       http://127.0.2.2:3106
+   - Environments: .env
+
+ ✓ Starting...
+ ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+ ✓ Ready in 436ms
+ GET / 200 in 1400ms (compile: 1103ms, proxy.ts: 27ms, render: 270ms)
+ ⚠ Found a change in next.config.ts. Restarting the server to apply the changes...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   ▲ Next.js 16.0.10 (Turbopack)
+   - Local:         http://localhost:3106
+   - Network:       http://127.0.2.2:3106
+   - Environments: .env
+
+ ✓ Starting...
+ ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+ ✓ Ready in 471ms
+ ⚠ Found a change in next.config.ts. Restarting the server to apply the changes...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   ▲ Next.js 16.0.10 (Turbopack)
+   - Local:         http://localhost:3106
+   - Network:       http://127.0.2.2:3106
+   - Environments: .env
+
+ ✓ Starting...
+ ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+ ✓ Ready in 450ms
+ ✓ Compiled in 2ms

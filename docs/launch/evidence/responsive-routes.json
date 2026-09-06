@@ -1,0 +1,182 @@
+[
+  {
+    "route": "/",
+    "width": 768,
+    "h1": "Welcome back, Launch",
+    "overflow": false
+  },
+  {
+    "route": "/calendar",
+    "width": 768,
+    "h1": "Meeting calendar",
+    "overflow": false
+  },
+  {
+    "route": "/chat",
+    "width": 768,
+    "h1": "# general",
+    "overflow": false
+  },
+  {
+    "route": "/news",
+    "width": 768,
+    "h1": "News feed",
+    "overflow": false
+  },
+  {
+    "route": "/resources",
+    "width": 768,
+    "h1": "Resources",
+    "overflow": false
+  },
+  {
+    "route": "/community",
+    "width": 768,
+    "h1": "Member directory",
+    "overflow": false
+  },
+  {
+    "route": "/feed",
+    "width": 768,
+    "h1": "Community feed",
+    "overflow": false
+  },
+  {
+    "route": "/announcements",
+    "width": 768,
+    "h1": "Announcements",
+    "overflow": false
+  },
+  {
+    "route": "/agenda",
+    "width": 768,
+    "h1": "Agenda maker",
+    "overflow": false
+  },
+  {
+    "route": "/robot",
+    "width": 768,
+    "h1": "Robot Benchmark",
+    "overflow": false
+  },
+  {
+    "route": "/profile",
+    "width": 768,
+    "h1": "Your profile",
+    "overflow": false
+  },
+  {
+    "route": "/events",
+    "width": 768,
+    "h1": "Events",
+    "overflow": false
+  },
+  {
+    "route": "/events/new",
+    "width": 768,
+    "h1": "New Event",
+    "overflow": false
+  },
+  {
+    "route": "/events/launch-test-event",
+    "width": 768,
+    "h1": "Launch test meetup",
+    "overflow": false
+  },
+  {
+    "route": "/vote",
+    "width": 768,
+    "h1": "Meeting date votes",
+    "overflow": false
+  },
+  {
+    "route": "/",
+    "width": 1280,
+    "h1": "Welcome back, Launch",
+    "overflow": false
+  },
+  {
+    "route": "/calendar",
+    "width": 1280,
+    "h1": "Meeting calendar",
+    "overflow": false
+  },
+  {
+    "route": "/chat",
+    "width": 1280,
+    "h1": "# general",
+    "overflow": false
+  },
+  {
+    "route": "/news",
+    "width": 1280,
+    "h1": "News feed",
+    "overflow": false
+  },
+  {
+    "route": "/resources",
+    "width": 1280,
+    "h1": "Resources",
+    "overflow": false
+  },
+  {
+    "route": "/community",
+    "width": 1280,
+    "h1": "Member directory",
+    "overflow": false
+  },
+  {
+    "route": "/feed",
+    "width": 1280,
+    "h1": "Community feed",
+    "overflow": false
+  },
+  {
+    "route": "/announcements",
+    "width": 1280,
+    "h1": "Announcements",
+    "overflow": false
+  },
+  {
+    "route": "/agenda",
+    "width": 1280,
+    "h1": "Agenda maker",
+    "overflow": false
+  },
+  {
+    "route": "/robot",
+    "width": 1280,
+    "h1": "Robot Benchmark",
+    "overflow": false
+  },
+  {
+    "route": "/profile",
+    "width": 1280,
+    "h1": "Your profile",
+    "overflow": false
+  },
+  {
+    "route": "/events",
+    "width": 1280,
+    "h1": "Events",
+    "overflow": false
+  },
+  {
+    "route": "/events/new",
+    "width": 1280,
+    "h1": "New Event",
+    "overflow": false
+  },
+  {
+    "route": "/events/launch-test-event",
+    "width": 1280,
+    "h1": "Launch test meetup",
+    "overflow": false
+  },
+  {
+    "route": "/vote",
+    "width": 1280,
+    "h1": "Meeting date votes",
+    "overflow": false
+  }
+]

@@ -1,0 +1,5 @@
+import type { Metadata } from 'next';
+export const metadata: Metadata = {title:'Accessibility',description:'Accessibility features and help for Gay I Club.',alternates:{canonical:'https://gayiclub.com/accessibility'}};
+export default function Accessibility() {
+ return <article className="legal-page"><p className="eyebrow">VibeShift AI · Updated 2026-09-06</p><h1>Accessibility</h1><p>We want Gay I Club to be usable with a keyboard, screen reader, enlarged text, and mobile device. The site provides light and dark themes, visible keyboard focus, a skip-to-content link, labeled navigation, and support for reduced motion.</p><p>We continue to test and improve accessibility. Member-submitted content and third-party services may have limitations. This statement is not a claim of complete accessibility conformance.</p><h2>Get help or report a barrier</h2><p>Email <a href="mailto:praxis+gayiclub@vibeshiftai.com">praxis+gayiclub@vibeshiftai.com</a> with the page address, the task you were trying to complete, and the assistive technology or device involved, if you want to share it. We can help with an alternative way to access club information.</p></article>;
+}

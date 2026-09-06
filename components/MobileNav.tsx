@@ -25,7 +25,7 @@ export default function MobileNav() {
       {/* Mobile Header */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-16 px-4 flex items-center justify-between bg-surface/95 backdrop-blur-sm z-50 border-b border-border">
         <Link href="/hub" className="flex items-center gap-2">
-          <img src="/logo.png" alt="Gay I Club" className="w-11 h-11" />
+          <img src="/logo.svg" alt="Gay I Club" className="w-11 h-11" />
           <span className="text-xl font-display font-bold text-foreground">
             Gay I Club
           </span>

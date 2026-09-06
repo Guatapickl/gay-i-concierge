@@ -1,0 +1,104 @@
+
+> gay-i-concierge@0.1.0 build
+> next build
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   ▲ Next.js 16.0.10 (Turbopack)
+   - Environments: .env
+
+ ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+   Creating an optimized production build ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ✓ Compiled successfully in 1534.0ms
+   Running TypeScript ...
+   Collecting page data using 15 workers ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ⚠ Using edge runtime on a page currently disables static generation for that page
+   Generating static pages using 15 workers (0/44) ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   Generating static pages using 15 workers (11/44)
+   Generating static pages using 15 workers (22/44)
+   Generating static pages using 15 workers (33/44)
+ ✓ Generating static pages using 15 workers (44/44) in 509.1ms
+   Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ○ /_not-found
+├ ○ /accessibility
+├ ○ /agenda
+├ ○ /alerts
+├ ○ /alerts/confirm
+├ ○ /alerts/unsubscribe
+├ ○ /alerts/unsubscribe/confirm
+├ ○ /announcements
+├ ƒ /api/agenda/draft
+├ ƒ /api/alerts/confirm
+├ ƒ /api/alerts/subscribe
+├ ƒ /api/alerts/unsubscribe
+├ ƒ /api/alerts/unsubscribe/confirm
+├ ƒ /api/auth/session
+├ ƒ /api/chat
+├ ƒ /api/cron/reminders
+├ ƒ /api/directory
+├ ƒ /api/events/rsvp
+├ ƒ /api/invite
+├ ƒ /api/news
+├ ƒ /api/news/ingest
+├ ƒ /api/polls/[id]/notify
+├ ƒ /api/robot/generate
+├ ƒ /api/robot/stats
+├ ƒ /api/rsvp
+├ ○ /auth/auth-code-error
+├ ○ /auth/callback
+├ ○ /auth/forgot
+├ ○ /auth/reset
+├ ○ /auth/sign-in
+├ ○ /auth/sign-up
+├ ○ /calendar
+├ ○ /chat
+├ ○ /community
+├ ƒ /community/[id]
+├ ○ /events
+├ ƒ /events/[id]
+├ ƒ /events/[id]/agenda
+├ ƒ /events/[id]/edit
+├ ○ /events/new
+├ ○ /feed
+├ ○ /hub
+├ ○ /icon.svg
+├ ○ /news
+├ ○ /opengraph-image
+├ ○ /privacy-policy
+├ ○ /profile
+├ ○ /resources
+├ ƒ /resources/[id]/edit
+├ ○ /resources/new
+├ ○ /robot
+├ ○ /robots.txt
+├ ○ /sitemap.xml
+├ ○ /terms-of-use
+├ ○ /vote
+├ ƒ /vote/[id]
+└ ○ /vote/new
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand

@@ -1,0 +1,250 @@
+
+> gay-i-concierge@0.1.0 lint
+> eslint .
+
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/app/alerts/confirm/page.tsx
+  13:7  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/app/alerts/confirm/page.tsx:13:7
+  11 |     const token = params.get('token');
+  12 |     if (!token) {
+> 13 |       setStatus('error'); setMessage('Missing token'); return;
+     |       ^^^^^^^^^ Avoid calling setState() directly within an effect
+  14 |     }
+  15 |     (async () => {
+  16 |       try {  react-hooks/set-state-in-effect
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/app/alerts/unsubscribe/confirm/page.tsx
+  12:19  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/app/alerts/unsubscribe/confirm/page.tsx:12:19
+  10 |     const params = new URLSearchParams(window.location.search);
+  11 |     const token = params.get('token');
+> 12 |     if (!token) { setStatus('error'); setMessage('Missing token'); return; }
+     |                   ^^^^^^^^^ Avoid calling setState() directly within an effect
+  13 |     (async () => {
+  14 |       try {
+  15 |         const res = await fetch(`/api/alerts/unsubscribe/confirm?token=${encodeURIComponent(token)}`);  react-hooks/set-state-in-effect
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/app/calendar/page.tsx
+  107:15  warning  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/app/calendar/page.tsx:107:15
+  105 |
+  106 |   // Sidebar: selected day's events, or all visible-month upcoming
+> 107 |   const now = Date.now();
+      |               ^^^^^^^^^^ Cannot call impure function
+  108 |   const sidebarEvents = selected
+  109 |     ? events.filter(e => {
+  110 |         const d = new Date(e.event_datetime);  react-hooks/purity
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/app/chat/page.tsx
+  49:56  warning  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/app/chat/page.tsx:49:56
+  47 |
+  48 |   const lastVisited = useMemo(() => {
+> 49 |     if (typeof window === 'undefined') return new Date(Date.now() - 7 * 86_400_000).toISOString();
+     |                                                        ^^^^^^^^^^ Cannot call impure function
+  50 |     const raw = window.localStorage.getItem(LAST_VISITED_KEY);
+  51 |     return raw || new Date(Date.now() - 7 * 86_400_000).toISOString();
+  52 |   }, []);  react-hooks/purity
+  51:28  warning  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/app/chat/page.tsx:51:28
+  49 |     if (typeof window === 'undefined') return new Date(Date.now() - 7 * 86_400_000).toISOString();
+  50 |     const raw = window.localStorage.getItem(LAST_VISITED_KEY);
+> 51 |     return raw || new Date(Date.now() - 7 * 86_400_000).toISOString();
+     |                            ^^^^^^^^^^ Cannot call impure function
+  52 |   }, []);
+  53 |
+  54 |   // Bootstrap: auth, channels, unread tallies                     react-hooks/purity
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/app/events/[id]/page.tsx
+  140:40  warning  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/app/events/[id]/page.tsx:140:40
+  138 |   const eventDate = new Date(event.event_datetime);
+  139 |   const recurrence = describeRecurrence(event.recurrence_rule);
+> 140 |   const isPast = eventDate.getTime() < Date.now();
+      |                                        ^^^^^^^^^^ Cannot call impure function
+  141 |
+  142 |   const formattedDate = eventDate.toLocaleDateString('en-US', {
+  143 |     weekday: 'long',  react-hooks/purity
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/app/feed/page.tsx
+   4:10  warning  'Newspaper' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   @typescript-eslint/no-unused-vars
+  43:5   warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/app/feed/page.tsx:43:5
+  41 |
+  42 |   useEffect(() => {
+> 43 |     refresh();
+     |     ^^^^^^^ Avoid calling setState() directly within an effect
+  44 |   }, [refresh]);
+  45 |
+  46 |   if (loading) {  react-hooks/set-state-in-effect
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/app/news/page.tsx
+  4:49  warning  'Zap' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/app/robot/page.tsx
+    3:31  warning  'useMemo' is defined but never used                                                 @typescript-eslint/no-unused-vars
+   15:3   warning  'User' is defined but never used                                                    @typescript-eslint/no-unused-vars
+   91:10  warning  'userId' is assigned a value but never used                                         @typescript-eslint/no-unused-vars
+  714:13  warning  Unused eslint-disable directive (no problems were reported from 'react/no-danger')
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/components/AgendaSuggestions.tsx
+  50:5  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/components/AgendaSuggestions.tsx:50:5
+  48 |
+  49 |   useEffect(() => {
+> 50 |     load();
+     |     ^^^^ Avoid calling setState() directly within an effect
+  51 |   }, [load]);
+  52 |
+  53 |   const submit = async (e: React.FormEvent) => {  react-hooks/set-state-in-effect
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/components/AppLayout.tsx
+  43:21  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/components/AppLayout.tsx:43:21
+  41 |   const current = navigation.find(n => n.href === '/' ? pathname === '/' : pathname === n.href || pathname.startsWith(n.href + '/'));
+  42 |   const active = (href:string) => href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(href + '/');
+> 43 |   useEffect(() => { setMobileOpen(false); }, [pathname]);
+     |                     ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  44 |   useEffect(() => {
+  45 |     if (!mobileOpen) return;
+  46 |     const previous = document.body.style.overflow;  react-hooks/set-state-in-effect
+  59:5   warning  Arrow function expected no return value                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        consistent-return
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/components/AvatarMenu.tsx
+  27:18  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/components/AvatarMenu.tsx:27:18
+  25 |   useEffect(() => {
+  26 |     let mounted = true;
+> 27 |     if (!user) { setName(null); return; }
+     |                  ^^^^^^^ Avoid calling setState() directly within an effect
+  28 |     setName(user.displayName ?? null);
+  29 |     (async () => {
+  30 |       try {  react-hooks/set-state-in-effect
+  38:5   warning  Arrow function expected no return value                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              consistent-return
+  48:5   warning  Arrow function expected no return value                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              consistent-return
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/components/ChatModalProvider.tsx
+  35:5  warning  Arrow function expected no return value  consistent-return
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/components/MobileNav.tsx
+  28:11  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/components/ThemeToggle.tsx
+  6:21  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/components/ThemeToggle.tsx:6:21
+  4 | export default function ThemeToggle() {
+  5 |   const [dark, setDark] = useState(true);
+> 6 |   useEffect(() => { setDark(document.documentElement.dataset.theme !== 'light'); }, []);
+    |                     ^^^^^^^ Avoid calling setState() directly within an effect
+  7 |   function toggle() {
+  8 |     const next = !dark;
+  9 |     document.documentElement.dataset.theme = next ? 'dark' : 'light';  react-hooks/set-state-in-effect
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/eslint.config.mjs
+  3:1  warning  Assign array to a variable before exporting as module default  import/no-anonymous-default-export
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/lib/email.ts
+  33:7  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/postcss.config.mjs
+  1:1  warning  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/scripts/migrate-supabase-to-firestore.mjs
+   93:24  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+   94:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  106:1   warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/scripts/smoke-tests.mjs
+  10:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  32:1  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  81:1  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/tests/announcements.lib.test.ts
+   3:11  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  20:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  20:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  37:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  37:63  warning  'id' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/tests/calendar.test.ts
+  15:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  24:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/tests/chat.route.test.ts
+  33:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  40:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/tests/invite.route.test.ts
+  15:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  36:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/tests/rsvp.lib.test.ts
+  10:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  22:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  22:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  56:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 46 problems (0 errors, 46 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.

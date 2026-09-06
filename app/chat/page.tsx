@@ -26,7 +26,7 @@ const FALLBACK_CHANNELS: ChatChannel[] = [
 ];
 
 const COLOR_FOR_USER = (id: string) => {
-  const palette = ['#e0007a', '#7c3aed', '#0099cc', '#007a4a', '#c05200', '#ff2d9b', '#7c2fff', '#008ab5'];
+  const palette = ['#087F75', '#13796F', '#327E78', '#347D72', '#56756F', '#087F75', '#13796F', '#327E78'];
   let h = 0;
   for (const ch of id) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
   return palette[h % palette.length];
@@ -124,11 +124,11 @@ export default function CommunicationHubPage() {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[210px_1fr] rounded-xl overflow-hidden border-[1.5px] border-border bg-surface min-h-[560px] animate-fade-in">
+    <div className="grid grid-cols-1 md:grid-cols-[210px_1fr] rounded-lg overflow-hidden border-[1.5px] border-border bg-surface min-h-[560px] animate-fade-in">
       {/* Sidebar */}
       <aside className="bg-surface-elevated border-b md:border-b-0 md:border-r border-border py-5 flex flex-col">
-        <div className="px-4 pb-4 text-[12px] font-extrabold text-primary-muted tracking-[0.14em] font-display">
-          GAY I CLUB NYC
+        <div className="px-4 pb-4 text-[12px] font-semibold text-primary-muted tracking-[0.14em] font-display">
+          COMMUNICATION HUB
         </div>
         <div className="px-4 pt-3 pb-1.5 text-[10px] font-bold text-foreground-faint tracking-[0.15em] font-mono">
           CHANNELS
@@ -147,7 +147,7 @@ export default function CommunicationHubPage() {
               }`}
               style={
                 isActive
-                  ? { borderLeft: '2px solid #ff2d9b' }
+                  ? { borderLeft: '2px solid #087F75' }
                   : { borderLeft: '2px solid transparent' }
               }
             >
@@ -184,7 +184,7 @@ export default function CommunicationHubPage() {
       <section className="flex flex-col min-w-0 bg-surface">
         <header className="px-6 py-4 border-b border-border flex items-center justify-between">
           <div>
-            <span className="text-base font-bold text-foreground">{channelMeta?.name}</span>
+            <h1 className="text-xl font-display font-semibold text-foreground">{channelMeta?.name || 'Communication hub'}</h1>
             {channelMeta?.description && (
               <p className="text-[12px] text-foreground-subtle">{channelMeta.description}</p>
             )}
@@ -223,6 +223,7 @@ export default function CommunicationHubPage() {
           )}
           <div className="flex gap-2.5">
             <FormTextarea
+              aria-label="Channel message"
               value={body}
               onChange={e => setBody(e.target.value)}
               onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {

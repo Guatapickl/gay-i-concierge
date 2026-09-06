@@ -8,18 +8,43 @@
       "source": "functions",
       "codebase": "reminders",
       "runtime": "nodejs20",
-      "predeploy": ["npm --prefix \"$RESOURCE_DIR\" run build"]
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run build"
+      ]
     }
   ],
   "apphosting": {
     "backendId": "gayiclub-web",
     "rootDir": "/",
-    "ignore": ["node_modules", ".git", "functions", "netlify", "*.sql", "Internal Communications"]
+    "ignore": [
+      "node_modules",
+      ".git",
+      "functions",
+      "netlify",
+      "*.sql",
+      "Internal Communications",
+      ".env*",
+      "service-account*.json",
+      "docs",
+      "Gayiclub.com redesign review",
+      "tests",
+      ".next",
+      ".next-audit",
+      "*.log"
+    ]
   },
   "emulators": {
-    "auth": { "port": 9099 },
-    "firestore": { "port": 8080 },
-    "functions": { "port": 5001 },
-    "ui": { "enabled": true }
+    "auth": {
+      "port": 9099
+    },
+    "firestore": {
+      "port": 8080
+    },
+    "functions": {
+      "port": 5001
+    },
+    "ui": {
+      "enabled": true
+    }
   }
 }

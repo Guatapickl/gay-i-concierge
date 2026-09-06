@@ -1,0 +1,4 @@
+Contact: mailto:praxis+gayiclub@vibeshiftai.com
+Expires: 2027-09-06T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://gayiclub.com/.well-known/security.txt

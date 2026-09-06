@@ -1,0 +1,27 @@
+[1mRunning axe-core 4.11.0 in chrome-headless[22m
+[1m[22m
+[1mTesting [4m[34mhttp://localhost:3107/[39m[24m[22m ... please wait, this may take a minute.
+[32m 0 violations found![39m
+[1m[22m
+[1mTesting [4m[34mhttp://localhost:3107/auth/sign-in[39m[24m[22m ... please wait, this may take a minute.
+[32m 0 violations found![39m
+[1m[22m
+[1mTesting [4m[34mhttp://localhost:3107/auth/sign-up[39m[24m[22m ... please wait, this may take a minute.
+[32m 0 violations found![39m
+[1m[22m
+[1mTesting [4m[34mhttp://localhost:3107/privacy-policy[39m[24m[22m ... please wait, this may take a minute.
+[32m 0 violations found![39m
+[1m[22m
+[1mTesting [4m[34mhttp://localhost:3107/terms-of-use[39m[24m[22m ... please wait, this may take a minute.
+[32m 0 violations found![39m
+[1m[22m
+[1mTesting [4m[34mhttp://localhost:3107/accessibility[39m[24m[22m ... please wait, this may take a minute.
+[32m 0 violations found![39m
+[1mTesting complete of 6 pages[22m
+[1m[22m
+Saved file at /Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch/docs/launch/evidence/axe-public-final.json
+
+[3mPlease note that only 20% to 50% of all accessibility issues can automatically be detected. [23m
+[3mManual testing is always required. For more information see:[23m
+[3m[4m[34mhttps://dequeuniversity.com/class/testing[39m[24m[23m
+[3m[23m

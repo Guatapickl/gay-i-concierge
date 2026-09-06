@@ -34,7 +34,7 @@ console.log('Running smoke tests...');
 // Core pages and APIs
 has('app/events/page.tsx');
 has('app/events/[id]/page.tsx');
-has('app/events/my/page.tsx');
+contains('app/events/page.tsx', /getRsvpedEventIds/, 'events page loads member RSVP state');
 has('app/alerts/page.tsx');
 has('app/alerts/unsubscribe/page.tsx');
 has('app/alerts/confirm/page.tsx');
@@ -58,7 +58,7 @@ has('lib/tokens.ts');
 // Specific content checks
 contains('app/api/invite/route.ts', /gayiclub\.com/, 'invite prompt includes link');
 contains('components/ChatWindow.tsx', /AbortController/, 'chat uses AbortController');
-contains('components/ChatWindow.tsx', /bg-gray-100|dark:bg-gray-800/, 'chat uses concrete Tailwind utilities');
+contains('components/ChatWindow.tsx', /sendMessage/, 'chat has a message submission handler');
 contains('app/api/chat/route.ts', /rateLimit\(|getClientId\(/, 'chat route rate limited');
 contains('app/api/invite/route.ts', /rateLimit\(|getClientId\(/, 'invite route rate limited');
 contains('app/api/chat/route.ts', /system.*Upcoming events|getUpcomingEvents\(/, 'chat enriched with upcoming events');
@@ -66,8 +66,10 @@ contains('lib/calendar.ts', /export function buildICS|downloadICS|googleCalendar
 contains('lib/rsvp.ts', /export async function deleteRsvp|getRsvpedEventIds/, 'rsvp helpers added');
 contains('app/api/alerts/confirm/route.ts', /alerts_confirmations|subscribe/, 'subscribe confirmation handler');
 contains('app/api/alerts/unsubscribe/confirm/route.ts', /alerts_confirmations|unsubscribe/, 'unsubscribe confirmation handler');
-contains('app/api/alerts/subscribe/route.ts', /generateToken|alerts_confirmations/, 'subscribe creates confirmation tokens');
-contains('app/api/alerts/unsubscribe/route.ts', /generateToken|alerts_confirmations/, 'unsubscribe creates confirmation tokens');
+contains('app/api/alerts/subscribe/route.ts', /requestAlertChange\(req, 'subscribe'\)/, 'subscribe requests email confirmation');
+contains('app/api/alerts/unsubscribe/route.ts', /requestAlertChange\(req, 'unsubscribe'\)/, 'unsubscribe requests email confirmation');
+contains('app/api/alerts/_request.ts', /await sendEmail/, 'alert confirmation uses email delivery');
+contains('app/api/directory/route.ts', /await userFromRequest/, 'directory authenticates before returning member data');
 
 // TypeScript config sanity
 has('tsconfig.json');

@@ -1,8 +1,8 @@
 # Architecture — Gay-I Club Concierge
 
-> **Version**: 2026-05-21  
-> **Stack**: Next.js 16 (App Router) · React 19 · TypeScript · Supabase · OpenAI · Tailwind CSS v4  
-> **Deployment**: Netlify (via `@netlify/plugin-nextjs`)  
+> **Version**: 2026-05-21
+> **Stack**: Next.js 16 (App Router) · React 19 · TypeScript · Supabase · OpenAI · Tailwind CSS v4
+> **Deployment**: Netlify (via `@netlify/plugin-nextjs`)
 > **Production**: [gayiclub.com](https://gayiclub.com) · Repo: [Guatapickl/gay-i-concierge](https://github.com/Guatapickl/gay-i-concierge)
 
 ---
@@ -63,10 +63,10 @@ flowchart TD
 
     PROF -->|auth flows| SB
     HUB -->|posts CRUD| SB
-    
+
     FEED -->|news queries| NEWS_FEED_API
     NEWS_FEED_API -->|read/write news & saves| SB
-    
+
     CORTEX -->|bulk ingest + bearer secret| NEWS_INGEST_API
     NEWS_INGEST_API -->|service-role writes| SB
 

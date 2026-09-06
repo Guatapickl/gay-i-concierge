@@ -1,6 +1,6 @@
 # Database Schema — Gay-I Club Concierge
 
-> **Stack**: Supabase (PostgreSQL) · RLS-enforced · UUID primary keys  
+> **Stack**: Supabase (PostgreSQL) · RLS-enforced · UUID primary keys
 > **Last updated**: 2026-07-06
 
 

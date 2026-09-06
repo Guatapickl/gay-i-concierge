@@ -1,6 +1,4 @@
-import { orderBy } from 'firebase/firestore';
-import { getRow, listRows } from '@/lib/firebase/db';
-
+import { authHeader } from '@/lib/firebase/authClient';
 export type DirectoryMember = {
   id: string;
   full_name: string | null;
@@ -9,41 +7,14 @@ export type DirectoryMember = {
   created_at: string;
 };
 
-type ProfileRow = DirectoryMember & Record<string, unknown>;
-
-function toMember(p: ProfileRow): DirectoryMember {
-  return {
-    id: p.id,
-    full_name: p.full_name ?? null,
-    experience_level: p.experience_level ?? null,
-    interests: p.interests ?? null,
-    created_at: p.created_at,
-  };
-}
-
-/**
- * Fetch all members for the community directory.
- * Returns public profile data only (no email/phone).
- */
+/** Only allowlisted fields cross the authenticated server boundary. */
 export async function getDirectoryMembers(): Promise<DirectoryMember[]> {
-  try {
-    const rows = await listRows<ProfileRow>('user_profiles', orderBy('created_at', 'desc'));
-    return rows.map(toMember);
-  } catch (err) {
-    console.error('Error fetching directory:', (err as Error).message);
-    return [];
-  }
+  const response = await fetch('/api/directory', { headers: await authHeader(), cache: 'no-store' });
+  if (!response.ok) throw new Error('Could not load the member directory. Please try again.');
+  return (await response.json()).members;
 }
-
-/**
- * Fetch a single member's public profile by their user ID.
- */
 export async function getMemberProfile(userId: string): Promise<DirectoryMember | null> {
-  try {
-    const row = await getRow<ProfileRow>('user_profiles', userId);
-    return row ? toMember(row) : null;
-  } catch (err) {
-    console.error('Error fetching member profile:', (err as Error).message);
-    return null;
-  }
+  const response = await fetch(`/api/directory?id=${encodeURIComponent(userId)}`, { headers: await authHeader(), cache: 'no-store' });
+  if (!response.ok) throw new Error('Could not load this member. Please try again.');
+  return (await response.json()).member;
 }

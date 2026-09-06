@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { currentUser, providerIds, setPassword } from '@/lib/firebase/authClient';
+import { authHeader, currentUser, providerIds, setPassword } from '@/lib/firebase/authClient';
 import { getRow, listRows, nowIso, payloadOf, ref } from '@/lib/firebase/db';
 import { limit, orderBy, setDoc, where } from 'firebase/firestore';
 import { Button, FormInput, Alert, LoadingSpinner } from '@/components/ui';
@@ -20,7 +20,9 @@ export default function ProfilePage() {
 
   // Profile fields
   const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState('');
+  const [betaOptIn, setBetaOptIn] = useState(false);
+  const [savedMessage, setSavedMessage] = useState('');
+  const [originalEmailOptIn, setOriginalEmailOptIn] = useState(false);
   type ExperienceLevel = 'none' | 'beginner' | 'intermediate' | 'advanced';
   const [experience, setExperience] = useState<ExperienceLevel>('none');
 
@@ -38,7 +40,6 @@ export default function ProfilePage() {
 
   // Alerts
   const [emailOptIn, setEmailOptIn] = useState(false);
-  const [smsOptIn, setSmsOptIn] = useState(false);
 
   const canSave = useMemo(() => !!userId, [userId]);
 
@@ -54,13 +55,13 @@ export default function ProfilePage() {
       // Load profile (auth-coupled user profile)
       const profileRow = await getRow<{
         full_name?: string | null;
-        phone?: string | null;
+        beta_opt_in?: boolean;
         experience_level?: string | null;
         interests?: string[] | null;
       }>('user_profiles', user.uid).catch(() => null);
       if (profileRow) {
         setFullName(profileRow.full_name ?? '');
-        setPhone(profileRow.phone ?? '');
+        setBetaOptIn(!!profileRow.beta_opt_in);
         const expVals = ['none','beginner','intermediate','advanced'] as const;
         const raw = (profileRow.experience_level ?? 'none') as string;
         const nextExp: ExperienceLevel = (expVals as readonly string[]).includes(raw) ? (raw as ExperienceLevel) : 'none';
@@ -72,21 +73,10 @@ export default function ProfilePage() {
       const interests = await listRows<Interest>('interests', orderBy('name')).catch(() => [] as Interest[]);
       setAllInterests(interests);
 
-      // Alerts status
-      // We treat email/phone as independent channels.
-      const emailVal = user.email ?? null;
-      if (emailVal) {
-        const [sub] = await listRows<{ email_opt_in?: boolean }>(
-          'alerts_subscribers', where('email', '==', emailVal), limit(1),
-        ).catch(() => []);
-        if (sub) setEmailOptIn(!!sub.email_opt_in);
-      }
-      if (profileRow?.phone) {
-        const [sub] = await listRows<{ sms_opt_in?: boolean }>(
-          'alerts_subscribers', where('phone', '==', profileRow.phone), limit(1),
-        ).catch(() => []);
-        if (sub) setSmsOptIn(!!sub.sms_opt_in);
-      }
+      const [sub] = await listRows<{ email_opt_in?: boolean }>(
+        'alerts_subscribers', where('user_id', '==', user.uid), limit(1),
+      ).catch(() => []);
+      if (sub) {setEmailOptIn(!!sub.email_opt_in);setOriginalEmailOptIn(!!sub.email_opt_in);}
 
       setLoading(false);
     })();
@@ -108,38 +98,32 @@ export default function ProfilePage() {
     if (!userId) return;
     setSaving(true);
     setError(null);
+    setSavedMessage('');
     try {
       // Upsert user profile
       await setDoc(ref('user_profiles', userId), payloadOf({
         id: userId,
         full_name: fullName || null,
-        phone: phone || null,
+        beta_opt_in: betaOptIn,
         experience_level: experience,
         interests: selectedInterests,
         email: userEmail, // keep in sync for convenience
         updated_at: nowIso(),
       }), { merge: true });
 
-      // Sync alerts subscribers
-      // Email
-      if (userEmail) {
-        if (emailOptIn) {
-          await fetch('/api/alerts/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, channels: ['email'], user_id: userId }) });
-        } else {
-          await fetch('/api/alerts/unsubscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, channels: ['email'], user_id: userId }) });
+      let preferenceMessage = '';
+      if (userEmail && emailOptIn !== originalEmailOptIn) {
+        const response = await fetch(emailOptIn ? '/api/alerts/subscribe' : '/api/alerts/unsubscribe', {
+          method: 'POST', headers: {'Content-Type':'application/json', ...await authHeader()},
+          body: JSON.stringify({email:userEmail,channels:['email']}),
+        });
+        if (!response.ok) {
+          const body = await response.json().catch(()=>({}));
+          throw new Error(body.error || 'Profile saved, but email preferences could not be updated. Please try again.');
         }
+        preferenceMessage = ' Check your email to confirm your communication preference.';
       }
-      // SMS
-      if (phone) {
-        if (smsOptIn) {
-          await fetch('/api/alerts/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone, channels: ['sms'], user_id: userId }) });
-        } else {
-          await fetch('/api/alerts/unsubscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone, channels: ['sms'], user_id: userId }) });
-        }
-      }
-
-      // Visual confirmation
-      alert('Profile saved');
+      setSavedMessage('Profile saved.' + preferenceMessage);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to save profile.');
       } finally {
@@ -179,7 +163,7 @@ export default function ProfilePage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Your Profile</h2>
+      <p className="eyebrow mb-3">Account</p><h1 className="page-heading mb-6">Your profile</h1><p className="text-sm text-foreground-muted mb-6">Your name, interests and experience appear in the member directory. Your email stays private.</p>{savedMessage && <p role="status" className="card p-4 text-success mb-5">{savedMessage}</p>}
       {error && (
         <Alert variant="error" className="mb-4" onClose={() => setError(null)}>
           {error}
@@ -187,28 +171,21 @@ export default function ProfilePage() {
       )}
       <form onSubmit={saveProfile} className="space-y-6">
         <section>
-          <h3 className="font-semibold mb-2">Contact</h3>
+          <h2 className="font-semibold mb-2">Contact</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm mb-1">Full name</label>
-              <FormInput value={fullName} onChange={e => setFullName(e.target.value)} />
-            </div>
-            <div>
-              <label className="block text-sm mb-1">Phone</label>
-              <FormInput placeholder="+15551234567" value={phone} onChange={e => setPhone(e.target.value)} />
-              <p className="text-xs text-gray-500 mt-1">Use E.164 format, e.g., +15551234567.</p>
+              <FormInput label="Display name" value={fullName} onChange={e => setFullName(e.target.value)} />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm mb-1">Email</label>
-              <FormInput value={userEmail ?? ''} disabled className="bg-gray-100" />
+              <FormInput label="Email" value={userEmail ?? ''} disabled className="bg-surface-elevated" />
             </div>
           </div>
         </section>
 
         <section>
-          <h3 className="font-semibold mb-2">Experience Level</h3>
+          <h2 className="font-semibold mb-2">Experience Level</h2>
           <select
-            className="border px-3 py-2 rounded"
+            aria-label="AI experience level" className="input-field"
             value={experience}
             onChange={e => setExperience(e.target.value as ExperienceLevel)}
           >
@@ -220,7 +197,7 @@ export default function ProfilePage() {
         </section>
 
         <section>
-          <h3 className="font-semibold mb-2">Interests</h3>
+          <h2 className="font-semibold mb-2">Interests</h2>
           <div className="space-y-2">
             <div className="flex flex-wrap gap-3">
               {allInterests.map((i) => (
@@ -235,27 +212,28 @@ export default function ProfilePage() {
               <Button type="button" variant="outline" onClick={addNewInterest}>Add</Button>
             </div>
             {selectedInterests.length > 0 && (
-              <div className="text-xs text-gray-400">Selected: {selectedInterests.join(', ')}</div>
+              <div className="text-xs text-foreground-subtle">Selected: {selectedInterests.join(', ')}</div>
             )}
           </div>
         </section>
 
         <section>
-          <h3 className="font-semibold mb-2">Communications</h3>
+          <h2 className="font-semibold mb-2">Communications</h2>
           <div className="space-y-2">
             <label className="flex items-center gap-2"><input type="checkbox" checked={emailOptIn} onChange={e => setEmailOptIn(e.target.checked)} /> Email updates</label>
-            <label className="flex items-center gap-2"><input type="checkbox" checked={smsOptIn} onChange={e => setSmsOptIn(e.target.checked)} /> SMS updates</label>
-            <p className="text-xs text-gray-500">Toggles use your saved email/phone to manage alert subscriptions.</p>
+
+            <p className="text-xs text-foreground-muted">Changes to email updates are confirmed by email. SMS updates are not available.</p>
           </div>
         </section>
 
+        <section className="card p-5"><h2 className="font-semibold mb-3">Beta program</h2><label className="flex gap-3 items-start text-sm"><input type="checkbox" checked={betaOptIn} onChange={e=>setBetaOptIn(e.target.checked)}/>I am interested in testing VibeShift AI projects.</label><p className="text-xs text-foreground-muted mt-2">This saves your interest with your club profile. It does not subscribe you to marketing emails.</p></section>
         <Button type="submit" disabled={!canSave || saving} variant="primary">
           {saving ? 'Saving…' : 'Save Profile'}
         </Button>
       </form>
 
       <section className="mt-8 card p-5 space-y-3">
-        <h3 className="font-semibold">Sign-in &amp; password</h3>
+        <h2 className="font-semibold">Sign-in &amp; password</h2>
         <p className="text-xs text-foreground-muted">
           You currently sign in with: {providers.map(pv => (pv === 'password' ? 'email + password / magic link' : pv === 'emailLink' ? 'magic link' : pv === 'google.com' ? 'google' : pv)).join(', ')}.
           {!providers.includes('password') && ' Set a password below to also sign in without Google or a magic link.'}
@@ -288,6 +266,7 @@ export default function ProfilePage() {
         </form>
       </section>
 
+      <section className="card p-5 mt-8"><h2 className="section-heading mb-2">Account help</h2><p className="text-sm text-foreground-muted">For an email change, data export, account deletion, or other help, <a className="text-primary underline" href="mailto:praxis+gayiclub@vibeshiftai.com">contact support</a>. Account changes are reviewed by a person.</p></section>
       <div className="mt-8">
         <MyRsvps />
       </div>

@@ -9,7 +9,13 @@ export const runtime = 'nodejs';
  * POST { idToken } after sign-in → sets the __session cookie for SSR.
  * DELETE on sign-out → clears it.
  */
+function isSameOrigin(req: Request) {
+  const origin = req.headers.get('origin');
+  return (!origin || origin === new URL(req.url).origin) && req.headers.get('sec-fetch-site') !== 'cross-site';
+}
+
 export async function POST(req: Request) {
+  if (!isSameOrigin(req)) return NextResponse.json({error:'Forbidden origin'}, {status:403});
   let body: { idToken?: string };
   try {
     body = await req.json();
@@ -33,7 +39,8 @@ export async function POST(req: Request) {
   }
 }
 
-export async function DELETE() {
+export async function DELETE(req: Request) {
+  if (!isSameOrigin(req)) return NextResponse.json({error:'Forbidden origin'}, {status:403});
   const jar = await cookies();
   jar.delete(SESSION_COOKIE);
   return NextResponse.json({ ok: true });

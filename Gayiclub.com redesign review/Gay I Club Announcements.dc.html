@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f7f7f5;color:#2a2d31;font-family:'Space Grotesk',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#3aa8b4;text-decoration:none}a:hover{color:#2b8992}
+::selection{background:oklch(0.75 0.15 190 / 0.35)}
+</style>
+</helmet>
+<div style="min-height:100vh;background:{{ t.bg }};color:{{ t.text }}">
+  <nav style="display:flex;align-items:center;justify-content:space-between;padding:18px 40px;border-bottom:1px solid {{ t.line }}">
+    <div style="display:flex;align-items:baseline;gap:20px">
+      <a href="Gay I Club Internal.dc.html" style="font-size:13.5px;font-weight:500;color:{{ t.muted }}" style-hover="color:{{ t.strong }}">← Dashboard</a>
+      <div style="display:flex;align-items:baseline;gap:12px">
+        <a href="Gay I Club Landing.dc.html" style="font-weight:700;font-size:16px;letter-spacing:-0.02em;color:{{ t.strong }}">Gay I Club</a>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:{{ t.faint }};letter-spacing:0.08em">ANNOUNCEMENTS</span>
+      </div>
+    </div>
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;color:{{ t.faint }}">FROM THE ORGANIZERS</span>
+  </nav>
+  <main style="max-width:680px;margin:0 auto;padding:40px">
+    <h1 style="font-size:26px;font-weight:600;letter-spacing:-0.02em;margin:0 0 28px;color:{{ t.strong }}">Announcements</h1>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <sc-for list="{{ items }}" as="a" hint-placeholder-count="3">
+        <article style="border:1px solid {{ a.border }};border-radius:12px;background:{{ t.card }};padding:24px 26px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px">
+            <div style="display:flex;align-items:baseline;gap:10px">
+              <sc-if value="{{ a.isNew }}" hint-placeholder-val="{{ false }}"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:0.12em;color:{{ t.bg }};background:{{ t.accent }};padding:2px 8px;border-radius:99px">NEW</span></sc-if>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.1em;color:{{ t.faint }}">{{ a.date }}</span>
+            </div>
+            <span style="font-size:12.5px;color:{{ t.muted }}">{{ a.by }}</span>
+          </div>
+          <h2 style="font-size:17px;font-weight:600;margin:0 0 8px;color:{{ t.strong }};letter-spacing:-0.015em">{{ a.title }}</h2>
+          <p style="margin:0;font-size:14px;line-height:1.6;color:{{ t.muted }};text-wrap:pretty">{{ a.body }}</p>
+        </article>
+      </sc-for>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'dark'|'light'&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const dark = (this.props.theme ?? 'light') !== 'light';
+    const themes = {
+      dark: { bg:'#0a0b0d', card:'#0e1013', text:'#e8eaed', strong:'#f2f4f6', muted:'#a9afb8', faint:'#5c626b', line:'#1c1e22', accent:'oklch(0.75 0.15 190)', accentLine:'oklch(0.75 0.15 190 / 0.4)' },
+      light:{ bg:'#f7f7f5', card:'#ffffff', text:'#2a2d31', strong:'#141619', muted:'#5a6068', faint:'#9aa0a8', line:'#e4e4e0', accent:'oklch(0.55 0.13 190)', accentLine:'oklch(0.55 0.13 190 / 0.4)' }
+    };
+    const t = dark ? themes.dark : themes.light;
+    return {
+      t,
+      items: [
+        {isNew:true, date:'SEP 5', by:'Alex R.', border:t.accentLine, title:'Venue change for the Sep 11 paper club', body:'We\u2019ve outgrown the usual room — Thursday\u2019s Mixture-of-Agents session moves to the 4th floor at the same Flatiron address. Same time, 7:00 PM.'},
+        {isNew:true, date:'SEP 3', by:'Jamie', border:t.accentLine, title:'Robot Benchmark v2 is live', body:'The leaderboard now tracks three prompts and member voting is open. Submit runs in #model-releases; scores refresh nightly at 3 AM.'},
+        {isNew:false, date:'AUG 29', by:'Alex R.', border:t.line, title:'Speaker slots open for October', body:'We have two workshop slots and one paper club slot open next month. Propose a topic via the speaker sign-up form in Resources.'},
+        {isNew:false, date:'AUG 20', by:'Jamie', border:t.line, title:'Welcome our 200th member', body:'The club crossed 200 members this week. Thanks for making this the best corner of NYC\u2019s AI scene.'}
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

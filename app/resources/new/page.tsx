@@ -16,8 +16,8 @@ export default function NewResourcePage() {
   const [message, setMessage] = useState<string | null>(null);
 
   return (
-    <div className="max-w-md mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Add Resource</h2>
+    <div className="max-w-2xl mx-auto card p-6 md:p-8">
+      <h1 className="page-heading mb-6">Add Resource</h1>
       <form
         onSubmit={async e => {
           e.preventDefault();
@@ -40,34 +40,34 @@ export default function NewResourcePage() {
           });
           setSaving(false);
           if (ok) {
-            setMessage('✅ Resource created!');
+            setMessage('Resource created!');
             setTimeout(() => router.push('/resources'), 800);
           } else {
-            setMessage('❌ Failed to create resource.');
+            setMessage('Failed to create resource.');
           }
         }}
       >
         <div className="mb-3">
-          <label className="block font-medium mb-1">URL</label>
-          <input type="url" className="w-full border px-3 py-2" value={url} onChange={e => setUrl(e.target.value)} required />
+          <label htmlFor="resource-url" className="block text-sm font-medium mb-2">URL</label>
+          <input type="url" className="input-field w-full" id="resource-url" value={url} onChange={e => setUrl(e.target.value)} required />
         </div>
         <div className="mb-3">
-          <label className="block font-medium mb-1">Title</label>
-          <input type="text" className="w-full border px-3 py-2" value={title} onChange={e => setTitle(e.target.value)} required />
+          <label htmlFor="resource-title" className="block text-sm font-medium mb-2">Title</label>
+          <input type="text" className="input-field w-full" id="resource-title" value={title} onChange={e => setTitle(e.target.value)} required />
         </div>
         <div className="mb-3">
-          <label className="block font-medium mb-1">Description</label>
-          <textarea className="w-full border px-3 py-2" rows={3} value={description} onChange={e => setDescription(e.target.value)} />
+          <label htmlFor="resource-description" className="block text-sm font-medium mb-2">Description</label>
+          <textarea className="input-field w-full" rows={3} id="resource-description" value={description} onChange={e => setDescription(e.target.value)} />
         </div>
         <div className="mb-3">
-          <label className="block font-medium mb-1">Category</label>
-          <input type="text" className="w-full border px-3 py-2" value={category} onChange={e => setCategory(e.target.value)} placeholder="e.g., Tutorials" />
+          <label htmlFor="resource-category" className="block text-sm font-medium mb-2">Category</label>
+          <input type="text" className="input-field w-full" id="resource-category" value={category} onChange={e => setCategory(e.target.value)} placeholder="e.g., Tutorials" />
         </div>
         <div className="mb-4">
-          <label className="block font-medium mb-1">Tags</label>
-          <input type="text" className="w-full border px-3 py-2" value={tags} onChange={e => setTags(e.target.value)} placeholder="comma-separated" />
+          <label htmlFor="resource-tags" className="block text-sm font-medium mb-2">Tags</label>
+          <input type="text" className="input-field w-full" id="resource-tags" value={tags} onChange={e => setTags(e.target.value)} placeholder="comma-separated" />
         </div>
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded" disabled={saving}>
+        <button type="submit" className="btn-brand" disabled={saving}>
           {saving ? 'Saving…' : 'Create'}
         </button>
         {message && <p className="mt-2">{message}</p>}

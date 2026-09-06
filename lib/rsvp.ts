@@ -128,13 +128,13 @@ export async function checkRsvpStatus(eventId: string): Promise<boolean | null> 
 }
 
 /**
- * Fetch the full attendee list for an event. Does not require authentication
- * (visibility is controlled server-side by the API route).
+ * Fetch the attendee list for an authenticated member.
  */
 export async function getEventAttendees(eventId: string): Promise<AttendeeListResponse> {
   try {
     const res = await fetch(
       `/api/events/rsvp?event_id=${encodeURIComponent(eventId)}`,
+      { headers: await authHeader(), cache: 'no-store' },
     );
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f7f7f5;color:#2a2d31;font-family:'Space Grotesk',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#3aa8b4;text-decoration:none}a:hover{color:#2b8992}
+::selection{background:oklch(0.75 0.15 190 / 0.35)}
+</style>
+</helmet>
+<div style="min-height:100vh;background:{{ t.bg }};color:{{ t.text }}">
+  <nav style="display:flex;align-items:center;justify-content:space-between;padding:18px 40px;border-bottom:1px solid {{ t.line }}">
+    <div style="display:flex;align-items:baseline;gap:20px">
+      <a href="Gay I Club Internal.dc.html" style="font-size:13.5px;font-weight:500;color:{{ t.muted }}" style-hover="color:{{ t.strong }}">← Dashboard</a>
+      <div style="display:flex;align-items:baseline;gap:12px">
+        <a href="Gay I Club Landing.dc.html" style="font-weight:700;font-size:16px;letter-spacing:-0.02em;color:{{ t.strong }}">Gay I Club</a>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:{{ t.faint }};letter-spacing:0.08em">RESOURCES</span>
+      </div>
+    </div>
+  </nav>
+  <main style="max-width:920px;margin:0 auto;padding:40px">
+    <h1 style="font-size:26px;font-weight:600;letter-spacing:-0.02em;margin:0 0 28px;color:{{ t.strong }}">Resources</h1>
+    <sc-for list="{{ groups }}" as="g" hint-placeholder-count="3">
+      <div style="margin-bottom:36px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.14em;color:{{ t.faint }};text-transform:uppercase;margin-bottom:12px">{{ g.label }}</div>
+        <div style="border:1px solid {{ t.line }};border-radius:12px;background:{{ t.card }};overflow:hidden">
+          <sc-for list="{{ g.items }}" as="r" hint-placeholder-count="3">
+            <a href="#" style="display:flex;justify-content:space-between;align-items:center;gap:16px;padding:16px 22px;border-top:1px solid {{ t.line }};color:{{ t.text }}" style-hover="background:{{ t.hover }}">
+              <div style="min-width:0">
+                <div style="font-size:14.5px;font-weight:600;color:{{ t.strong }}">{{ r.title }}</div>
+                <div style="font-size:12.5px;color:{{ t.muted }};margin-top:2px">{{ r.desc }}</div>
+              </div>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.1em;color:{{ t.accentText }};border:1px solid {{ t.line }};padding:3px 9px;border-radius:99px;flex-shrink:0">{{ r.kind }}</span>
+            </a>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'dark'|'light'&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const dark = (this.props.theme ?? 'light') !== 'light';
+    const themes = {
+      dark: { bg:'#0a0b0d', card:'#0e1013', text:'#e8eaed', strong:'#f2f4f6', muted:'#a9afb8', faint:'#5c626b', line:'#1c1e22', accentText:'#7fd8e0', hover:'#111318' },
+      light:{ bg:'#f7f7f5', card:'#ffffff', text:'#2a2d31', strong:'#141619', muted:'#5a6068', faint:'#9aa0a8', line:'#e4e4e0', accentText:'oklch(0.5 0.13 190)', hover:'#fafaf8' }
+    };
+    return {
+      t: dark ? themes.dark : themes.light,
+      groups: [
+        { label:'Workshop materials', items:[
+          {title:'Agent Tooling in Practice', desc:'Slides, notebooks, and demo repo from the Sep 18 session', kind:'REPO'},
+          {title:'Fine-tuning on a Budget', desc:'Aug 28 workshop — LoRA walkthrough and cost sheet', kind:'SLIDES'},
+          {title:'Intro to Evals', desc:'Recorded session + starter eval harness', kind:'VIDEO'}
+        ]},
+        { label:'Paper club archive', items:[
+          {title:'Mixture-of-Agents Deep Dive', desc:'Reading notes and discussion summary', kind:'NOTES'},
+          {title:'Sparse Autoencoders for Interpretability', desc:'Annotated paper + follow-up questions', kind:'NOTES'}
+        ]},
+        { label:'Community', items:[
+          {title:'Member directory', desc:'Who\u2019s who — skills, interests, and what people are building', kind:'LIST'},
+          {title:'Code of conduct', desc:'How we keep the club welcoming', kind:'DOC'},
+          {title:'Speaker sign-up', desc:'Propose a talk or workshop for a future meetup', kind:'FORM'}
+        ]}
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

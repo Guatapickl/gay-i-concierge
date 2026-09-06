@@ -82,15 +82,15 @@ export default function AvatarMenu() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(o => !o)}
-        className="flex items-center gap-1.5 px-1.5 py-1 rounded-full hover:bg-surface-hover transition-colors"
-        aria-haspopup="menu"
+        className="flex items-center gap-1.5 min-h-11 min-w-11 px-1.5 py-1 rounded-full hover:bg-surface-hover transition-colors"
+        aria-label="Account menu" aria-haspopup="menu"
         aria-expanded={open}
       >
         <span
           className="w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-bold"
           style={{
-            background: 'linear-gradient(135deg, #ff2d9b, #7c2fff)',
-            color: '#fff',
+            background: 'var(--color-primary-muted)',
+            color: 'var(--color-background)',
           }}
         >
           {initial}
@@ -104,7 +104,7 @@ export default function AvatarMenu() {
         <div
           role="menu"
           className="absolute right-0 mt-2 w-56 bg-surface border-[1.5px] border-border rounded-xl shadow-lg overflow-hidden z-50 animate-fade-in"
-          style={{ boxShadow: '0 10px 40px rgba(124, 47, 255, 0.18)' }}
+
         >
           <div className="px-3.5 py-3 border-b border-border">
             <p className="text-sm font-semibold text-foreground truncate">{display}</p>

@@ -1,5 +1,6 @@
 import { addDoc } from 'firebase/firestore';
 import { col, nowIso, payloadOf } from './firebase/db';
+import { currentUser } from './firebase/authClient';
 import { Profile } from '@/types/supabase';
 
 /**
@@ -20,7 +21,10 @@ export async function saveProfile(
     experience_level: NonNullable<Profile['experienceLevel']>;
     created_at: string;
   };
-  const insertData: ProfileInsert = {
+  const user = await currentUser();
+  if (!user) return null;
+  const insertData: ProfileInsert & { user_id: string } = {
+    user_id: user.uid,
     name: profile.name,
     email: profile.email ?? null,
     interests: profile.interests,

@@ -2,311 +2,77 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import {
-  Calendar,
-  ArrowRight,
-  Repeat,
-  MapPin,
-  Newspaper,
-  MessageSquare,
-  ListChecks,
-  Bot,
-  Users,
-  Vote,
-} from 'lucide-react';
+import { ArrowRight, Calendar, Vote } from 'lucide-react';
+import { getRow } from '@/lib/firebase/db';
 import { currentUser } from '@/lib/firebase/authClient';
 import { getUpcomingEvents } from '@/lib/events';
-import { getNewsItems, relativeTime, colorForTag } from '@/lib/news';
+import { getNewsItems, relativeTime } from '@/lib/news';
 import { getOpenPolls } from '@/lib/polls';
-import { describeRecurrence } from '@/lib/recurrence';
-import type { Event, NewsItem, MeetingPoll } from '@/types/supabase';
+import { getChatChannels, getFeed } from '@/lib/posts';
+import type { Event, NewsItem, MeetingPoll, ChatChannel, FeedPost } from '@/types/supabase';
 import MyRsvps from '@/components/MyRsvps';
-import { LoadingSpinner } from '@/components/ui';
+import { Alert, LoadingSpinner } from '@/components/ui';
 
-/**
- * Authenticated landing — the post-login dashboard.
- *
- * Composition:
- *  - Welcome strip (greeting + tagline)
- *  - Next-meeting hero card (with recurrence pill, agenda link)
- *  - Quick actions row (Communication Hub / Calendar / Agenda / News / Robots)
- *  - Two-column: latest news preview + your upcoming RSVPs
- */
 export default function DashboardView() {
-  const [userName, setUserName] = useState<string | null>(null);
-  const [nextEvent, setNextEvent] = useState<Event | null>(null);
-  const [recentNews, setRecentNews] = useState<NewsItem[]>([]);
-  const [openPoll, setOpenPoll] = useState<MeetingPoll | null>(null);
+  const [name, setName] = useState('');
+  const [event, setEvent] = useState<Event | null>(null);
+  const [news, setNews] = useState<NewsItem[]>([]);
+  const [poll, setPoll] = useState<MeetingPoll | null>(null);
+  const [channels, setChannels] = useState<ChatChannel[]>([]);
+  const [posts, setPosts] = useState<FeedPost[]>([]);
+  const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let active = true;
     (async () => {
-      const user = await currentUser();
-      const uid = user?.uid || null;
-      if (user?.email) setUserName(user.email.split('@')[0]);
-      const [events, news, polls] = await Promise.all([
-        getUpcomingEvents(),
-        getNewsItems(3),
-        getOpenPolls(),
-      ]);
-      setOpenPoll(polls[0] || null);
-      setNextEvent(events[0] || null);
-      setRecentNews(news);
-      setLoading(false);
-      // Use uid only to silence the unused-warning; future personalization hooks here.
-      void uid;
+      try {
+        const user = await currentUser();
+        const [events, articles, polls, channelList, feed, profile] = await Promise.all([
+          getUpcomingEvents(), getNewsItems(4), getOpenPolls(), getChatChannels(), getFeed(user?.uid || null, 3), user ? getRow<{ full_name?: string }>('user_profiles', user.uid) : null,
+        ]);
+        if (!active) return;
+        setName(profile?.full_name?.split(' ')[0] || user?.displayName?.split(' ')[0] || '');
+        setEvent(events[0] || null); setNews(articles); setPoll(polls[0] || null);
+        setChannels(channelList); setPosts(feed);
+      } catch { if (active) setError(true); }
+      finally { if (active) setLoading(false); }
     })();
+    return () => { active = false; };
   }, []);
 
-  const quickActions = [
-    {
-      href: '/chat',
-      title: 'Communication Hub',
-      description: 'Post in a channel',
-      icon: MessageSquare,
-    },
-    {
-      href: '/calendar',
-      title: 'Calendar',
-      description: 'Browse meetings',
-      icon: Calendar,
-    },
-    {
-      href: '/agenda',
-      title: 'Agenda Maker',
-      description: 'Plan a meeting',
-      icon: ListChecks,
-    },
-    {
-      href: '/news',
-      title: 'News Feed',
-      description: 'Latest in AI',
-      icon: Newspaper,
-    },
-    {
-      href: '/robot',
-      title: 'Robot Benchmark',
-      description: 'Compare frontier models',
-      icon: Bot,
-    },
-    {
-      href: '/vote',
-      title: 'Date Votes',
-      description: 'Pick the next meeting',
-      icon: Vote,
-    },
-    {
-      href: '/community',
-      title: 'Community',
-      description: 'Browse members',
-      icon: Users,
-    },
-  ];
-
-  if (loading) return <LoadingSpinner text="Loading your hub..." className="py-12" />;
-
+  if (loading) return <LoadingSpinner text="Loading your dashboard..." className="py-12" />;
   return (
-    <div className="space-y-7 animate-fade-in">
-      <div className="space-y-1.5">
-        <p className="text-sm font-medium text-foreground-faint font-mono tracking-wide">
-          WELCOME BACK
-        </p>
-        <h1 className="text-display-lg font-display text-foreground">
-          {userName ? `Hey, ${userName}` : 'Your dashboard'}
-        </h1>
-        <p className="text-foreground-muted">
-          Meetings, recaps, and the latest from the AI frontier — all in one place.
-        </p>
-      </div>
-
-      {openPoll && (
-        <Link
-          href={`/vote/${openPoll.id}`}
-          className="card-tinted p-5 flex items-center gap-4 hover:border-border-strong transition-colors"
-        >
-          <div className="w-10 h-10 rounded-full bg-primary-muted text-white flex items-center justify-center shrink-0">
-            <Vote className="w-5 h-5" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="text-[11px] font-mono font-bold text-primary-muted tracking-wider">VOTE OPEN</div>
-            <div className="font-display font-bold text-foreground truncate">{openPoll.title}</div>
-            <div className="text-sm text-foreground-muted">Rank the dates for our next meeting.</div>
-          </div>
-          <ArrowRight className="w-5 h-5 text-foreground-subtle shrink-0" />
-        </Link>
-      )}
-
-      {nextEvent && <NextMeetingCard event={nextEvent} />}
-
-      <div>
-        <h2 className="text-xs font-bold text-foreground-faint tracking-[0.12em] uppercase mb-3 font-mono">
-          Quick actions
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-          {quickActions.map(action => (
-            <Link
-              key={action.href}
-              href={action.href}
-              className="group card p-4 flex flex-col hover:border-border-strong"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div className="p-2 rounded-lg bg-surface-elevated border border-border group-hover:border-primary transition-colors">
-                  <action.icon className="w-4 h-4 text-foreground-muted group-hover:text-primary-muted transition-colors" />
-                </div>
-                <ArrowRight className="w-3.5 h-3.5 text-foreground-faint opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
-              </div>
-              <h3 className="text-sm font-bold text-foreground group-hover:text-primary-muted transition-colors mb-0.5">
-                {action.title}
-              </h3>
-              <p className="text-xs text-foreground-muted">{action.description}</p>
-            </Link>
-          ))}
+    <div className="space-y-8">
+      <header className="border-b border-border pb-6">
+        <p className="eyebrow mb-2">Your club, at a glance</p>
+        <h1 className="page-heading">Welcome back{name ? `, ${name}` : ''}</h1>
+        <p className="text-sm text-foreground-muted font-mono mt-3">{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>
+      </header>
+      {error && <Alert variant="error">Some dashboard updates could not load. Refresh to try again.</Alert>}
+      {poll && <Link href={`/vote/${poll.id}`} className="card flex items-center gap-4 p-4"><Vote className="w-5 h-5 text-primary" /><span className="flex-1"><span className="eyebrow block">Date vote open</span>{poll.title}</span><ArrowRight className="w-4 h-4" /></Link>}
+      <div className="grid gap-6 xl:grid-cols-[1.55fr_1fr]">
+        <div className="space-y-6">
+          <section className="card p-6">
+            <PanelHeader title="Next meetup" href="/calendar" label="Calendar" />
+            {event ? <div className="flex gap-5 mt-6">
+              <div className="w-16 h-20 shrink-0 border border-border rounded-md bg-surface-elevated flex flex-col items-center justify-center"><span className="eyebrow">{new Date(event.event_datetime).toLocaleDateString(undefined, { month: 'short' })}</span><span className="text-3xl font-display">{new Date(event.event_datetime).getDate()}</span></div>
+              <div className="min-w-0"><h3 className="text-xl font-display font-semibold">{event.title}</h3><p className="text-sm text-foreground-muted mt-2">{new Date(event.event_datetime).toLocaleString(undefined, { weekday: 'short', hour: 'numeric', minute: '2-digit' })}{event.location ? ` · ${event.location}` : ''}</p><div className="flex flex-wrap gap-3 mt-5"><Link href={`/events/${event.id}`} className="btn-brand">View event & RSVP</Link>{Array.isArray(event.agenda) && event.agenda.length > 0 && <Link href={`/events/${event.id}/agenda`} className="btn-secondary">View agenda</Link>}</div></div>
+            </div> : <div className="py-8 text-foreground-muted text-sm"><Calendar className="w-6 h-6 mb-3 text-primary" />No upcoming meetups yet. Check back for the next gathering.</div>}
+          </section>
+          <section className="card p-6"><PanelHeader title="News feed" href="/news" label="All news" />{news.length ? <ul className="divide-y divide-border mt-3">{news.map(item => <li key={item.id} className="py-4"><a href={item.source_url} target="_blank" rel="noopener noreferrer" className="grid gap-2 sm:grid-cols-[76px_1fr] hover:text-primary"><time className="font-mono text-xs text-foreground-muted">{relativeTime(item.published_at || item.ingested_at)}</time><div><h3 className="font-medium leading-snug">{item.title}</h3><p className="text-xs text-foreground-muted mt-1">{item.source_name || item.tag || 'AI news'}</p></div></a></li>)}</ul> : <p className="py-7 text-sm text-foreground-muted">Check back for the next club news update.</p>}</section>
+          <section className="card p-6"><PanelHeader title="Your RSVPs" href="/events" label="All events" /><div className="mt-4"><MyRsvps /></div></section>
         </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <div className="lg:col-span-2">
-          <NewsPreview items={recentNews} />
-        </div>
-        <div className="card-elevated p-5">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base font-display font-bold text-foreground">
-              Your RSVPs
-            </h2>
-            <Link
-              href="/calendar"
-              className="text-xs text-primary-muted hover:opacity-70 transition-opacity font-mono uppercase tracking-wide"
-            >
-              All →
-            </Link>
-          </div>
-          <MyRsvps />
+        <div className="space-y-6">
+          <section className="card p-6"><PanelHeader title="Communication hub" href="/chat" label="Open" /><div className="mt-4 divide-y divide-border">{channels.length ? channels.slice(0, 6).map(channel => <Link key={channel.id} href="/chat" className="block py-3 text-sm text-foreground-muted hover:text-primary">{channel.name.startsWith('#') ? channel.name : `# ${channel.name}`}</Link>) : <p className="py-4 text-sm text-foreground-muted">Join the conversation in the communication hub.</p>}</div></section>
+          <section className="card p-6"><PanelHeader title="Community feed" href="/feed" label="Open" /><div className="divide-y divide-border mt-3">{posts.length ? posts.map(post => <Link key={post.id} href="/feed" className="block py-4"><p className="text-sm line-clamp-3">{post.body}</p><p className="text-xs font-mono text-foreground-muted mt-2">{relativeTime(post.created_at)}</p></Link>) : <p className="py-5 text-sm text-foreground-muted">No community updates yet. Share something with the club.</p>}</div></section>
+          <div className="flex flex-wrap gap-x-5 gap-y-3 text-xs font-mono text-foreground-muted"><Link href="/agenda">Agenda maker →</Link><Link href="/robot">Robot benchmark →</Link><Link href="/community">Member directory →</Link></div>
         </div>
       </div>
     </div>
   );
 }
 
-function NextMeetingCard({ event }: { event: Event }) {
-  const when = new Date(event.event_datetime);
-  const recurrence = describeRecurrence(event.recurrence_rule);
-  const isSoon = when.getTime() - Date.now() < 24 * 3600 * 1000;
-  const dateStr = when.toLocaleString(undefined, {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  });
-
-  return (
-    <div className="card-tinted p-6 relative overflow-hidden">
-      <div
-        className="absolute -top-32 -right-20 w-72 h-72 rounded-full blur-3xl pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(255,45,155,0.18), transparent 70%)' }}
-      />
-      <div className="relative">
-        <div className="flex items-center flex-wrap gap-2 mb-3">
-          <span className="badge badge-primary">
-            <Calendar className="w-3 h-3" />
-            {isSoon ? 'Up next' : 'Next meeting'}
-          </span>
-          {recurrence && (
-            <span className="badge badge-purple">
-              <Repeat className="w-3 h-3" />
-              {recurrence}
-            </span>
-          )}
-        </div>
-        <h2 className="text-2xl font-display font-extrabold text-foreground mb-1.5 tracking-tight">
-          {event.title}
-        </h2>
-        <p className="text-foreground-muted">{dateStr}</p>
-        {event.location && (
-          <p className="text-foreground-muted flex items-center gap-1.5 text-sm mt-1">
-            <MapPin className="w-3.5 h-3.5" />
-            {event.location}
-          </p>
-        )}
-        {event.description && (
-          <p className="mt-3 text-sm text-foreground-muted line-clamp-2 max-w-2xl">
-            {event.description}
-          </p>
-        )}
-        <div className="mt-5 flex flex-wrap items-center gap-3">
-          <Link href={`/events/${event.id}`} className="btn-brand inline-flex items-center gap-2 text-sm">
-            View details
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-          {Array.isArray(event.agenda) && event.agenda.length > 0 && (
-            <Link
-              href={`/events/${event.id}/agenda`}
-              className="text-sm text-foreground-muted hover:text-foreground transition-colors"
-            >
-              {event.agenda.length}-item agenda →
-            </Link>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function NewsPreview({ items }: { items: NewsItem[] }) {
-  return (
-    <div className="card-elevated p-5">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-base font-display font-bold text-foreground flex items-center gap-2">
-          <Newspaper className="w-5 h-5 text-primary-muted" />
-          Latest news
-        </h2>
-        <Link
-          href="/news"
-          className="text-xs text-primary-muted hover:opacity-70 transition-opacity font-mono uppercase tracking-wide"
-        >
-          Open feed →
-        </Link>
-      </div>
-      {items.length === 0 ? (
-        <div className="py-6 text-center">
-          <p className="text-foreground-muted text-sm mb-1">No news ingested yet</p>
-          <p className="text-foreground-faint text-xs">
-            The Cortex publishes here once its nightly cycle runs
-          </p>
-        </div>
-      ) : (
-        <ul className="space-y-3">
-          {items.map(it => {
-            const color = colorForTag(it.tag, it.tag_color);
-            return (
-              <li key={it.id}>
-                <a
-                  href={it.source_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block p-3 rounded-lg hover:bg-surface-hover transition-colors -mx-1"
-                >
-                  <div className="flex items-center gap-2 text-[11px] text-foreground-faint mb-1 font-mono">
-                    {it.tag && (
-                      <span
-                        className="px-1.5 py-0.5 rounded-full font-bold"
-                        style={{ color, background: `${color}12`, border: `1px solid ${color}` }}
-                      >
-                        {it.tag}
-                      </span>
-                    )}
-                    <span>·</span>
-                    <span>{relativeTime(it.published_at || it.ingested_at)}</span>
-                    {it.is_hot && <span className="text-[#e05000]">🔥</span>}
-                  </div>
-                  <h3 className="text-sm font-bold text-foreground line-clamp-1">{it.title}</h3>
-                  <p className="text-xs text-foreground-muted line-clamp-2 mt-0.5">{it.summary}</p>
-                </a>
-              </li>
-            );
-          })}
-        </ul>
-      )}
-    </div>
-  );
+function PanelHeader({ title, href, label }: { title: string; href: string; label: string }) {
+  return <div className="flex items-center justify-between gap-3"><h2 className="section-heading">{title}</h2><Link href={href} className="text-xs text-primary font-mono whitespace-nowrap">{label} →</Link></div>;
 }

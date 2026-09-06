@@ -49,9 +49,9 @@ export default function FeedPage() {
 
   if (!userId) {
     return (
-      <div className="max-w-3xl mx-auto animate-fade-in">
-        <h1 className="text-display-md font-display font-bold text-foreground mb-4">
-          Newsfeed
+      <div className="max-w-4xl mx-auto animate-fade-in">
+        <h1 className="page-heading mb-4">
+          Community feed
         </h1>
         <Alert variant="info">Please sign in to read and post to the feed.</Alert>
       </div>
@@ -65,12 +65,12 @@ export default function FeedPage() {
   });
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
+    <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-display-md font-display font-bold text-foreground flex items-center gap-2">
-            <Newspaper className="w-7 h-7 text-primary" />
-            Newsfeed
+          <h1 className="page-heading flex items-center gap-2">
+
+            Community feed
           </h1>
           <p className="text-foreground-muted mt-1">
             Updates, recaps, and announcements from the club
@@ -83,7 +83,7 @@ export default function FeedPage() {
               onClick={() => setFilter(f)}
               className={`px-3 py-1.5 text-sm rounded-md transition-colors capitalize ${
                 filter === f
-                  ? 'bg-primary text-background'
+                  ? 'bg-primary text-white'
                   : 'text-foreground-muted hover:text-foreground'
               }`}
             >

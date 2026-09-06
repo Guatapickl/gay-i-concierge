@@ -218,15 +218,15 @@ export default function AgendaMakerPage() {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6 animate-fade-in">
+    <div className="min-w-0 w-full max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6 animate-fade-in"><header className="lg:col-span-2"><p className="eyebrow mb-2">Make room for good conversations</p><h1 className="page-heading">Agenda maker</h1></header>
       {/* Editor */}
-      <div className="space-y-4">
+      <div className="min-w-0 space-y-4">
         {/* Meta */}
         <div className="card p-5 space-y-3">
           <input
             value={title}
             onChange={e => setTitle(e.target.value)}
-            className="input-field w-full text-lg font-display font-bold tracking-tight"
+            className="input-field min-w-0 w-full text-lg font-display font-bold tracking-tight"
             placeholder="Meeting title"
           />
           <div className="flex flex-wrap gap-3">
@@ -241,7 +241,7 @@ export default function AgendaMakerPage() {
               value={location}
               onChange={e => setLocation(e.target.value)}
               placeholder="Location"
-              className="flex-1 min-w-[200px]"
+              className="flex-1 min-w-0 w-full"
             />
           </div>
         </div>
@@ -289,58 +289,58 @@ export default function AgendaMakerPage() {
         <div className="space-y-2">
           {items.map((item, idx) => (
             <div key={item.id} className="card p-3.5">
-              <div className="flex items-center gap-2 mb-1.5">
-                <span className="font-extrabold text-sm text-primary-muted min-w-[20px]">
+              <div className="flex flex-wrap items-center gap-2 mb-3">
+                <span className="font-semibold text-sm text-primary-muted min-w-[20px]">
                   {idx + 1}.
                 </span>
                 <input
                   value={item.text}
                   onChange={e => update(item.id, 'text', e.target.value)}
-                  className="input-field flex-1 font-semibold text-sm"
+                  className="input-field min-w-0 flex-1 basis-[calc(100%_-_36px)] sm:basis-0 font-semibold text-sm"
                   placeholder="Agenda item"
                 />
                 <input
                   type="number"
                   value={item.duration}
                   onChange={e => update(item.id, 'duration', Number(e.target.value) || 0)}
-                  className="input-field w-16 text-center text-sm"
+                  aria-label="Duration in minutes" className="input-field min-w-0 w-16 min-h-11 text-center text-sm"
                   min={0}
                 />
                 <span className="text-[11px] text-foreground-faint">min</span>
                 <button
                   onClick={() => move(item.id, -1)}
-                  className="px-2 py-1 text-foreground-subtle hover:text-foreground border border-border-subtle rounded transition-colors"
+                  className="min-w-11 min-h-11 px-2 py-1 text-foreground-subtle hover:text-foreground border border-border-subtle rounded transition-colors"
                   aria-label="Move up"
                 >
                   ↑
                 </button>
                 <button
                   onClick={() => move(item.id, 1)}
-                  className="px-2 py-1 text-foreground-subtle hover:text-foreground border border-border-subtle rounded transition-colors"
+                  className="min-w-11 min-h-11 px-2 py-1 text-foreground-subtle hover:text-foreground border border-border-subtle rounded transition-colors"
                   aria-label="Move down"
                 >
                   ↓
                 </button>
                 <button
                   onClick={() => remove(item.id)}
-                  className="px-2 py-1 text-primary-muted hover:opacity-70 border border-border-subtle rounded transition-colors"
+                  className="min-w-11 min-h-11 px-2 py-1 text-primary-muted hover:opacity-70 border border-border-subtle rounded transition-colors"
                   aria-label="Remove"
                 >
                   ✕
                 </button>
               </div>
-              <div className="flex gap-2 pl-7">
+              <div className="flex flex-col sm:flex-row gap-2 sm:pl-7">
                 <input
                   value={item.owner}
                   onChange={e => update(item.id, 'owner', e.target.value)}
                   placeholder="Owner"
-                  className="input-field w-28 text-xs"
+                  className="input-field min-w-0 w-full sm:w-28 text-xs"
                 />
                 <input
                   value={item.note}
                   onChange={e => update(item.id, 'note', e.target.value)}
                   placeholder="Note…"
-                  className="input-field flex-1 text-xs"
+                  className="input-field min-w-0 w-full flex-1 text-xs"
                 />
               </div>
             </div>
@@ -354,7 +354,7 @@ export default function AgendaMakerPage() {
             onChange={e => setNewItemText(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), add())}
             placeholder="Add agenda item…"
-            className="input-field flex-1"
+            className="input-field min-w-0 flex-1"
           />
           <button
             onClick={add}
@@ -374,7 +374,7 @@ export default function AgendaMakerPage() {
               <select
                 value={linkedEventId}
                 onChange={e => setLinkedEventId(e.target.value)}
-                className="input-field flex-1 min-w-[200px] text-sm"
+                className="input-field flex-1 min-w-0 w-full text-sm"
               >
                 <option value="">— Choose event —</option>
                 {upcomingEvents.map(e => (
@@ -402,9 +402,9 @@ export default function AgendaMakerPage() {
       </div>
 
       {/* Preview */}
-      <aside>
-        <div className="card-tinted p-5 sticky top-20">
-          <div className="font-display font-extrabold text-base text-foreground mb-1">
+      <aside className="min-w-0">
+        <div className="card p-5 sticky top-20">
+          <div className="font-display font-semibold text-base text-foreground mb-1">
             {title || 'Untitled meeting'}
           </div>
           <div className="text-[11px] text-foreground-subtle mb-1 font-mono">
@@ -418,7 +418,7 @@ export default function AgendaMakerPage() {
           ) : (
             items.map((it, idx) => (
               <div key={it.id} className="flex items-start gap-2.5 mb-2.5">
-                <div className="w-7 h-7 rounded-full bg-primary-muted text-white text-[11px] font-extrabold flex items-center justify-center shrink-0">
+                <div className="w-7 h-7 rounded-full bg-primary-muted text-white text-[11px] font-semibold flex items-center justify-center shrink-0">
                   {idx + 1}
                 </div>
                 <div className="min-w-0">
