@@ -25,7 +25,7 @@ const navigation = [
   {href:'/vote',label:'Date votes',icon:Vote},
 ];
 const publicNavigation = [
-  {href:'/community',label:'Community'}, {href:'/events',label:'Events'},
+  {href:'/events',label:'Events'},
   {href:'/news',label:'News'}, {href:'/resources',label:'Resources'},
 ];
 

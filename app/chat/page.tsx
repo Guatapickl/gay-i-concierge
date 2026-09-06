@@ -21,7 +21,7 @@ const FALLBACK_CHANNELS: ChatChannel[] = [
   { id: 'general',  name: '# general',         description: null, sort_order: 1, is_archived: false, created_at: '' },
   { id: 'models',   name: '# model-releases',  description: null, sort_order: 2, is_archived: false, created_at: '' },
   { id: 'events',   name: '# events',          description: null, sort_order: 3, is_archived: false, created_at: '' },
-  { id: 'papers',   name: '# paper-club',      description: null, sort_order: 4, is_archived: false, created_at: '' },
+  { id: 'papers',   name: '# research-papers',      description: null, sort_order: 4, is_archived: false, created_at: '' },
   { id: 'random',   name: '# off-topic',       description: null, sort_order: 5, is_archived: false, created_at: '' },
 ];
 

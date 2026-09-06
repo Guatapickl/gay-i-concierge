@@ -33,3 +33,9 @@ describe('public launch assets',()=>{
   expect(middleware(new NextRequest('https://gayiclub.com/')).headers.get('x-robots-tag')).toBeNull();
  });
 });
+
+it('redirects signed-out directory and member-detail requests to sign-in', () => {
+ for (const path of ['/community', '/community/member-id']) {
+  expect(middleware(new NextRequest(`https://gayiclub.com${path}`)).headers.get('location')).toBe('https://gayiclub.com/auth/sign-in');
+ }
+});

@@ -30,7 +30,7 @@ const TEMPLATES: { name: string; items: { text: string; duration: number; owner?
     ],
   },
   {
-    name: 'Paper Club',
+    name: 'Research Discussion',
     items: [
       { text: 'Paper summary', duration: 10 },
       { text: 'Key findings discussion', duration: 20 },

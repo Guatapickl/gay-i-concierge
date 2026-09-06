@@ -7,7 +7,7 @@ import { publicRequestUrl } from './lib/publicRequestUrl'
  * and API routes verify it for real (see lib/firebase/session.ts).
  */
 const SESSION_COOKIE = '__session'
-const protectedRoutes = ['/hub', '/profile', '/events', '/resources', '/robot']
+const protectedRoutes = ['/hub', '/profile', '/events', '/resources', '/robot', '/community']
 
 export function middleware(request: NextRequest) {
     const publicUrl = publicRequestUrl(request)

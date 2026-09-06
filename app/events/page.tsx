@@ -61,7 +61,7 @@ export default function EventsPage() {
             Events
           </h1>
           <p className="text-foreground-muted mt-1">
-            Meetups, paper clubs, and shared experiments.
+            Meetups, research discussions, and shared experiments.
           </p>
         </div>
         {isAdmin && (

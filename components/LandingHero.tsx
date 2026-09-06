@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 const features = [
-  ['01', 'Communication Hub', 'Discussions across channels — model releases, paper club, off-topic, NYC-specific.'],
+  ['01', 'Communication Hub', 'Discussions across channels about model releases, new research papers, personal projects, and sometimes NYC-specific topics'],
   ['02', 'Meeting Calendar', 'Member-polled meeting dates with reminders, agendas, RSVPs, and calendar export.'],
   ['03', 'News Feed', 'Daily AI news from trusted sources. Save stories, share links, and bring ideas to our next meeting.'],
 ];
