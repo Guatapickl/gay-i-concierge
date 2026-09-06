@@ -1,6 +1,7 @@
 /** Dates record when each original artwork was added to the repository. */
 export type RobotShowcaseEntry = { id: string; name: string; model: string; addedAt: string };
 export const ROBOT_SHOWCASE: readonly RobotShowcaseEntry[] = [
+  { id: 'gpt-6-open-seat', name: 'The Open Seat', model: 'GPT-6 · Codex', addedAt: '2026-09-06T16:27:00Z' },
   { id: 'claude-fable-5', name: 'The Storyweaver', model: 'Fable 5', addedAt: '2026-06-12T14:03:04Z' },
   { id: 'claude-opus-4-5', name: 'Coral Opus', model: 'Claude Opus 4.5', addedAt: '2025-12-05T18:30:56Z' },
   { id: 'gpt-51-codex-max', name: 'Prismatic Pulse', model: 'GPT-5.1 Codex Max', addedAt: '2025-12-05T18:00:30Z' },
