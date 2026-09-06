@@ -1,5 +1,7 @@
 # Gay I Club feedback routing: operator handoff
 
+**Resolved September 6, 2026:** the mapping below is configured and the restarted daemon ingested live widget receipt PX-GIC-1 under GayIClub. See `feedback-ready-2026-09-06.md` for current evidence. The remaining text is the historical handoff, including separate email/support issues.
+
 Source inspection and read-only checks: 2026-09-06. No Praxis configuration, process, or registry was changed by this follow-up.
 
 ## Runtime mapping requires a restart with the current implementation
