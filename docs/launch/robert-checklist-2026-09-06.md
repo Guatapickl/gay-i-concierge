@@ -36,3 +36,10 @@ Do not follow the old Supabase restoration or Netlify setup steps in archived la
 ## Current verification
 
 48 tests pass, production builds pass, lint has zero errors (46 warnings). Lighthouse:94 performance / 100 SEO / 100 accessibility / 100 best practices in a local production-host simulation. Final public accessibility scan: 6 pages, zero violations. Fifteen main member views fit mobile/tablet/desktop widths. These results do not establish live email delivery or completed platform integration. The independent launch verdict is currently not ready; see [readiness report](readiness-2026-09-06.md).
+
+## Email check update
+
+- [x] Confirm Praxis inbox access and delivery to praxis+gayiclub@vibeshiftai.com. One authorized test arrived.
+- [ ] Complete actual application email-flow tests; the mailbox self-test alone does not prove them.
+
+Google rewrote the submitted plus-address From to praxis@vibeshiftai.com. Gayiclub.com has no receiving MX records. See [mail findings](mail-findings-2026-09-06.md); the site still uses Resend, and that end-to-end delivery retest is pending credential access.

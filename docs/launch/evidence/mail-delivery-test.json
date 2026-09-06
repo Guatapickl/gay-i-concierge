@@ -1,0 +1,19 @@
+{
+  "checkedAt": "2026-09-06T12:48:12.637Z",
+  "from": "praxis+gayiclub@vibeshiftai.com",
+  "to": "praxis+gayiclub@vibeshiftai.com",
+  "subject": "Gay I Club launch-test mailbox 2026-09-06T12:48:11.227Z",
+  "smtpAccepted": [
+    "praxis+gayiclub@vibeshiftai.com"
+  ],
+  "messageId": "<9d7c3e25-2126-cdcf-4cce-c08ba6423249@vibeshiftai.com>",
+  "receivedInInbox": true,
+  "receivedFrom": [
+    "praxis@vibeshiftai.com"
+  ],
+  "receivedTo": [
+    "praxis+gayiclub@vibeshiftai.com"
+  ],
+  "testMarkedRead": true,
+  "resendKeyAvailableInAppEnvironment": false
+}

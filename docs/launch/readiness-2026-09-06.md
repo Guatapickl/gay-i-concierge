@@ -42,3 +42,7 @@ Project remains parked; these are recorded ideas, not launched background jobs.
 - Platform preview, final independent gate and owner approval: `394e3894-90e1-44b3-a01d-0422255306e5`.
 
 Emulator-only RSVP was created and cancelled through the UI. Privacy regression tests now delete their own exact document/auth IDs. Other local seed fixtures and earlier emulator-only test IDs persist only in the temporary emulator process for preview; no test records were added to production.
+
+## Authorized mailbox test update
+
+See `mail-findings-2026-09-06.md`. Praxis SMTP and IMAP work; the club plus-address received one labeled test in the Praxis inbox. Google rewrote From to the base Praxis address. No receiving MX for gayiclub.com. Resend delivery retest was blocked by missing local key and unavailable secret access; the earlier domain verification remains distinct from delivery evidence. Forms/Sender rows remain fail until actual application flows and intended sender identity are verified.

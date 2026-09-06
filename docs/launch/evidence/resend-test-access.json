@@ -1,0 +1,5 @@
+{
+  "checkedAt": "2026-09-06",
+  "result": "not sent",
+  "reason": "No Resend key in local app environment; configured service-account Secret Manager access returned403 and signed-in Firebase CLI access failed. Existing earlier domain audit recorded gayiclub.com verified. No secret values recorded."
+}
