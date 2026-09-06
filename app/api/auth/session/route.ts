@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { publicRequestUrl } from '@/lib/publicRequestUrl';
 import { createSessionCookie, SESSION_COOKIE } from '@/lib/firebase/session';
 
 export const runtime = 'nodejs';
@@ -11,13 +12,7 @@ export const runtime = 'nodejs';
  */
 function isSameOrigin(req: Request) {
   const origin = req.headers.get('origin');
-  const publicUrl = new URL(req.url);
-  const forwardedHost = req.headers.get('x-forwarded-host')?.split(',')[0].trim();
-  if (forwardedHost) {
-    publicUrl.port = '';
-    publicUrl.host = forwardedHost;
-    publicUrl.protocol = req.headers.get('x-forwarded-proto')?.split(',')[0].trim() || 'https';
-  }
+  const publicUrl = publicRequestUrl(req);
   return (!origin || origin === publicUrl.origin) && req.headers.get('sec-fetch-site') !== 'cross-site';
 }
 

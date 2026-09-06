@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
+import { publicRequestUrl } from './lib/publicRequestUrl'
 
 /**
  * Edge middleware. The Firebase Admin SDK can't run here, so we only check
@@ -9,21 +10,18 @@ const SESSION_COOKIE = '__session'
 const protectedRoutes = ['/hub', '/profile', '/events', '/resources', '/robot']
 
 export function middleware(request: NextRequest) {
-    // Firebase App Hosting preserves the public hostname in this proxy header.
-    const hostname = (request.headers.get('x-forwarded-host') || request.headers.get('host') || request.nextUrl.hostname).split(',')[0].trim().split(':')[0].toLowerCase()
+    const publicUrl = publicRequestUrl(request)
+    const hostname = publicUrl.hostname
     if (hostname === 'www.gayiclub.com') {
-        const canonical = request.nextUrl.clone()
-        canonical.protocol = 'https:'
-        canonical.hostname = 'gayiclub.com'
-        canonical.port = ''
-        return NextResponse.redirect(canonical, 308)
+        publicUrl.hostname = 'gayiclub.com'
+        return NextResponse.redirect(publicUrl, 308)
     }
     const isProtectedRoute = protectedRoutes.some(route => request.nextUrl.pathname === route || request.nextUrl.pathname.startsWith(route + '/'))
     const hasSession = !!request.cookies.get(SESSION_COOKIE)?.value
 
     if (!hasSession && isProtectedRoute) {
         // Redirect to login if accessing a protected route without a session
-        const url = request.nextUrl.clone()
+        const url = new URL(publicUrl)
         url.pathname = '/auth/sign-in'
         return NextResponse.redirect(url)
     }

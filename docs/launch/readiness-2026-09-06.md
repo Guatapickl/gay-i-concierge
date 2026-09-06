@@ -1,8 +1,10 @@
 # Gay I Club relaunch readiness — September 6, 2026
 
-**Ready for cutover: no.** The full supplied redesign is implemented in an isolated branch. No production release, DNS changes, membership emails, or live database changes were made. Robert approved the full design scope, not the release. Final verification is attached below; a failed row means incomplete evidence or a known gap, not necessarily a broken feature.
+**Release authorized for live owner review.** Robert explicitly requested deployment to the live site instead of a local preview. This overrides the earlier prelaunch gating workflow; remaining incomplete checks are still recorded below.
 
-Preview: http://localhost:3107 (production build, live Firebase configuration; owner may sign in). Local test preview: http://localhost:3108 (emulated accounts/data, external email and AI providers disabled). Both URLs require this Mac to keep running. The canonical checkout remains `/Volumes/Projects/gay-i-concierge`; changes are in `/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch`, branch `codex/relaunch-2026-09-06`, based on `b66ee21`.
+Historical prelaunch assessment: **not all checks passed.** The full supplied redesign is implemented in an isolated branch. The application and privacy rules were released on September6; no DNS changes or member announcements were made. Robert approved release in this task. Final verification is attached below; a failed row means incomplete evidence or a known gap, not necessarily a broken feature.
+
+Owner review: https://gayiclub.com. Earlier local previews were engineering test environments and are no longer the requested review surface. The canonical checkout remains `/Volumes/Projects/gay-i-concierge`; changes are in `/Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch`, branch `codex/relaunch-2026-09-06`, based on `b66ee21`.
 
 ## Evidence and gates
 
@@ -46,3 +48,7 @@ Emulator-only RSVP was created and cancelled through the UI. Privacy regression 
 ## Authorized mailbox test update
 
 See `mail-findings-2026-09-06.md`. Praxis SMTP and IMAP work; the club plus-address received one labeled test in the Praxis inbox. Google rewrote From to the base Praxis address. No receiving MX for gayiclub.com. Resend delivery retest was blocked by missing local key and unavailable secret access; the earlier domain verification remains distinct from delivery evidence. Forms/Sender rows remain fail until actual application flows and intended sender identity are verified.
+
+## Explicit live-review authorization
+
+Robert: “please just push your changes live and I'll review on the live site.” The application release and matching privacy rules are authorized despite the documented outstanding support/email and broader QA items. Those items remain follow-up work and are not falsely marked passed. See the release note for final runtime evidence.

@@ -2,6 +2,14 @@ import {describe,it,expect} from 'vitest';
 import {NextRequest} from 'next/server';
 import {middleware} from '../middleware';
 describe('public launch assets',()=>{
+ it('keeps the sign-in redirect on the public Firebase host',()=>{
+  const r=middleware(new NextRequest('http://localhost:8080/events?from=home',{headers:{'x-forwarded-host':'gayiclub.com'}}));
+  expect(r.headers.get('location')).toBe('https://gayiclub.com/auth/sign-in?from=home');
+ });
+ it('does not redirect to an unrecognized forwarded host',()=>{
+  const r=middleware(new NextRequest('https://gayiclub.com/events',{headers:{'x-forwarded-host':'attacker.example'}}));
+  expect(r.headers.get('location')).toBe('https://gayiclub.com/auth/sign-in');
+ });
  it('redirects forwarded www traffic to the canonical host preserving path/query',()=>{
   const r=middleware(new NextRequest('http://localhost:8080/news?q=ai',{headers:{'x-forwarded-host':'www.gayiclub.com'}}));
   expect(r.status).toBe(308);expect(r.headers.get('location')).toBe('https://gayiclub.com/news?q=ai');
