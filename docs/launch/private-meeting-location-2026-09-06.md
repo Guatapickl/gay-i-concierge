@@ -9,3 +9,5 @@ Two emulator rules suites passed, including explicit anonymous event GET and lis
 Live release: app source b0a1ebd, Firebase rollout build-2026-09-06-009 at 100% traffic; matching Firestore rules deployed. Live public event document/list requests and private settings reads returned 403. Calendar/event URLs redirect guests to sign-in with 307. The address is absent from the homepage, privacy page, sitemap, and robots output. Evidence: evidence/private-location-live-check.json. Events and email queue remain empty. Default meeting time still pending.
 
 Rollback must retain member-only event reads and the broadcast redaction. Never restore public event access while private meeting locations may be stored. The actual address is intentionally absent from this note and the verification artifact.
+
+Update: Robert supplied 6:30 p.m. New York time. The live server-only defaultMeetingTime is now 18:30, and September’s poll displays the same start time. Both required meeting defaults are configured. The earlier missing-time statements above describe the prior state. Evidence: evidence/meeting-defaults-configured.json.

@@ -2,15 +2,25 @@
 
 Gay I Club · September 6, 2026
 
-## Your next steps
+## Friends beta: before announcing
+
+The meeting defaults are complete: 6:30 p.m. America/New_York and the private location. A small friends beta can proceed; the remaining launch check is a real new-account/email walkthrough. Application-email inbox delivery has not been verified end to end by code tests.
+
+- [ ] Have one friend create a fresh account, check verification/sign-in/reset mail (including spam), sign in, and submit September availability. Fix any blocker before inviting the rest.
+- [ ] Include the sign-up link and September poll link in your invitation, with the **September 11, 6 p.m. New York** voting deadline. Describe this as a beta and point testers to **Send feedback**.
+- [ ] Ask testers to try mobile/light mode, the unavailable-date option, community posting, and news Save/Share. Review feedback and your support inbox during the beta.
+
+Search Console, broader promotion, cross-project beta-contact sync, and automatic support receipts can wait. Claude is expanding news sources separately; preserve those edits.
+
+## Ongoing owner checklist
 
 - [ ] Review [gayiclub.com](https://gayiclub.com) on your phone and computer. Sign in with your normal club account. Try light mode and type in “What should we discuss?” and other forms.
 - [x] Confirm September poll dates: **September 12, 13, 19, and 20**. These are saved; the last weekend is excluded.
 - [ ] Open [September’s poll](https://gayiclub.com/vote/september-2026). When ready, use the admin control to email members the invitation. No synthetic poll invitations were broadcast during testing.
 - [x] Private meeting location configured in server-only settings. Event details and addresses require member sign-in.
-- [ ] Provide the default meeting start time in New York. Automatic booking still waits for that time.
+- [x] Default meeting start time configured: **6:30 p.m. America/New_York**. Automatic booking now has both required defaults.
 - [x] September’s exception: close voting **September 11 at 6 p.m. New York time**. The four approved dates stay unchanged.
-- [ ] Review the owner results report after the poll closes. A clear points winner is scheduled automatically once defaults are configured. For a tie, answer the Praxis questionnaire (or choose a tied date on the poll page). After booking, use “Email the result” if you want a separate member announcement.
+- [ ] Review the owner results report after the poll closes. A clear points winner is scheduled automatically using the configured time and private location. For a tie, answer the Praxis questionnaire (or choose a tied date on the poll page). After booking, use “Email the result” if you want a separate member announcement.
 - [ ] After each meeting, answer the Praxis availability questionnaire for the following month. Mark every offered Saturday/Sunday Available or Unavailable. Only your available dates become a member poll. No response or no available dates means no member poll.
 - [ ] Review [News](https://gayiclub.com/news). Use Remove to delete an item, Check sources now for an immediate refresh, Save for personal bookmarks, and Share to pass along a source link.
 - [ ] Check real email delivery to your inbox: verification, sign-in link, password reset, opt-in/opt-out, and RSVP confirmation. These delivery checks remain separate from automated code tests. Avoid using the membership as a test list.
@@ -20,7 +30,7 @@ Gay I Club · September 6, 2026
 
 ## How the automations run
 
-- News collection runs at **8 a.m. America/New_York daily** from OpenAI, Google AI, and MIT News. Deleted source URLs stay suppressed on future refreshes. Members can save and share; only admins can remove/collect.
+- News collection runs at **8 a.m. America/New_York daily** from the configured publisher feeds (Claude is expanding the source list separately). Deleted source URLs stay suppressed on future refreshes. Members can save and share; only admins can remove/collect.
 - The meeting workflow checks at **9 a.m. America/New_York daily**. After a booked meeting has ended and the next local day arrives, it asks for your following-month weekend availability through Praxis. One workflow is created per target month, including month-end meetings.
 - Future automated member polls stay open for **one full week**. September closes September 11 at 6 p.m. New York time by your explicit exception. Voting deadlines are enforced on the server.
 - A cloud check runs every **five minutes** to close due polls, queue your summary, and schedule a clear winner. Email delivery runs every ten minutes, so allow about 15 minutes after the deadline. Reports show available, “can’t make this date,” unanswered, and nonresponding counts.
