@@ -1,3 +1,5 @@
+> **September 6, 2026 update:** AIlex is paused by the owner. AppLayout no longer mounts ChatModalProvider; POST /api/chat returns 503 AILEX_DISABLED without contacting a model. POST /api/invite returns standard invitation text without OpenAI. Chat implementation descriptions below are retained as historical context for a future redesign. Community chat is a separate feature.
+
 # Architecture — Gay-I Club Concierge
 
 > **Version**: 2026-05-21

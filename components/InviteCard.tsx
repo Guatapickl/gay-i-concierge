@@ -17,15 +17,15 @@ export default function InviteCard() {
     setMessage(null);
     setError(null);
     setCopied(false);
-    
+
     try {
-      const res = await fetch("/api/invite", { 
+      const res = await fetch("/api/invite", {
         method: "POST",
         headers: {
           'Content-Type': 'application/json'
         }
       });
-      
+
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({ error: "Unknown error" }));
         console.error("API Error:", errorData);
@@ -33,10 +33,10 @@ export default function InviteCard() {
         setLoading(false);
         return;
       }
-      
+
       const data = await res.json();
       setMessage(data.message);
-      
+
     } catch (fetchError) {
       console.error("Fetch error:", fetchError);
       setError("Network error: Couldn't connect to server");
@@ -65,13 +65,13 @@ export default function InviteCard() {
       >
         {loading ? "Loading..." : "Get invite message"}
       </button>
-      
+
       {error && (
         <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded">
           <strong>Error:</strong> {error}
         </div>
       )}
-      
+
       {message && (
         <div className="space-y-2">
           <div className="p-3 bg-green-50 border border-green-200 rounded">
