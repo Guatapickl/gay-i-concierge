@@ -6,6 +6,10 @@ vi.mock('@/lib/firebase/session',()=>({createSessionCookie:create,SESSION_COOKIE
 import {POST} from '@/app/api/auth/session/route';
 beforeEach(()=>{vi.clearAllMocks();create.mockResolvedValue('server-cookie')});
 describe('session origin guard',()=>{
+ it('accepts the public origin forwarded by Firebase App Hosting',async()=>{
+  const r=await POST(new Request('http://localhost:8080/api/auth/session',{method:'POST',headers:{Origin:'https://gayiclub.com','x-forwarded-host':'gayiclub.com','x-forwarded-proto':'https','Content-Type':'application/json'},body:JSON.stringify({idToken:'valid-token'})}));
+  expect(r.status).toBe(200);expect(set).toHaveBeenCalled();
+ });
  it('rejects a cross-origin login before minting a session',async()=>{
   const r=await POST(new Request('https://gayiclub.com/api/auth/session',{method:'POST',headers:{Origin:'https://attacker.example','Content-Type':'text/plain'},body:JSON.stringify({idToken:'attacker-token'})}));
   expect(r.status).toBe(403);expect(create).not.toHaveBeenCalled();

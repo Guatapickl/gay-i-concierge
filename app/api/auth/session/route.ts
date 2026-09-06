@@ -11,7 +11,14 @@ export const runtime = 'nodejs';
  */
 function isSameOrigin(req: Request) {
   const origin = req.headers.get('origin');
-  return (!origin || origin === new URL(req.url).origin) && req.headers.get('sec-fetch-site') !== 'cross-site';
+  const publicUrl = new URL(req.url);
+  const forwardedHost = req.headers.get('x-forwarded-host')?.split(',')[0].trim();
+  if (forwardedHost) {
+    publicUrl.port = '';
+    publicUrl.host = forwardedHost;
+    publicUrl.protocol = req.headers.get('x-forwarded-proto')?.split(',')[0].trim() || 'https';
+  }
+  return (!origin || origin === publicUrl.origin) && req.headers.get('sec-fetch-site') !== 'cross-site';
 }
 
 export async function POST(req: Request) {

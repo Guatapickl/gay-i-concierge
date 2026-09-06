@@ -2,6 +2,14 @@ import {describe,it,expect} from 'vitest';
 import {NextRequest} from 'next/server';
 import {middleware} from '../middleware';
 describe('public launch assets',()=>{
+ it('redirects forwarded www traffic to the canonical host preserving path/query',()=>{
+  const r=middleware(new NextRequest('http://localhost:8080/news?q=ai',{headers:{'x-forwarded-host':'www.gayiclub.com'}}));
+  expect(r.status).toBe(308);expect(r.headers.get('location')).toBe('https://gayiclub.com/news?q=ai');
+ });
+ it('uses the original host forwarded by Firebase App Hosting',()=>{
+  expect(middleware(new NextRequest('http://localhost:8080/',{headers:{host:'localhost:8080','x-forwarded-host':'gayiclub.com'}})).headers.get('x-robots-tag')).toBeNull();
+  expect(middleware(new NextRequest('http://localhost:8080/',{headers:{host:'localhost:8080','x-forwarded-host':'gayiclub-web--gayiclub.us-east4.hosted.app'}})).headers.get('x-robots-tag')).toBe('noindex, nofollow');
+ });
  it('allows the canonical Host behind a local reverse proxy',()=>{
   expect(middleware(new NextRequest('http://localhost:3107/',{headers:{host:'gayiclub.com'}})).headers.get('x-robots-tag')).toBeNull();
  });

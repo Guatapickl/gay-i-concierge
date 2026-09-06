@@ -9,6 +9,15 @@ const SESSION_COOKIE = '__session'
 const protectedRoutes = ['/hub', '/profile', '/events', '/resources', '/robot']
 
 export function middleware(request: NextRequest) {
+    // Firebase App Hosting preserves the public hostname in this proxy header.
+    const hostname = (request.headers.get('x-forwarded-host') || request.headers.get('host') || request.nextUrl.hostname).split(',')[0].trim().split(':')[0].toLowerCase()
+    if (hostname === 'www.gayiclub.com') {
+        const canonical = request.nextUrl.clone()
+        canonical.protocol = 'https:'
+        canonical.hostname = 'gayiclub.com'
+        canonical.port = ''
+        return NextResponse.redirect(canonical, 308)
+    }
     const isProtectedRoute = protectedRoutes.some(route => request.nextUrl.pathname === route || request.nextUrl.pathname.startsWith(route + '/'))
     const hasSession = !!request.cookies.get(SESSION_COOKIE)?.value
 
@@ -20,7 +29,6 @@ export function middleware(request: NextRequest) {
     }
 
     const response = NextResponse.next()
-    const hostname = (request.headers.get('host') || request.nextUrl.hostname).split(':')[0].toLowerCase()
     if (hostname !== 'gayiclub.com' && hostname !== 'www.gayiclub.com') {
         response.headers.set('X-Robots-Tag', 'noindex, nofollow')
     }
