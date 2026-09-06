@@ -84,13 +84,13 @@ describe('owner-first member polling', () => {
     await expect(recordOwnerEvent(id, { ...answered, queryId: 'unrelated-questionnaire' }, now)).rejects.toThrow();
     expect(entries('meeting_polls')).toHaveLength(0);
   });
-  it('uses winter New York midnight for an approaching voting deadline', async () => {
+  it('gives later polls a full week even when an offered date is sooner', async () => {
     const winterId = 'month-2026-12';
     const winterDates = ['2026-12-05', '2026-12-06'];
     const winterQuery = `hq_auto_${createHash('sha256').update(`gayiclub:${winterId}`).digest('hex').slice(0, 32)}`;
     store.rows.set(`meeting_automation_requests/${winterId}`, { targetMonth: '2026-12', dates: winterDates, state: 'pending', ownerUid: 'owner', expiresAt: '2026-12-05T00:00:00Z' });
     await recordOwnerEvent(winterId, { ...answered, queryId: winterQuery, answers: Object.fromEntries(winterDates.map(date => [dateQuestionId(date), 'Available'])) }, new Date('2026-12-03T15:00:00Z'));
-    expect(adminToIso(entries('meeting_polls')[0][1].closes_at)).toBe('2026-12-05T05:00:00.000Z');
+    expect(adminToIso(entries('meeting_polls')[0][1].closes_at)).toBe('2026-12-10T15:00:00.000Z');
   });
   it('keeps binding stable on retries and rejects a different questionnaire even with a replayed event ID', async () => {
     await recordOwnerEvent(id, sent, now);

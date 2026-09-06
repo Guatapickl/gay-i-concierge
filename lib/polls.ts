@@ -1,24 +1,14 @@
-import { addDoc, deleteDoc, doc, getDocs, orderBy, query, updateDoc, where, writeBatch } from 'firebase/firestore';
+import { addDoc, deleteDoc, doc, orderBy, updateDoc, where, writeBatch } from 'firebase/firestore';
 import { db } from './firebase/client';
-import { currentUser } from './firebase/authClient';
+import { authHeader, currentUser } from './firebase/authClient';
 import { col, getRow, listRows, nowIso, payloadOf, ref } from './firebase/db';
-import type { MeetingPoll, MeetingPollOption, MeetingPollVote } from '@/types/supabase';
+import type { MeetingPoll, MeetingPollOption, MeetingPollVote, MeetingPollBallot } from '@/types/supabase';
 
 export type PollWithOptions = MeetingPoll & { options: MeetingPollOption[] };
 
-export type OptionTally = {
-  option: MeetingPollOption;
-  /** Borda points: n options → 1st choice = n points, last = 1 point. */
-  points: number;
-  firstChoice: number;
-  /** Average rank across voters who ranked it (lower is better). */
-  avgRank: number | null;
-};
-
-export type PollTally = {
-  voters: number;
-  ranked: OptionTally[]; // best first
-};
+export { tallyPoll, selectPollWinner, mergePollVotes } from './poll-tally';
+export type { PollTally, OptionTally, PollWinner } from './poll-tally';
+import { mergePollVotes } from './poll-tally';
 
 /** meeting_poll_votes doc id — mirrors the Postgres (poll_id, user_id, option_id) unique key. */
 export function pollVoteDocId(pollId: string, userId: string, optionId: string) {
@@ -73,7 +63,9 @@ export async function createPoll(args: {
       description: args.description,
       status: 'open',
       event_id: null,
-      closes_at: args.closesAt,
+      auto_schedule: true,
+      opened_at: now,
+      closes_at: args.closesAt || new Date(Date.parse(now) + 7 * 86400000).toISOString(),
       created_by: user?.uid ?? null,
       created_at: now,
       updated_at: now,
@@ -102,99 +94,40 @@ export async function createPoll(args: {
   return pollId;
 }
 
-export async function getMyRanking(pollId: string, userId: string): Promise<string[]> {
-  try {
-    const rows = await listRows<MeetingPollVote>(
-      'meeting_poll_votes',
-      where('poll_id', '==', pollId),
-      where('user_id', '==', userId),
-    );
-    return rows.sort((a, b) => a.rank - b.rank).map(r => r.option_id);
-  } catch {
-    return [];
-  }
+export type MyBallot = { availableOptionIds: string[]; unavailableOptionIds: string[] };
+
+export async function getMyBallot(pollId: string, userId: string): Promise<MyBallot | null> {
+  const ballots = await listRows<MeetingPollBallot>('meeting_poll_ballots', where('poll_id', '==', pollId), where('user_id', '==', userId));
+  const ballot = ballots.sort((a, b) => b.updated_at.localeCompare(a.updated_at))[0];
+  if (ballot) return { availableOptionIds: ballot.available_option_ids, unavailableOptionIds: ballot.unavailable_option_ids };
+  const legacy = await listRows<MeetingPollVote>('meeting_poll_votes', where('poll_id', '==', pollId), where('user_id', '==', userId));
+  if (!legacy.length) return null;
+  return { availableOptionIds: legacy.filter(v => v.available !== false && v.rank !== null).sort((a, b) => a.rank! - b.rank!).map(v => v.option_id), unavailableOptionIds: [] };
 }
 
-/** Replace the caller's ranking with `orderedOptionIds` (best first). */
-export async function submitRanking(
-  pollId: string,
-  userId: string,
-  orderedOptionIds: string[]
-): Promise<boolean> {
-  try {
-    const existing = await getDocs(query(
-      col('meeting_poll_votes'),
-      where('poll_id', '==', pollId),
-      where('user_id', '==', userId),
-    ));
-    if (existing.size > 0) {
-      const del = writeBatch(db);
-      existing.docs.forEach(d => del.delete(d.ref));
-      await del.commit();
-    }
-  } catch (err) {
-    console.error('Failed to clear previous ranking:', (err as Error).message);
-    return false;
-  }
-  try {
-    const batch = writeBatch(db);
-    const created_at = nowIso();
-    orderedOptionIds.forEach((option_id, i) => {
-      batch.set(ref('meeting_poll_votes', pollVoteDocId(pollId, userId, option_id)), payloadOf({
-        poll_id: pollId,
-        option_id,
-        user_id: userId,
-        rank: i + 1,
-        created_at,
-      }));
-    });
-    await batch.commit();
-    return true;
-  } catch (err) {
-    console.error('Failed to submit ranking:', (err as Error).message);
-    return false;
+export async function getMyRanking(pollId: string, userId: string): Promise<string[]> {
+  return (await getMyBallot(pollId, userId))?.availableOptionIds ?? [];
+}
+
+/** The server replaces the whole ballot atomically; a failed save preserves the prior ballot. */
+export async function submitBallot(pollId: string, ballot: MyBallot): Promise<void> {
+  const response = await fetch(`/api/polls/${encodeURIComponent(pollId)}/ballot`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
+    body: JSON.stringify(ballot),
+  });
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    throw new Error(data.error || 'Could not save your availability. Please try again.');
   }
 }
 
 export async function getPollVotes(pollId: string): Promise<MeetingPollVote[]> {
-  try {
-    return await listRows<MeetingPollVote>('meeting_poll_votes', where('poll_id', '==', pollId));
-  } catch (err) {
-    console.error('Error fetching votes:', (err as Error).message);
-    return [];
-  }
-}
-
-/** Borda count over the ranked ballots. Ties broken by first-choice count, then earlier date. */
-export function tallyPoll(options: MeetingPollOption[], votes: MeetingPollVote[]): PollTally {
-  const n = options.length;
-  const voters = new Set(votes.map(v => v.user_id)).size;
-  const byOption = new Map<string, { points: number; first: number; rankSum: number; rankCount: number }>();
-  for (const o of options) byOption.set(o.id, { points: 0, first: 0, rankSum: 0, rankCount: 0 });
-  for (const v of votes) {
-    const slot = byOption.get(v.option_id);
-    if (!slot) continue;
-    slot.points += Math.max(0, n - v.rank + 1);
-    if (v.rank === 1) slot.first += 1;
-    slot.rankSum += v.rank;
-    slot.rankCount += 1;
-  }
-  const ranked: OptionTally[] = options.map(option => {
-    const s = byOption.get(option.id)!;
-    return {
-      option,
-      points: s.points,
-      firstChoice: s.first,
-      avgRank: s.rankCount ? s.rankSum / s.rankCount : null,
-    };
-  });
-  ranked.sort(
-    (a, b) =>
-      b.points - a.points ||
-      b.firstChoice - a.firstChoice ||
-      new Date(a.option.option_datetime).getTime() - new Date(b.option.option_datetime).getTime()
-  );
-  return { voters, ranked };
+  const [legacy, ballots] = await Promise.all([
+    listRows<MeetingPollVote>('meeting_poll_votes', where('poll_id', '==', pollId)),
+    listRows<MeetingPollBallot>('meeting_poll_ballots', where('poll_id', '==', pollId)),
+  ]);
+  return mergePollVotes(legacy, ballots);
 }
 
 export async function closePoll(pollId: string, eventId: string | null): Promise<boolean> {

@@ -211,7 +211,7 @@ export function pollInviteEmail(poll: PollForEmail, options: PollOptionForEmail[
   const list = options.map(o => `<li style="margin:4px 0;">${escapeHtml(formatOptionForEmail(o))}</li>`).join('');
   const closes = poll.closes_at
     ? `<p style="margin:0 0 16px;color:${PALETTE.muted};font-size:14px;">Voting closes ${escapeHtml(
-        new Date(poll.closes_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
+        new Date(poll.closes_at).toLocaleString('en-US', { month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York', timeZoneName: 'short' })
       )}.</p>`
     : '';
   const body = `
@@ -221,7 +221,7 @@ ${poll.description ? `<p style="margin:0 0 16px;line-height:1.5;">${escapeHtml(p
 <ul style="margin:0 0 20px;padding-left:20px;line-height:1.6;">${list}</ul>
 ${closes}
 ${button('Rank the dates', voteUrl)}
-<p style="margin:20px 0 0;color:${PALETTE.muted};font-size:13px;">Rank every date from best to worst — we book whichever comes out on top. You can change your ranking any time before voting closes.</p>`;
+<p style="margin:20px 0 0;color:${PALETTE.muted};font-size:13px;">Rank the dates you can attend from best to worst, and mark any you can’t make. A clear winner is booked automatically; Robert decides ties. You can change your response before voting closes.</p>`;
   const text = [
     poll.title,
     '',
@@ -230,7 +230,8 @@ ${button('Rank the dates', voteUrl)}
     'Candidate dates:',
     ...options.map(o => `- ${formatOptionForEmail(o)}`),
     '',
-    `Rank the dates: ${voteUrl}`,
+    `Rank the dates you can attend and mark any you can't make: ${voteUrl}`,
+    'A clear winner is booked automatically; Robert decides ties.',
   ].join('\n');
   return { subject, html: shell({ title: subject, preheader: 'Rank the dates for our next meeting', body }), text };
 }

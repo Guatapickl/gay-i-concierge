@@ -83,7 +83,7 @@ export default function NewPollPage() {
               <input type="time" className="input-field w-full" value={defaultTime} onChange={e => setDefaultTime(e.target.value)} />
             </div>
             <div>
-              <label className="block text-sm mb-1">Voting closes (optional)</label>
+              <label className="block text-sm mb-1">Voting closes (defaults to one week)</label>
               <input type="date" className="input-field w-full" value={closesAt} onChange={e => setClosesAt(e.target.value)} />
             </div>
           </div>

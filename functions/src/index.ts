@@ -44,3 +44,8 @@ export const meetingPollTick = onSchedule(
   { schedule: '0 9 * * *', timeZone: 'America/New_York', secrets: [CRON_SECRET], region: 'us-east4', timeoutSeconds: 180 },
   () => invokeAutomation('/api/cron/meeting-polls')
 );
+
+export const pollResultsTick = onSchedule(
+  { schedule: 'every 5 minutes', timeZone: 'America/New_York', secrets: [CRON_SECRET], region: 'us-east4', timeoutSeconds: 180 },
+  () => invokeAutomation('/api/cron/poll-results')
+);

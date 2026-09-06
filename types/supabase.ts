@@ -187,6 +187,14 @@ export type Resource = {
  * Meeting date poll (ranked-choice vote on candidate dates).
  */
 export type MeetingPoll = {
+  auto_schedule?: boolean;
+  result_status?: string;
+  tie_option_ids?: string[];
+  selected_option_id?: string | null;
+  report_queued_at?: string | null;
+  opened_at?: string;
+  default_meeting_time?: string;
+  default_meeting_location?: string;
   date_only?: boolean;
   id: string;
   title: string;
@@ -213,7 +221,8 @@ export type MeetingPollVote = {
   poll_id: string;
   option_id: string;
   user_id: string;
-  rank: number;
+  rank: number | null;
+  available?: boolean;
   created_at: string;
 };
 
@@ -232,4 +241,14 @@ export type AgendaSuggestion = {
   /** Derived client-side */
   vote_count?: number;
   voted_by_me?: boolean;
+};
+
+export type MeetingPollBallot = {
+  id: string;
+  poll_id: string;
+  user_id: string;
+  available_option_ids: string[];
+  unavailable_option_ids: string[];
+  created_at: string;
+  updated_at: string;
 };

@@ -7,17 +7,16 @@ import { ArrowLeft, ArrowUp, ArrowDown, Trophy, CalendarPlus, Mail, Users } from
 import { authHeader, currentUser } from '@/lib/firebase/authClient';
 import {
   getPoll,
-  getMyRanking,
-  submitRanking,
+  getMyBallot,
+  submitBallot,
   getPollVotes,
   tallyPoll,
-  closePoll,
+  selectPollWinner,
   formatOption,
   type PollWithOptions,
   type PollTally,
 } from '@/lib/polls';
 import { isPollOpen, newYorkDate, newYorkMeetingTime, formatPollDeadline } from '@/lib/poll-scheduling';
-import { createEvent, getUpcomingEvents } from '@/lib/events';
 import { isCurrentUserAdmin } from '@/lib/isAdmin';
 import type { MeetingPollOption } from '@/types/supabase';
 import { Button, FormInput, FormTextarea, Alert, LoadingSpinner } from '@/components/ui';
@@ -32,6 +31,7 @@ export default function PollPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [order, setOrder] = useState<string[]>([]);
+  const [unavailable, setUnavailable] = useState<string[]>([]);
   const [hasVoted, setHasVoted] = useState(false);
   const [saving, setSaving] = useState(false);
   const [tally, setTally] = useState<PollTally | null>(null);
@@ -49,27 +49,34 @@ export default function PollPage() {
 
   const load = useCallback(async () => {
     if (!pollId) return;
+    try {
     const [p, user] = await Promise.all([getPoll(pollId), currentUser()]);
     const uid = user?.uid ?? null;
     setUserId(uid);
     setPoll(p);
     if (p && uid) {
       const [mine, admin, votes] = await Promise.all([
-        getMyRanking(pollId, uid),
+        getMyBallot(pollId, uid),
         isCurrentUserAdmin(uid),
         getPollVotes(pollId),
       ]);
       setIsAdmin(admin);
       const optionIds = p.options.map(o => o.id);
-      const known = mine.filter(id => optionIds.includes(id));
-      setHasVoted(known.length > 0);
-      setOrder([...known, ...optionIds.filter(id => !known.includes(id))]);
+      const known = (mine?.availableOptionIds ?? []).filter(id => optionIds.includes(id));
+      const unavailableIds = (mine?.unavailableOptionIds ?? []).filter(id => optionIds.includes(id));
+      setHasVoted(mine !== null);
+      setUnavailable(unavailableIds);
+      setOrder([...known, ...optionIds.filter(id => !known.includes(id) && !unavailableIds.includes(id))]);
+      setMeetingTime(p.default_meeting_time ?? '');
+      setMeetingLocation(p.default_meeting_location ?? '');
       const t = tallyPoll(p.options, votes);
       setTally(t);
-      if (!chosenOptionId && t.ranked[0]) setChosenOptionId(t.ranked[0].option.id);
+      setChosenOptionId(previous => previous || (p.tie_option_ids?.[0] ?? t.ranked[0]?.option.id ?? ''));
     }
-    setLoading(false);
-  }, [pollId, chosenOptionId]);
+    } catch (error) {
+      setMessage({ text: error instanceof Error ? error.message : 'Could not load poll responses.', variant: 'error' });
+    } finally { setLoading(false); }
+  }, [pollId]);
 
   useEffect(() => {
     load();
@@ -104,16 +111,15 @@ export default function PollPage() {
       return;
     }
     setSaving(true);
-    const ok = await submitRanking(pollId, userId, order);
-    setSaving(false);
-    if (ok) {
+    try {
+      await submitBallot(pollId, { availableOptionIds: order, unavailableOptionIds: unavailable });
       setHasVoted(true);
-      setMessage({ text: 'Your ranking is saved. You can change it any time before the poll closes.', variant: 'success' });
+      setMessage({ text: 'Your availability and ranking are saved. You can update them before the poll closes.', variant: 'success' });
       const votes = await getPollVotes(pollId);
-      if (poll) setTally(tallyPoll(poll.options, votes));
-    } else {
-      setMessage({ text: 'Could not save your ranking. Please try again.', variant: 'error' });
-    }
+      setTally(tallyPoll(poll.options, votes));
+    } catch (error) {
+      setMessage({ text: error instanceof Error ? error.message : 'Could not save your availability.', variant: 'error' });
+    } finally { setSaving(false); }
   };
 
   const notify = async (type: 'invite' | 'result') => {
@@ -143,44 +149,28 @@ export default function PollPage() {
     if (!poll || !chosenOptionId || !isAdmin || poll.event_id) return;
     const opt = optionById.get(chosenOptionId);
     if (!opt) return;
-    let eventDateTime = opt.option_datetime;
     if (opt.date_only || poll.date_only) {
-      try {
-        eventDateTime = newYorkMeetingTime(newYorkDate(opt.option_datetime), meetingTime);
-      } catch (error) {
+      try { newYorkMeetingTime(newYorkDate(opt.option_datetime), meetingTime); }
+      catch (error) {
         setMessage({ text: error instanceof Error ? error.message : 'Choose a valid New York meeting time.', variant: 'error' });
         return;
       }
     }
     setCreating(true);
     setMessage(null);
-    // Guard against double-creating the same meeting.
-    const upcoming = await getUpcomingEvents();
-    const dup = upcoming.find(e => Math.abs(new Date(e.event_datetime).getTime() - new Date(eventDateTime).getTime()) < 60_000);
-    let eventId: string | null = dup?.id ?? null;
-    if (!eventId) {
-      const ok = await createEvent({
-        title: meetingTitle.trim() || 'Gay I Club Meeting',
-        description: meetingDescription.trim() || null,
-        event_datetime: eventDateTime,
-        location: meetingLocation.trim() || null,
+    try {
+      const response = await fetch(`/api/polls/${encodeURIComponent(poll.id)}/book`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
+        body: JSON.stringify({ optionId: chosenOptionId, meetingTime: meetingTime || undefined, title: meetingTitle.trim() || 'Gay I Club Meeting', location: meetingLocation.trim(), description: meetingDescription.trim() }),
       });
-      if (!ok) {
-        setCreating(false);
-        setMessage({ text: 'Could not create the meeting. Admin permission may be missing.', variant: 'error' });
-        return;
-      }
-      const after = await getUpcomingEvents();
-      eventId = after.find(e => new Date(e.event_datetime).toISOString() === new Date(eventDateTime).toISOString())?.id ?? null;
-    }
-    const closed = await closePoll(poll.id, eventId);
-    setCreating(false);
-    if (closed) {
-      setMessage({ text: dup ? 'A meeting already existed at that time; poll closed and linked to it.' : 'Meeting created and poll closed.', variant: 'success' });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Could not book the meeting.');
+      setMessage({ text: 'Meeting booked and linked to this poll.', variant: 'success' });
       await load();
-    } else {
-      setMessage({ text: 'Meeting created but the poll could not be closed.', variant: 'error' });
-    }
+    } catch (error) {
+      setMessage({ text: error instanceof Error ? error.message : 'Could not book the meeting.', variant: 'error' });
+    } finally { setCreating(false); }
   };
 
   if (loading) return <LoadingSpinner text="Loading poll…" className="mt-8" />;
@@ -207,7 +197,14 @@ export default function PollPage() {
   const isOpen = isPollOpen(poll, clockNow);
   const chosenOption = optionById.get(chosenOptionId);
   const needsMeetingTime = !!(chosenOption?.date_only || poll.date_only);
-  const winner = tally?.ranked[0];
+  const result = tally ? selectPollWinner(tally) : null;
+  const winner = result?.status === 'winner' ? tally?.ranked.find(r => r.option.id === result.optionIds[0]) : null;
+  const awaitingTie = !!poll.tie_option_ids?.length && !poll.event_id;
+  const bookingOptions = tally?.ranked.filter(r => !awaitingTie || poll.tie_option_ids?.includes(r.option.id)) ?? [];
+  const toggleUnavailable = (id: string, checked: boolean) => {
+    setUnavailable(previous => checked ? [...previous, id] : previous.filter(value => value !== id));
+    setOrder(previous => checked ? previous.filter(value => value !== id) : [...previous, id]);
+  };
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
@@ -220,7 +217,7 @@ export default function PollPage() {
           <span className={`badge ${isOpen ? 'badge-cyan' : ''}`}>{isOpen ? 'Voting open' : 'Closed'}</span>
           {tally && (
             <span className="badge badge-purple">
-              <Users className="w-3 h-3" /> {tally.voters} {tally.voters === 1 ? 'vote' : 'votes'}
+              <Users className="w-3 h-3" /> {tally.voters} {tally.voters === 1 ? 'respondent' : 'respondents'}
             </span>
           )}
         </div>
@@ -241,28 +238,37 @@ export default function PollPage() {
       {isOpen && (
         <div className="card p-5 space-y-3">
           <div className="text-xs font-bold text-foreground-faint tracking-[0.1em] font-mono">
-            YOUR RANKING — BEST DATE FIRST
+            YOUR AVAILABILITY & RANKING
           </div>
-          {order.map((id, idx) => {
+          <p className="text-sm text-foreground-muted">Mark dates you cannot attend, then rank the remaining dates with your best date first. You can submit even if none work.</p>
+          {[...order, ...unavailable].map(id => {
+            const idx = order.indexOf(id);
+            const cannotAttend = unavailable.includes(id);
             const o = optionById.get(id);
             if (!o) return null;
             return (
               <div key={id} className="flex items-center gap-3 p-3 rounded-lg bg-surface-elevated border border-border">
                 <div className="w-7 h-7 rounded-full bg-primary-muted text-background text-[11px] font-extrabold flex items-center justify-center shrink-0">
-                  {idx + 1}
+                  {cannotAttend ? '—' : idx + 1}
                 </div>
-                <div className="flex-1 text-sm font-semibold text-foreground">{formatOption(o)}</div>
-                <button onClick={() => move(idx, -1)} disabled={idx === 0} className="p-1.5 border border-border-subtle rounded text-foreground-subtle hover:text-foreground disabled:opacity-30" aria-label="Move up">
+                <div className="flex-1 text-sm font-semibold text-foreground">
+                  {formatOption(o)}
+                  <label className="mt-2 flex items-center gap-2 text-xs font-normal text-foreground-muted">
+                    <input type="checkbox" checked={cannotAttend} disabled={saving} onChange={e => toggleUnavailable(id, e.target.checked)} />
+                    Can’t make this date
+                  </label>
+                </div>
+                <button onClick={() => move(idx, -1)} disabled={saving || cannotAttend || idx === 0} className="p-1.5 border border-border-subtle rounded text-foreground-subtle hover:text-foreground disabled:opacity-30" aria-label="Move up">
                   <ArrowUp className="w-4 h-4" />
                 </button>
-                <button onClick={() => move(idx, 1)} disabled={idx === order.length - 1} className="p-1.5 border border-border-subtle rounded text-foreground-subtle hover:text-foreground disabled:opacity-30" aria-label="Move down">
+                <button onClick={() => move(idx, 1)} disabled={saving || cannotAttend || idx === order.length - 1} className="p-1.5 border border-border-subtle rounded text-foreground-subtle hover:text-foreground disabled:opacity-30" aria-label="Move down">
                   <ArrowDown className="w-4 h-4" />
                 </button>
               </div>
             );
           })}
           <Button variant="primary" onClick={submit} disabled={saving}>
-            {saving ? 'Saving…' : hasVoted ? 'Update my ranking' : 'Submit my ranking'}
+            {saving ? 'Saving…' : hasVoted ? 'Update my response' : 'Submit my response'}
           </Button>
         </div>
       )}
@@ -273,6 +279,8 @@ export default function PollPage() {
             <Trophy className="w-4 h-4 text-primary" />
             <h2 className="font-display font-bold text-foreground">Current standings</h2>
           </div>
+          {result?.status === 'tie' && <p className="text-sm text-foreground-muted mb-3">Tied for the lead: {result.optionIds.map(id => formatOption(optionById.get(id)!)).join('; ')}. Robert chooses the date if the final results are tied.</p>}
+          {result?.status === 'no_available_dates' && <p className="text-sm text-foreground-muted mb-3">No date has any available respondents.</p>}
           {tally.voters === 0 ? (
             <p className="text-sm text-foreground-muted">No votes yet.</p>
           ) : (
@@ -283,6 +291,9 @@ export default function PollPage() {
                     <th className="py-1 pr-3">#</th>
                     <th className="py-1 pr-3">Date</th>
                     <th className="py-1 pr-3 text-right">Points</th>
+                    <th className="py-1 pr-3 text-right">Can attend</th>
+                    <th className="py-1 pr-3 text-right">Can’t attend</th>
+                    <th className="py-1 pr-3 text-right">Unanswered</th>
                     <th className="py-1 pr-3 text-right">1st picks</th>
                     <th className="py-1 text-right">Avg rank</th>
                   </tr>
@@ -290,9 +301,12 @@ export default function PollPage() {
                 <tbody>
                   {tally.ranked.map((r, idx) => (
                     <tr key={r.option.id} className={idx === 0 ? 'font-semibold text-foreground' : 'text-foreground-muted'}>
-                      <td className="py-1.5 pr-3">{idx + 1}</td>
+                      <td className="py-1.5 pr-3">{result?.status === 'tie' && result.optionIds.includes(r.option.id) ? 'Tie' : idx + 1}</td>
                       <td className="py-1.5 pr-3">{formatOption(r.option)}</td>
                       <td className="py-1.5 pr-3 text-right font-mono">{r.points}</td>
+                      <td className="py-1.5 pr-3 text-right font-mono">{r.available}</td>
+                      <td className="py-1.5 pr-3 text-right font-mono">{r.unavailable}</td>
+                      <td className="py-1.5 pr-3 text-right font-mono">{r.unanswered}</td>
                       <td className="py-1.5 pr-3 text-right font-mono">{r.firstChoice}</td>
                       <td className="py-1.5 text-right font-mono">{r.avgRank ? r.avgRank.toFixed(2) : '—'}</td>
                     </tr>
@@ -300,7 +314,7 @@ export default function PollPage() {
                 </tbody>
               </table>
               <p className="text-[11px] text-foreground-faint mt-2">
-                Points use a Borda count: with {poll.options.length} dates, a first choice is worth {poll.options.length} points and a last choice 1.
+                Points use a Borda count: with {poll.options.length} dates, a first choice is worth {poll.options.length} points and each lower available preference earns one fewer point. Unavailable dates earn zero. Unanswered counts missing choices among respondents.
               </p>
             </div>
           )}
@@ -324,11 +338,11 @@ export default function PollPage() {
             <div className="space-y-3 pt-2 border-t border-border">
               <div className="flex items-center gap-2">
                 <CalendarPlus className="w-4 h-4 text-primary" />
-                <span className="font-semibold text-foreground text-sm">Book the meeting</span>
+                <span className="font-semibold text-foreground text-sm">{awaitingTie ? 'Choose the tied date and book' : 'Book the meeting'}</span>
                 {winner && <span className="text-xs text-foreground-faint">(leader: {formatOption(winner.option)})</span>}
               </div>
               <select aria-label="Meeting date" className="input-field w-full text-sm" value={chosenOptionId} onChange={e => setChosenOptionId(e.target.value)}>
-                {tally?.ranked.map(r => (
+                {bookingOptions.map(r => (
                   <option key={r.option.id} value={r.option.id}>
                     {formatOption(r.option)} · {r.points} pts
                   </option>

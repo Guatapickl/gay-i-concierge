@@ -3,7 +3,7 @@ import { describe, it, expect, vi } from 'vitest';
 // tallyPoll is pure; stub the Firebase client so importing lib/polls needs no env.
 vi.mock('@/lib/firebase/client', () => ({ db: {}, firebaseAuth: {} }));
 vi.mock('@/lib/firebase/authClient', () => ({ currentUser: async () => null }));
-import { tallyPoll } from '@/lib/polls';
+import { tallyPoll, selectPollWinner, mergePollVotes } from '@/lib/polls';
 import type { MeetingPollOption, MeetingPollVote } from '@/types/supabase';
 
 const opt = (id: string, dt: string): MeetingPollOption => ({
@@ -38,16 +38,51 @@ describe('tallyPoll', () => {
     expect(t.ranked[3].avgRank).toBeCloseTo((3 + 4 + 4) / 3);
   });
 
-  it('breaks point ties by first-choice count, then earlier date', () => {
+  it('keeps tied scores for an owner decision', () => {
     const two = [opt('a', '2026-09-20T00:00:00Z'), opt('b', '2026-09-12T00:00:00Z')];
-    // 1 voter each way → 3 points each, 1 first choice each → earlier date (b) wins
+    // 1 voter each way → 3 points each. Earlier date sorts first but does not win.
     const votes = [vote('x', 'a', 1), vote('x', 'b', 2), vote('y', 'b', 1), vote('y', 'a', 2)];
-    expect(tallyPoll(two, votes).ranked[0].option.id).toBe('b');
+    expect(selectPollWinner(tallyPoll(two, votes))).toEqual({ status: 'tie', optionIds: ['b', 'a'] });
+  });
+
+  it('does not use first-choice counts to resolve equal points', () => {
+    const t = tallyPoll(options, [vote('x', 'sep12', 1), vote('y', 'sep19', 3), vote('z', 'sep19', 3)]);
+    expect(t.ranked.find(r => r.option.id === 'sep12')?.firstChoice).toBe(1);
+    expect(t.ranked.find(r => r.option.id === 'sep19')?.firstChoice).toBe(0);
+    expect(selectPollWinner(t)).toEqual({ status: 'tie', optionIds: ['sep12', 'sep19'] });
   });
 
   it('handles no votes', () => {
     const t = tallyPoll(options, []);
     expect(t.voters).toBe(0);
     expect(t.ranked.every(r => r.points === 0 && r.avgRank === null)).toBe(true);
+  });
+});
+
+
+describe('explicit availability', () => {
+  const options = [opt('a', '2026-09-12T00:00:00Z'), opt('b', '2026-09-20T00:00:00Z')];
+  it('supersedes legacy votes for a new ballot and counts all-unavailable respondents', () => {
+    const merged = mergePollVotes([vote('x', 'a', 1), vote('y', 'b', 1)], [{
+      id: 'ballot', poll_id: 'p', user_id: 'x', available_option_ids: [], unavailable_option_ids: ['a', 'b'], created_at: '', updated_at: '',
+    }]);
+    const t = tallyPoll(options, merged);
+    expect(t.voters).toBe(2);
+    expect(t.ranked.find(r => r.option.id === 'a')).toMatchObject({ points: 0, available: 0, unavailable: 1, unanswered: 1 });
+    expect(t.ranked.find(r => r.option.id === 'b')).toMatchObject({ points: 2, available: 1, unavailable: 1, unanswered: 0 });
+    expect(selectPollWinner(t)).toEqual({ status: 'winner', optionIds: ['b'] });
+    expect(selectPollWinner(t, ['a'])).toEqual({ status: 'no_available_dates', optionIds: [] });
+  });
+  it('does not award points for unavailable or invalid ranks', () => {
+    const t = tallyPoll(options, [{ ...vote('x', 'a', 1), available: false }, vote('y', 'a', 0), vote('z', 'b', 1.5)]);
+    expect(t.ranked.every(r => r.points === 0)).toBe(true);
+  });
+  it('does not select malformed available responses with no valid ranked points', () => {
+    const t = tallyPoll(options, [{ ...vote('x', 'a', 1), rank: null, available: true }]);
+    expect(selectPollWinner(t)).toEqual({ status: 'no_available_dates', optionIds: [] });
+  });
+  it('distinguishes no respondents from no availability', () => {
+    expect(selectPollWinner(tallyPoll(options, []))).toEqual({ status: 'no_responses', optionIds: [] });
+    expect(selectPollWinner(tallyPoll(options, [{ ...vote('x', 'a', 1), available: false }]))).toEqual({ status: 'no_available_dates', optionIds: [] });
   });
 });

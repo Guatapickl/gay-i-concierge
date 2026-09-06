@@ -52,7 +52,7 @@ export default function VoteIndexPage() {
       <div className="flex items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-display font-bold text-foreground">Meeting date votes</h1>
-          <p className="text-sm text-foreground-muted">Rank the dates that work for you.</p>
+          <p className="text-sm text-foreground-muted">Mark dates you can’t attend and rank the dates that work for you.</p>
         </div>
         {isAdmin && (
           <Link href="/vote/new" className="btn-brand inline-flex items-center gap-2 text-sm">

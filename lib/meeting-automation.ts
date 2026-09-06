@@ -46,7 +46,7 @@ export async function ownerQuestions() {
   const snap = await workflows().get();
   return snap.docs.filter(d => ['pending', 'awaiting_owner'].includes(d.data().state) && new Date(d.data().expiresAt) > new Date()).slice(0, 20).map(d => {
     const w = d.data() as Workflow;
-    return { id: d.id, subject: `GayIClub: your ${w.targetMonth} weekend availability`, body: 'Which days work for you? Members will only be polled on days you mark Available. This does not book a meeting. If none work, no member poll will be sent.', recipientName: 'Robert', questions: w.dates.map(date => ({ id: dateQuestionId(date), kind: 'choice', prompt: dateLabel(date), options: ['Available', 'Unavailable'], required: true })), expiresAt: w.expiresAt };
+    return { id: d.id, subject: `GayIClub: your ${w.targetMonth} weekend availability`, body: 'Which days work for you? Members will only be polled on days you mark Available. Your available dates will be offered to members for one week. A clear winner is booked using your meeting defaults; ties come back to you. If none work, no member poll will be sent.', recipientName: 'Robert', questions: w.dates.map(date => ({ id: dateQuestionId(date), kind: 'choice', prompt: dateLabel(date), options: ['Available', 'Unavailable'], required: true })), expiresAt: w.expiresAt };
   });
 }
 export async function recordOwnerEvent(id: string, body: Record<string, unknown>, now = new Date()) {
@@ -78,7 +78,7 @@ export async function recordOwnerEvent(id: string, body: Record<string, unknown>
       const existingPoll = await tx.get(pollRef);
       if (existingPoll.exists) throw new Error('Poll already exists');
       if (chosen.length) {
-        tx.create(pollRef, adminPayloadOf({ title: `${new Date(`${w.targetMonth}-01T12:00:00Z`).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' })} meeting date`, description: 'Rank the days that work for you. Robert has confirmed availability on each option. The meeting time will be confirmed after voting.', status: 'open', event_id: null, date_only: true, target_month: w.targetMonth, source_workflow: id, closes_at: new Date(Math.min(now.getTime() + 7 * 86400000, Date.parse(newYorkMeetingTime(chosen[0], '00:00')))).toISOString(), created_by: w.ownerUid, created_at: now.toISOString(), updated_at: now.toISOString() }));
+        tx.create(pollRef, adminPayloadOf({ title: `${new Date(`${w.targetMonth}-01T12:00:00Z`).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' })} meeting date`, description: 'Rank the days that work for you and mark any dates you cannot make. Robert has confirmed availability on each option. Voting stays open for one week; a clear winner is booked automatically and Robert decides ties.', status: 'open', event_id: null, date_only: true, target_month: w.targetMonth, source_workflow: id, auto_schedule: true, opened_at: now.toISOString(), closes_at: new Date(now.getTime() + 7 * 86400000).toISOString(), created_by: w.ownerUid, created_at: now.toISOString(), updated_at: now.toISOString() }));
         chosen.forEach((date, index) => tx.create(db.collection('meeting_poll_options').doc(`${pollId}-${date}`), adminPayloadOf({ poll_id: pollId, option_datetime: pollDateTimestamp(date), label: dateLabel(date), date_only: true, sort_order: index })));
       }
       tx.update(ref, { state: chosen.length ? 'published' : 'needs_availability', selectedDates: chosen, answers: body.answers, queryId: body.queryId, answeredAt: now.toISOString(), pollId: chosen.length ? pollId : null });

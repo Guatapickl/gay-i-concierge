@@ -122,15 +122,18 @@ service cloud.firestore {
       allow create, delete: if isAdmin();
       allow update: if false;
     }
-    match /meeting_poll_votes/{id} {      // doc id = `${poll_id}_${user_id}_${option_id}`
+    // Complete ballots are validated and saved atomically by the API.
+    // Legacy votes remain readable for historical responses, never client-writable.
+    match /meeting_poll_votes/{id} {
       allow read: if signedIn();
-      allow create: if willOwn('user_id')
-        && get(/databases/$(database)/documents/meeting_polls/$(request.resource.data.poll_id)).data.status == 'open'
-        && (get(/databases/$(database)/documents/meeting_polls/$(request.resource.data.poll_id)).data.get('closes_at', null) == null
-          || request.time < get(/databases/$(database)/documents/meeting_polls/$(request.resource.data.poll_id)).data.closes_at);
-      allow delete: if owns('user_id');
-      allow update: if false;
+      allow write: if false;
     }
+    match /meeting_poll_ballots/{id} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+    match /poll_outcomes/{document=**} { allow read, write: if false; }
+    match /poll_owner_decisions/{document=**} { allow read, write: if false; }
 
     // ---- member agenda suggestions
     match /agenda_suggestions/{id} {

@@ -1,8 +1,8 @@
 import { it, expect } from 'vitest';
 import { initializeApp, deleteApp } from 'firebase/app';
 import { getAuth, connectAuthEmulator, signInAnonymously, deleteUser } from 'firebase/auth';
-import { getFirestore, connectFirestoreEmulator, doc, setDoc, getDoc, terminate, Timestamp } from 'firebase/firestore';
-it.skipIf(process.env.RUN_FIREBASE_RULES_TESTS !== '1')('poll deadlines and automation privacy are enforced by Firestore', async () => {
+import { getFirestore, connectFirestoreEmulator, doc, setDoc, getDoc, deleteDoc, terminate, Timestamp } from 'firebase/firestore';
+it.skipIf(process.env.RUN_FIREBASE_RULES_TESTS !== '1')('poll ballots are server-only and automation data stays private', async () => {
   const app = initializeApp({ projectId: 'demo-gayiclub', apiKey: 'demo-key' }, `meeting-rules-${Date.now()}`);
   const db = getFirestore(app); connectFirestoreEmulator(db, '127.0.0.1', 8080);
   const auth = getAuth(app); connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: true });
@@ -20,9 +20,18 @@ it.skipIf(process.env.RUN_FIREBASE_RULES_TESTS !== '1')('poll deadlines and auto
       await seed(`meeting_polls/${id}`, { status: { stringValue: 'open' }, closes_at: { timestampValue: new Date(Date.now()+offset).toISOString() } });
       const votePath = `meeting_poll_votes/${id}_${user.uid}_option`;
       const write = setDoc(doc(db, votePath), { poll_id: id, option_id: 'option', user_id: user.uid, rank: 1, created_at: Timestamp.now() });
-      if (name === 'open') { await write; paths.push(votePath); } else await expect(write).rejects.toMatchObject({ code: 'permission-denied' });
+      await expect(write).rejects.toMatchObject({ code: 'permission-denied' });
+      const ballotPath = `meeting_poll_ballots/${id}_${user.uid}`;
+      await expect(setDoc(doc(db, ballotPath), { poll_id: id, user_id: user.uid, available_option_ids: [], unavailable_option_ids: ['option'], created_at: Timestamp.now(), updated_at: Timestamp.now() })).rejects.toMatchObject({ code: 'permission-denied' });
+      // Existing responses remain readable but cannot be overwritten or deleted directly.
+      for (const path of [votePath, ballotPath]) {
+        await seed(path, { poll_id: { stringValue: id }, user_id: { stringValue: user.uid } });
+        await expect(getDoc(doc(db, path))).resolves.toMatchObject({});
+        await expect(setDoc(doc(db, path), { user_id: user.uid }, { merge: true })).rejects.toMatchObject({ code: 'permission-denied' });
+        await expect(deleteDoc(doc(db, path))).rejects.toMatchObject({ code: 'permission-denied' });
+      }
     }
-    for (const collection of ['meeting_automation_config','meeting_automation_requests','news_tombstones']) {
+    for (const collection of ['meeting_automation_config','meeting_automation_requests','news_tombstones','poll_outcomes','poll_owner_decisions']) {
       const path = `${collection}/${prefix}`; await seed(path, { private: { booleanValue: true } });
       await expect(getDoc(doc(db, path))).rejects.toMatchObject({ code: 'permission-denied' });
       await expect(setDoc(doc(db, path), { private: false })).rejects.toMatchObject({ code: 'permission-denied' });
