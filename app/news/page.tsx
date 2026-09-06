@@ -146,7 +146,7 @@ export default function NewsFeedPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
-      <header><p className="eyebrow mb-2">From the AI frontier</p><h1 className="page-heading">News feed</h1><p className="text-foreground-muted mt-2">Developments, research, and ideas worth reading. Updated daily from OpenAI, Google AI, and MIT News.</p></header>
+      <header><p className="eyebrow mb-2">From the AI frontier</p><h1 className="page-heading">News feed</h1><p className="text-foreground-muted mt-2">Developments, research, and ideas worth reading. Updated daily from AI labs, university research, independent journalism, safety and policy writers, and global tech reporting.</p></header>
 
       {notice && <p role="status" className="text-sm text-foreground-muted">{notice}</p>}
       <div className="flex flex-wrap items-center gap-3">

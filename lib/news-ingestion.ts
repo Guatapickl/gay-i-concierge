@@ -6,10 +6,30 @@ export type NewsInput = {
   is_hot: boolean; relevance_score: number | null;
 };
 export type NewsSource = { name: string; url: string; hosts: string[]; tag: string };
+// Fixed RSS 2.0 publishers. Every feed was verified to answer 200 without a redirect
+// (collectNews uses redirect:'error') and to link stories on the listed hosts.
 export const NEWS_SOURCES: NewsSource[] = [
+  // Labs and industry
   { name: 'OpenAI', url: 'https://openai.com/news/rss.xml', hosts: ['openai.com'], tag: 'Industry' },
   { name: 'Google AI', url: 'https://blog.google/innovation-and-ai/technology/ai/rss/', hosts: ['blog.google'], tag: 'Industry' },
+  { name: 'Google DeepMind', url: 'https://deepmind.google/blog/rss.xml', hosts: ['deepmind.google'], tag: 'Industry' },
+  { name: 'NVIDIA Blog', url: 'https://blogs.nvidia.com/feed/', hosts: ['blogs.nvidia.com'], tag: 'Industry' },
+  // Open source and research
+  { name: 'Hugging Face', url: 'https://huggingface.co/blog/feed.xml', hosts: ['huggingface.co'], tag: 'Open Source' },
   { name: 'MIT News', url: 'https://news.mit.edu/rss/topic/artificial-intelligence2', hosts: ['news.mit.edu'], tag: 'Research' },
+  { name: 'Nature Machine Learning', url: 'https://www.nature.com/subjects/machine-learning.rss', hosts: ['www.nature.com', 'nature.com'], tag: 'Research' },
+  // Independent journalism
+  { name: 'MIT Technology Review', url: 'https://www.technologyreview.com/topic/artificial-intelligence/feed', hosts: ['www.technologyreview.com', 'technologyreview.com'], tag: 'Journalism' },
+  { name: 'Ars Technica', url: 'https://arstechnica.com/ai/feed/', hosts: ['arstechnica.com'], tag: 'Journalism' },
+  { name: 'WIRED', url: 'https://www.wired.com/feed/tag/ai/latest/rss', hosts: ['www.wired.com', 'wired.com'], tag: 'Journalism' },
+  { name: 'The Guardian', url: 'https://www.theguardian.com/technology/artificialintelligenceai/rss', hosts: ['www.theguardian.com', 'theguardian.com'], tag: 'Journalism' },
+  { name: 'TechCrunch', url: 'https://techcrunch.com/category/artificial-intelligence/feed/', hosts: ['techcrunch.com'], tag: 'Journalism' },
+  { name: 'IEEE Spectrum', url: 'https://spectrum.ieee.org/feeds/topic/artificial-intelligence.rss', hosts: ['spectrum.ieee.org'], tag: 'Journalism' },
+  // Safety, policy, and critical perspectives
+  { name: 'Import AI', url: 'https://importai.substack.com/feed', hosts: ['importai.substack.com'], tag: 'Safety' },
+  { name: 'AI as Normal Technology', url: 'https://www.normaltech.ai/feed', hosts: ['www.normaltech.ai', 'normaltech.ai'], tag: 'Policy' },
+  // Global perspective
+  { name: 'Rest of World', url: 'https://restofworld.org/feed/latest/', hosts: ['restofworld.org'], tag: 'Global' },
 ];
 
 export function hasSecret(req: Request, expected: string | undefined): boolean {

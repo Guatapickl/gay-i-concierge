@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import type { Firestore } from 'firebase-admin/firestore';
 import { adminDb } from '@/lib/firebase/admin';
 import { adminPayloadOf } from '@/lib/firebase/adminDb';
-import { canonicalNewsUrl, normalizeNewsItem } from '@/lib/news-ingestion';
+import { canonicalNewsUrl, normalizeNewsItem, type NewsInput } from '@/lib/news-ingestion';
 
 export function newsDocumentId(url: string): string {
   const canonical = canonicalNewsUrl(url);
@@ -11,16 +11,20 @@ export function newsDocumentId(url: string): string {
 }
 
 /** All publishers share the same tombstone/read/write transaction and canonical URL key. */
-export async function ingestNews(items: unknown[], db: Firestore = adminDb()) {
+export async function ingestNews(items: unknown[], db: Firestore = adminDb(), concurrency = 8) {
   const counts = { inserted: 0, updated: 0, skipped: 0 };
   const seen = new Set<string>();
+  const queue: NewsInput[] = [];
   for (const raw of items) {
     const item = normalizeNewsItem(raw);
     if (!item || seen.has(item.source_url)) { counts.skipped++; continue; }
     seen.add(item.source_url);
+    queue.push(item);
+  }
+  const col = db.collection('news_items');
+  const upsert = async (item: NewsInput) => {
     const id = newsDocumentId(item.source_url);
-    const col = db.collection('news_items');
-    const outcome = await db.runTransaction(async tx => {
+    return db.runTransaction(async tx => {
       const tombstone = await tx.get(db.collection('news_tombstones').doc(id));
       if (tombstone.exists) return 'skipped' as const;
       const target = col.doc(id);
@@ -36,8 +40,12 @@ export async function ingestNews(items: unknown[], db: Firestore = adminDb()) {
       }
       return existing ? 'updated' as const : 'inserted' as const;
     });
-    counts[outcome]++;
-  }
+  };
+  // Bounded parallelism keeps a 16-source refresh inside the route's 60s budget; each URL is unique so transactions never contend.
+  let cursor = 0;
+  await Promise.all(Array.from({ length: Math.max(1, concurrency) }, async () => {
+    while (cursor < queue.length) counts[await upsert(queue[cursor++])]++;
+  }));
   return counts;
 }
 

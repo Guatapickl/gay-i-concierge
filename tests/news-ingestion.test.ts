@@ -38,3 +38,18 @@ describe('news ingestion', () => {
     expect(hasSecret(new Request('https://site.test', { headers: { authorization: 'Bearer secret' } }), 'secret')).toBe(true);
   });
 });
+
+describe('news source list', () => {
+  it('covers several perspectives with unique, redirect-free https feeds', async () => {
+    const { NEWS_SOURCES } = await import('@/lib/news-ingestion');
+    const knownTags = ['Industry', 'Research', 'Open Source', 'Journalism', 'Safety', 'Policy', 'Global'];
+    expect(new Set(NEWS_SOURCES.map(s => s.url)).size).toBe(NEWS_SOURCES.length);
+    expect(new Set(NEWS_SOURCES.map(s => s.name)).size).toBe(NEWS_SOURCES.length);
+    expect(new Set(NEWS_SOURCES.map(s => s.tag)).size).toBeGreaterThanOrEqual(5);
+    for (const s of NEWS_SOURCES) {
+      expect(s.url.startsWith('https://')).toBe(true);
+      expect(s.hosts.length).toBeGreaterThan(0);
+      expect(knownTags).toContain(s.tag);
+    }
+  });
+});

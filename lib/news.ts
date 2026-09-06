@@ -80,6 +80,8 @@ export const TAG_COLORS: Record<string, string> = {
   'Safety': '#b91c1c',
   'Tooling': '#008ab5',
   'Industry': '#7a6090',
+  'Journalism': '#1f4e8c',
+  'Global': '#0f766e',
 };
 
 export function colorForTag(tag: string | null, fallback: string | null = null): string {
