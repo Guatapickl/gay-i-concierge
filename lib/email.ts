@@ -14,7 +14,9 @@ export type SendEmailArgs = {
   /** Override for one-off sends; otherwise EMAIL_FROM env var is used. */
   from?: string;
   replyTo?: string;
-  /** Used by Resend to dedupe headers if you regenerate templates. */
+  /** Stable provider request key for retries of one queued message (24h retention). */
+  idempotencyKey?: string;
+  /** Additional email message headers. */
   headers?: Record<string, string>;
 };
 
@@ -41,12 +43,16 @@ export async function sendEmail(args: SendEmailArgs): Promise<SendEmailResult> {
     return { ok: false, error: 'RESEND_API_KEY missing' };
   }
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15_000);
   try {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
+      signal: controller.signal,
       headers: {
         Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
+        ...(args.idempotencyKey ? { 'Idempotency-Key': args.idempotencyKey } : {}),
       },
       body: JSON.stringify({
         from,
@@ -67,5 +73,7 @@ export async function sendEmail(args: SendEmailArgs): Promise<SendEmailResult> {
     return { ok: true, id: json.id || null, provider: 'resend' };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : String(e) };
+  } finally {
+    clearTimeout(timeout);
   }
 }

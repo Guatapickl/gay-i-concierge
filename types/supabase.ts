@@ -187,6 +187,7 @@ export type Resource = {
  * Meeting date poll (ranked-choice vote on candidate dates).
  */
 export type MeetingPoll = {
+  date_only?: boolean;
   id: string;
   title: string;
   description: string | null;
@@ -199,6 +200,7 @@ export type MeetingPoll = {
 };
 
 export type MeetingPollOption = {
+  date_only?: boolean;
   id: string;
   poll_id: string;
   option_datetime: string;

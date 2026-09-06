@@ -1,17 +1,23 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { Sparkles, Activity, Filter, RefreshCw, Zap } from 'lucide-react';
+import { Sparkles, Activity, Filter, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { currentUser } from '@/lib/firebase/authClient';
-import { getSavedNewsIds, toggleSavedNews } from '@/lib/news';
+import { authHeader, currentUser } from '@/lib/firebase/authClient';
+import { getSavedNewsIds, getNewsItemsByIds, toggleSavedNews } from '@/lib/news';
 import type { NewsItem } from '@/types/supabase';
 import { Alert, LoadingSpinner } from '@/components/ui';
 import NewsCard from '@/components/NewsCard';
+import { isCurrentUserAdmin } from '@/lib/isAdmin';
 
 export default function NewsFeedPage() {
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [collecting, setCollecting] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [savedOnly, setSavedOnly] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [items, setItems] = useState<NewsItem[]>([]);
+  const [savedItems, setSavedItems] = useState<NewsItem[]>([]);
   const [saved, setSaved] = useState<Set<string>>(new Set());
   const [filter, setFilter] = useState<string>('All');
   const [loading, setLoading] = useState<boolean>(true);
@@ -31,6 +37,8 @@ export default function NewsFeedPage() {
 
       const uid = user?.uid || null;
       setUserId(uid);
+      setIsAdmin(uid ? await isCurrentUserAdmin(uid) : false);
+      if (!uid) { setSaved(new Set()); setSavedItems([]); setSavedOnly(false); }
 
       // Fetch from the newly created backend API
       const res = await fetch('/api/news?limit=60');
@@ -49,6 +57,7 @@ export default function NewsFeedPage() {
       if (uid) {
         const savedNewsSet = await getSavedNewsIds(uid);
         setSaved(savedNewsSet);
+        setSavedItems(await getNewsItemsByIds(savedNewsSet));
       }
     } catch (err: unknown) {
       console.error('Error loading news feed:', err);
@@ -65,20 +74,17 @@ export default function NewsFeedPage() {
 
   const tags = useMemo(() => {
     const uniqueTags = new Set<string>();
-    items.forEach(item => {
+    (savedOnly ? savedItems : items).forEach(item => {
       if (item.tag) {
         uniqueTags.add(item.tag);
       }
     });
     return ['All', ...Array.from(uniqueTags).sort()];
-  }, [items]);
+  }, [items, savedItems, savedOnly]);
 
   const filteredItems = useMemo(() => {
-    if (filter === 'All') {
-      return items;
-    }
-    return items.filter(item => item.tag === filter);
-  }, [items, filter]);
+    return (savedOnly ? savedItems : items).filter(item => (filter === 'All' || item.tag === filter) && (!savedOnly || saved.has(item.id)));
+  }, [items, savedItems, filter, savedOnly, saved]);
 
   const handleToggleSave = async (id: string) => {
     if (!userId) {
@@ -89,6 +95,11 @@ export default function NewsFeedPage() {
 
     try {
       const isNowSaved = await toggleSavedNews(userId, id);
+      setSavedItems(previous => {
+        if (!isNowSaved) return previous.filter(item => item.id !== id);
+        const item = items.find(item => item.id === id);
+        return item && !previous.some(existing => existing.id === id) ? [item, ...previous] : previous;
+      });
       setSaved(prev => {
         const nextSet = new Set(prev);
         if (isNowSaved) {
@@ -100,7 +111,29 @@ export default function NewsFeedPage() {
       });
     } catch (err) {
       console.error('Error toggling save status:', err);
+      throw new Error('Could not update saved stories. Please try again.');
     }
+  };
+
+  const handleRemove = async (id: string) => {
+    const response = await fetch(`/api/news/${encodeURIComponent(id)}`, { method: 'DELETE', headers: await authHeader() });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Could not remove this story.');
+    setItems(previous => previous.filter(item => item.id !== id));
+    setSavedItems(previous => previous.filter(item => item.id !== id));
+    setNotice('Story removed. Future updates will keep it removed.');
+  };
+
+  const handleCollect = async () => {
+    setCollecting(true); setNotice(null); setError(null);
+    try {
+      const response = await fetch('/api/news/refresh', { method: 'POST', headers: await authHeader() });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Could not check news sources.');
+      await fetchNews(true);
+      setNotice(`${data.inserted} new ${data.inserted === 1 ? 'story' : 'stories'} added.${data.partial ? ' Some sources are temporarily unavailable; available sources were updated.' : ' Sources are up to date.'}`);
+    } catch (err) { setError(err instanceof Error ? err.message : 'Could not check news sources.'); }
+    finally { setCollecting(false); }
   };
 
   if (loading) {
@@ -113,7 +146,13 @@ export default function NewsFeedPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
-      <header><p className="eyebrow mb-2">From the AI frontier</p><h1 className="page-heading">News feed</h1><p className="text-foreground-muted mt-2">Developments, research, and ideas worth reading.</p></header>
+      <header><p className="eyebrow mb-2">From the AI frontier</p><h1 className="page-heading">News feed</h1><p className="text-foreground-muted mt-2">Developments, research, and ideas worth reading. Updated daily from OpenAI, Google AI, and MIT News.</p></header>
+
+      {notice && <p role="status" className="text-sm text-foreground-muted">{notice}</p>}
+      <div className="flex flex-wrap items-center gap-3">
+        {userId && <button className="btn-secondary text-xs" aria-pressed={savedOnly} onClick={() => { setSavedOnly(value => !value); setFilter('All'); }}>{savedOnly ? 'Showing saved stories' : 'Show saved stories'}</button>}
+        {isAdmin && <button className="btn-secondary text-xs" disabled={collecting || refreshing} onClick={handleCollect}>{collecting ? 'Checking sources…' : 'Check sources now'}</button>}
+      </div>
 
       {/* Controls Section */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border pb-5">
@@ -171,7 +210,7 @@ export default function NewsFeedPage() {
       )}
 
       {/* Empty State (No items at all) */}
-      {items.length === 0 && !error && (
+      {!savedOnly && items.length === 0 && !error && (
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -192,7 +231,7 @@ export default function NewsFeedPage() {
 
       {/* Feed Grid */}
       <AnimatePresence mode="popLayout">
-        {filteredItems.length === 0 && items.length > 0 ? (
+        {filteredItems.length === 0 && (savedOnly || items.length > 0) && !error ? (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -200,9 +239,9 @@ export default function NewsFeedPage() {
             className="p-12 text-center rounded-lg border border-border bg-surface shadow-soft"
           >
             <Activity className="w-10 h-10 text-foreground-faint mx-auto mb-3" />
-            <h3 className="text-base font-bold text-foreground mb-1.5">No stories in this topic</h3>
+            <h3 className="text-base font-bold text-foreground mb-1.5">{savedOnly ? 'No saved stories here' : 'No stories in this topic'}</h3>
             <p className="text-foreground-muted font-mono text-xs max-w-md mx-auto">
-              Choose another topic to see more stories.
+              {savedOnly ? 'Save a story to find it here later, or show all stories.' : 'Choose another topic to see more stories.'}
             </p>
           </motion.div>
         ) : (
@@ -217,6 +256,7 @@ export default function NewsFeedPage() {
                 isSaved={saved.has(item.id)}
                 userId={userId}
                 onToggleSave={handleToggleSave}
+                onRemove={isAdmin ? handleRemove : undefined}
               />
             ))}
           </motion.div>

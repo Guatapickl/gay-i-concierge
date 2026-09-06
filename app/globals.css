@@ -52,6 +52,17 @@ html{scroll-behavior:smooth}
 main{min-width:0;width:100%}
 button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed}
 input,textarea,select{max-width:100%;accent-color:var(--color-primary-muted)}
+@layer base {
+  input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),textarea,select {
+    background-color:var(--color-surface);
+    color:var(--color-foreground);
+    border-color:var(--color-border-subtle);
+  }
+  input::placeholder,textarea::placeholder {color:var(--color-foreground-subtle);opacity:1}
+  select option {background-color:var(--color-surface);color:var(--color-foreground)}
+}
+.landing-sign-up{display:inline-flex;align-items:center;min-height:44px;padding:0 8px;font-size:14px;color:var(--color-foreground-muted);text-decoration:underline;text-underline-offset:4px}
+.chat-model-label{flex-shrink:0;padding:.5rem 1rem;color:var(--color-foreground-subtle);font:400 11px/1.5 var(--font-mono)}
 img,video{max-width:100%;height:auto}
 *:focus-visible{outline:2px solid var(--color-primary);outline-offset:4px}
 ::selection{background:var(--color-primary-subtle)}

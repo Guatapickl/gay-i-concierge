@@ -16,6 +16,7 @@ import {
   type PollWithOptions,
   type PollTally,
 } from '@/lib/polls';
+import { isPollOpen, newYorkDate, newYorkMeetingTime, formatPollDeadline } from '@/lib/poll-scheduling';
 import { createEvent, getUpcomingEvents } from '@/lib/events';
 import { isCurrentUserAdmin } from '@/lib/isAdmin';
 import type { MeetingPollOption } from '@/types/supabase';
@@ -41,6 +42,8 @@ export default function PollPage() {
   const [meetingTitle, setMeetingTitle] = useState('Gay I Club Meeting');
   const [meetingLocation, setMeetingLocation] = useState('');
   const [meetingDescription, setMeetingDescription] = useState('');
+  const [meetingTime, setMeetingTime] = useState('');
+  const [clockNow, setClockNow] = useState(() => Date.now());
   const [creating, setCreating] = useState(false);
   const [emailing, setEmailing] = useState<'invite' | 'result' | null>(null);
 
@@ -72,6 +75,11 @@ export default function PollPage() {
     load();
   }, [load]);
 
+  useEffect(() => {
+    const timer = setInterval(() => setClockNow(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   const optionById = useMemo(() => {
     const m = new Map<string, MeetingPollOption>();
     for (const o of poll?.options || []) m.set(o.id, o);
@@ -89,7 +97,12 @@ export default function PollPage() {
   };
 
   const submit = async () => {
-    if (!pollId || !userId) return;
+    if (!pollId || !userId || !poll) return;
+    if (!isPollOpen(poll)) {
+      setClockNow(Date.now());
+      setMessage({ text: 'Voting has closed for this poll.', variant: 'info' });
+      return;
+    }
     setSaving(true);
     const ok = await submitRanking(pollId, userId, order);
     setSaving(false);
@@ -127,20 +140,29 @@ export default function PollPage() {
   };
 
   const createMeeting = async () => {
-    if (!poll || !chosenOptionId) return;
+    if (!poll || !chosenOptionId || !isAdmin || poll.event_id) return;
     const opt = optionById.get(chosenOptionId);
     if (!opt) return;
+    let eventDateTime = opt.option_datetime;
+    if (opt.date_only || poll.date_only) {
+      try {
+        eventDateTime = newYorkMeetingTime(newYorkDate(opt.option_datetime), meetingTime);
+      } catch (error) {
+        setMessage({ text: error instanceof Error ? error.message : 'Choose a valid New York meeting time.', variant: 'error' });
+        return;
+      }
+    }
     setCreating(true);
     setMessage(null);
     // Guard against double-creating the same meeting.
     const upcoming = await getUpcomingEvents();
-    const dup = upcoming.find(e => Math.abs(new Date(e.event_datetime).getTime() - new Date(opt.option_datetime).getTime()) < 60_000);
+    const dup = upcoming.find(e => Math.abs(new Date(e.event_datetime).getTime() - new Date(eventDateTime).getTime()) < 60_000);
     let eventId: string | null = dup?.id ?? null;
     if (!eventId) {
       const ok = await createEvent({
         title: meetingTitle.trim() || 'Gay I Club Meeting',
         description: meetingDescription.trim() || null,
-        event_datetime: opt.option_datetime,
+        event_datetime: eventDateTime,
         location: meetingLocation.trim() || null,
       });
       if (!ok) {
@@ -149,7 +171,7 @@ export default function PollPage() {
         return;
       }
       const after = await getUpcomingEvents();
-      eventId = after.find(e => new Date(e.event_datetime).toISOString() === new Date(opt.option_datetime).toISOString())?.id ?? null;
+      eventId = after.find(e => new Date(e.event_datetime).toISOString() === new Date(eventDateTime).toISOString())?.id ?? null;
     }
     const closed = await closePoll(poll.id, eventId);
     setCreating(false);
@@ -182,7 +204,9 @@ export default function PollPage() {
     );
   }
 
-  const isOpen = poll.status === 'open';
+  const isOpen = isPollOpen(poll, clockNow);
+  const chosenOption = optionById.get(chosenOptionId);
+  const needsMeetingTime = !!(chosenOption?.date_only || poll.date_only);
   const winner = tally?.ranked[0];
 
   return (
@@ -202,9 +226,9 @@ export default function PollPage() {
         </div>
         <h1 className="text-2xl font-display font-bold text-foreground">{poll.title}</h1>
         {poll.description && <p className="text-foreground-muted mt-2 whitespace-pre-line">{poll.description}</p>}
-        {poll.closes_at && isOpen && (
+        {poll.closes_at && (
           <p className="text-[11px] font-mono text-foreground-faint mt-3">
-            Voting closes {new Date(poll.closes_at).toLocaleDateString()}
+            Voting deadline: {formatPollDeadline(poll.closes_at)}
           </p>
         )}
         {!isOpen && poll.event_id && (
@@ -296,24 +320,30 @@ export default function PollPage() {
             </Button>
           </div>
 
-          {isOpen && (
+          {!poll.event_id && (
             <div className="space-y-3 pt-2 border-t border-border">
               <div className="flex items-center gap-2">
                 <CalendarPlus className="w-4 h-4 text-primary" />
                 <span className="font-semibold text-foreground text-sm">Book the meeting</span>
                 {winner && <span className="text-xs text-foreground-faint">(leader: {formatOption(winner.option)})</span>}
               </div>
-              <select className="input-field w-full text-sm" value={chosenOptionId} onChange={e => setChosenOptionId(e.target.value)}>
+              <select aria-label="Meeting date" className="input-field w-full text-sm" value={chosenOptionId} onChange={e => setChosenOptionId(e.target.value)}>
                 {tally?.ranked.map(r => (
                   <option key={r.option.id} value={r.option.id}>
                     {formatOption(r.option)} · {r.points} pts
                   </option>
                 ))}
               </select>
+              {needsMeetingTime && (
+                <div className="space-y-1">
+                  <FormInput type="time" label="Meeting time (America/New_York)" value={meetingTime} onChange={e => setMeetingTime(e.target.value)} required />
+                  <p className="text-xs text-foreground-muted">Members voted on the date only. Choose the meeting start time in New York before booking.</p>
+                </div>
+              )}
               <FormInput value={meetingTitle} onChange={e => setMeetingTitle(e.target.value)} placeholder="Meeting title" />
               <FormInput value={meetingLocation} onChange={e => setMeetingLocation(e.target.value)} placeholder="Location" />
               <FormTextarea value={meetingDescription} onChange={e => setMeetingDescription(e.target.value)} placeholder="Description (optional)" rows={2} />
-              <Button variant="primary" onClick={createMeeting} disabled={creating || !chosenOptionId}>
+              <Button variant="primary" onClick={createMeeting} disabled={creating || !chosenOptionId || (needsMeetingTime && !meetingTime)}>
                 {creating ? 'Booking…' : 'Create meeting & close poll'}
               </Button>
               <p className="text-xs text-foreground-faint">

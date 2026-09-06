@@ -1,3 +1,4 @@
+import { AILEX_MODEL } from "@/lib/ai-model";
 import { NextResponse } from "next/server";
 import { rateLimit, getClientId } from "@/lib/rateLimit";
 import { getUpcomingEvents } from "@/lib/events";
@@ -65,7 +66,7 @@ export async function POST(req: Request) {
     },
     method: "POST",
     body: JSON.stringify({
-      model: "gpt-4o",
+      model: AILEX_MODEL.id,
       messages: enriched,
       stream: true,
     }),

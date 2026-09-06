@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Vote, Plus, CheckCircle2 } from 'lucide-react';
 import { currentUser } from '@/lib/firebase/authClient';
+import { isPollOpen, formatPollDeadline } from '@/lib/poll-scheduling';
 import { getAllPolls } from '@/lib/polls';
 import { isCurrentUserAdmin } from '@/lib/isAdmin';
 import type { MeetingPoll } from '@/types/supabase';
@@ -43,8 +44,8 @@ export default function VoteIndexPage() {
     );
   }
 
-  const open = polls.filter(p => p.status === 'open');
-  const closed = polls.filter(p => p.status !== 'open');
+  const open = polls.filter(p => isPollOpen(p));
+  const closed = polls.filter(p => !isPollOpen(p));
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
@@ -71,7 +72,7 @@ export default function VoteIndexPage() {
               {p.description && <p className="text-sm text-foreground-muted mt-1 line-clamp-2">{p.description}</p>}
               {p.closes_at && (
                 <p className="text-[11px] font-mono text-foreground-faint mt-2">
-                  Closes {new Date(p.closes_at).toLocaleDateString()}
+                  Closes {formatPollDeadline(p.closes_at)}
                 </p>
               )}
             </Link>

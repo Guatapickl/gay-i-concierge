@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Send, ChevronDown, Sparkles } from "lucide-react";
+import { AILEX_MODEL } from "@/lib/ai-model";
 import { saveRsvp } from "@/lib/rsvp";
 import { getUpcomingEvents } from "@/lib/events";
 import { fetchInterests } from "@/lib/interests";
@@ -487,6 +488,7 @@ export default function ChatWindow() {
   if (!hasOnboarded) {
     return (
       <div className="w-full max-w-lg mx-auto space-y-6">
+        <p className="chat-model-label">{AILEX_MODEL.label}</p>
         <div className="card-elevated p-6">
           <p className="text-lg font-display font-medium text-foreground mb-1">
             {onboardingStep === 0 && "What's your name?"}
@@ -595,6 +597,7 @@ export default function ChatWindow() {
   /* ── Chat interface ── */
   return (
     <div className="chat-container">
+      <p className="chat-model-label">{AILEX_MODEL.label}</p>
       {/* Messages area */}
       <div
         ref={scrollRef}

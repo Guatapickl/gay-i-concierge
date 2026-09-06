@@ -23,6 +23,19 @@ export async function getNewsItems(limit = 60): Promise<NewsItem[]> {
   }
 }
 
+/** Fetch saved documents regardless of age; client reads retain Firestore auth rules.
+ * Sequential groups keep each `in` query below Firestore's 30-value limit.
+ * Deleted documents are naturally omitted, and errors propagate to the UI.
+ */
+export async function getNewsItemsByIds(ids: Iterable<string>): Promise<NewsItem[]> {
+  const unique = [...new Set(ids)];
+  const items: NewsItem[] = [];
+  for (let i = 0; i < unique.length; i += 30) {
+    items.push(...await listRows<NewsItem>('news_items', where('__name__', 'in', unique.slice(i, i + 30))));
+  }
+  return items.sort((a, b) => Date.parse(b.published_at || b.ingested_at) - Date.parse(a.published_at || a.ingested_at));
+}
+
 export async function getSavedNewsIds(userId: string): Promise<Set<string>> {
   try {
     const rows = await listRows<{ news_id: string }>('news_saves', where('user_id', '==', userId));

@@ -108,6 +108,10 @@ service cloud.firestore {
     // ---- robot benchmark: results written by the API route
     match /robot_benchmarks/{id} { allow read: if signedIn(); allow write: if false; }
 
+    match /news_tombstones/{id} { allow read, write: if false; }
+    match /meeting_automation_config/{id} { allow read, write: if false; }
+    match /meeting_automation_requests/{document=**} { allow read, write: if false; }
+
     // ---- meeting date polls
     match /meeting_polls/{id} {
       allow read: if signedIn();
@@ -121,7 +125,9 @@ service cloud.firestore {
     match /meeting_poll_votes/{id} {      // doc id = `${poll_id}_${user_id}_${option_id}`
       allow read: if signedIn();
       allow create: if willOwn('user_id')
-        && get(/databases/$(database)/documents/meeting_polls/$(request.resource.data.poll_id)).data.status == 'open';
+        && get(/databases/$(database)/documents/meeting_polls/$(request.resource.data.poll_id)).data.status == 'open'
+        && (get(/databases/$(database)/documents/meeting_polls/$(request.resource.data.poll_id)).data.get('closes_at', null) == null
+          || request.time < get(/databases/$(database)/documents/meeting_polls/$(request.resource.data.poll_id)).data.closes_at);
       allow delete: if owns('user_id');
       allow update: if false;
     }

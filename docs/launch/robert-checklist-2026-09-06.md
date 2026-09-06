@@ -1,54 +1,36 @@
-# Robert’s relaunch checklist
+# Robert’s live-site checklist
 
 Gay I Club · September 6, 2026
 
-## Before you announce the relaunch
+## Your next steps
 
-- [x] Approve the full supplied redesign. Confirmed in this task.
-- [ ] Review https://gayiclub.com on your phone and computer: landing page, signed-in home, calendar, hub, directory and profile. Sign in with your normal club account.
-- [ ] Confirm the first meeting or date poll: dates, time zone (New York), location, RSVP expectations and organizer. Earlier notes proposed September 12, 13, 19 and 20; confirm those are still the choices you want.
-- [ ] Review the actual event and resource content. Remove or archive obsolete/test content through the normal admin workflow after identifying exact records. The mockup’s example people/events are not launch content.
-- [ ] Confirm who receives and handles support and moderation requests. The published contact is praxis+gayiclub@vibeshiftai.com. Verify a message reaches the inbox and a reply reaches you. Praxis feedback routing is also pending engineering configuration; this is not a task you need to implement. Automatic account-request receipts and cross-project beta syncing are not implemented yet.
-- [ ] Review the Privacy Policy, Terms of Use and Accessibility pages. In particular: adult membership, member-visible profiles/content, AI processing, feedback screenshots/voice/logs, retention and reviewed account requests. Current retention wording describes the implementation; it does not promise an automatic purge schedule.
-- [ ] Complete the real-inbox checks: email verification, magic link, password reset, update opt-in/opt-out, and RSVP confirmation. Check inbox and spam, sender name, reply address and destination links. Automated/local tests do not prove delivery to you. Do not email the membership as a test.
-- [ ] If exact fleet sender compliance is required for today, verify vibeshiftai.com in the sending Resend account or connect the approved mailbox sender. The currently verified sender domain is gayiclub.com; the release uses neutral “VibeShift AI Support” there with the plus-address as Reply-To.
-- [ ] Resolve the support-backbone gaps in the readiness report, or explicitly decide which may follow after launch. A profile beta checkbox currently saves interest locally; it does not sync contacts cross-project.
-- [x] Authorize release for review on the live site. Confirmed explicitly in this task; remaining support/email checks stay on the follow-up list.
+- [ ] Review [gayiclub.com](https://gayiclub.com) on your phone and computer. Sign in with your normal club account. Try light mode and type in “What should we discuss?” and other forms.
+- [x] Confirm September poll dates: **September 12, 13, 19, and 20**. These are saved; the last weekend is excluded.
+- [ ] Open [September’s poll](https://gayiclub.com/vote/september-2026). When ready, use the admin control to email members the invitation. No synthetic poll invitations were broadcast during testing.
+- [ ] When voting is finished, choose the date and explicitly enter the meeting time in New York time. Confirm location/agenda and book the meeting. Dates are not booked automatically.
+- [ ] After each meeting, answer the Praxis availability questionnaire for the following month. Mark every offered Saturday/Sunday Available or Unavailable. Only your available dates become a member poll. No response or no available dates means no member poll.
+- [ ] Review [News](https://gayiclub.com/news). Use Remove to delete an item, Collect latest news for an immediate refresh, Save for personal bookmarks, and Share to pass along a source link.
+- [ ] Check real email delivery to your inbox: verification, sign-in link, password reset, opt-in/opt-out, and RSVP confirmation. These delivery checks remain separate from automated code tests. Avoid using the membership as a test list.
+- [ ] Review the public Privacy Policy, Terms of Use and Accessibility pages, and confirm who handles moderation/account requests at praxis+gayiclub@vibeshiftai.com.
+- [ ] Send your relaunch announcement when you are happy with the live review. Include the sign-in URL and September poll link.
+- [ ] Submit [the sitemap](https://gayiclub.com/sitemap.xml) in your Google Search Console property, if desired.
 
-## After the release is verified live
+## How the automations run
 
-- [ ] Sign in once at gayiclub.com on your phone; confirm profile, date voting, RSVP and calendar export.
-- [ ] Publish or send your relaunch announcement only after the live checks pass. Include the correct club URL, what members should do first, and meeting/poll deadline.
-- [ ] Submit the sitemap in Google Search Console if you own the property: https://gayiclub.com/sitemap.xml. If the property is not verified, complete the ownership step in your Google account.
-- [ ] Check the support inbox and any failed email deliveries during the first day.
-- [ ] Review broken links/404s and member feedback about two weeks after launch.
+- News collection runs at **8 a.m. America/New_York daily** from OpenAI, Google AI, and MIT News. Deleted source URLs stay suppressed on future refreshes. Members can save and share; only admins can remove/collect.
+- The meeting workflow checks at **9 a.m. America/New_York daily**. After a booked meeting has ended and the next local day arrives, it asks for your following-month weekend availability through Praxis. One workflow is created per target month, including month-end meetings.
+- Member voting normally lasts **seven days**, or ends before the earliest offered date if sooner. Voting deadlines are enforced on the server. September’s restored poll has no automatic closing date; you decide when to book it.
+- All members see published polls in the site. Invitation email respects subscription preferences and excludes you from the automatic member invitation.
+- The cloud schedule runs independently of ChatGPT. Owner questionnaire delivery and answer forwarding use the existing Praxis daemon and feedback relay; keep Praxis running on its host. A temporary outage retries safely, but an expired questionnaire needs operator attention.
+- AIlex uses **OpenAI GPT-4o**, displayed in its chat interface. This label comes from the same constant used by its API request.
 
-## Already handled / not work you need to repeat
+## Already handled
 
-- Located the actual Firebase app and all 14 redesign references.
-- Made an isolated redesign branch and retained the original source commit.
-- Privately backed up Firebase user records, Firestore documents and current DNS records; captured old-site screenshots.
-- Verified the existing apex and www custom domains have active Firebase certificates. The site already runs on Firebase App Hosting.
-- Registered Gay I Club’s feedback submission token with the existing relay.
+- Full redesign and live deployment authorized; no local test server is needed for your review.
+- Old calendar events and recurring-series creation removed after a private backup. September’s four confirmed options restored.
+- Light-theme textareas use the app’s theme colors. Sign in is the homepage’s primary action; Sign up is a smaller link.
+- Private owner answers remain server-only. Retry protection covers owner-question delivery, callbacks, poll creation, and invitation queue entries.
 
-Do not follow the old Supabase restoration or Netlify setup steps in archived launch notes. They describe the platform before the September 4 migration.
+## Remaining support follow-ups
 
-## Current verification
-
-48 tests pass, production builds pass, lint has zero errors (46 warnings). Lighthouse:94 performance / 100 SEO / 100 accessibility / 100 best practices in a local production-host simulation. Final public accessibility scan: 6 pages, zero violations. Fifteen main member views fit mobile/tablet/desktop widths. These results do not establish live email delivery or completed platform integration. The independent launch verdict is currently not ready; see [readiness report](readiness-2026-09-06.md).
-
-## Email check update
-
-- [x] Confirm Praxis inbox access and delivery to praxis+gayiclub@vibeshiftai.com. One authorized test arrived.
-- [ ] Complete actual application email-flow tests; the mailbox self-test alone does not prove them.
-
-Google rewrote the submitted plus-address From to praxis@vibeshiftai.com. Gayiclub.com has no receiving MX records. See [mail findings](mail-findings-2026-09-06.md); the site still uses Resend, and that end-to-end delivery retest is pending credential access.
-
-## Live release update
-
-- [x] Publish the redesign and matching privacy rules to https://gayiclub.com.
-- [x] Verify live sign-in sessions, protected profile, safe directory fields, privacy denial, canonical redirects and public legal/SEO files.
-- [x] Remove the exact temporary test account.
-- [ ] Review the live site with your normal account and send any changes you want.
-
-Support/email follow-ups above remain open. No local server is needed. See [release note](release-2026-09-06.md).
+Praxis’s mailbox/plus-address has received an authorized test. Gayiclub.com is a verified **sending** domain in Resend but has no receiving MX records. Application mail uses `VibeShift AI Support <noreply@gayiclub.com>` with Reply-To `praxis+gayiclub@vibeshiftai.com`. The support beta-interest checkbox still saves locally; cross-project contact sync and automatic account-request receipts are separate engineering follow-ups. Earlier “not ready” audit notes describe pre-release gaps; see the current release and automation notes for what is live versus still pending.

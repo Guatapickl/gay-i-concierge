@@ -171,8 +171,7 @@ export async function processDueReminders(limit = 50): Promise<{
 }> {
   const db = adminDb();
 
-  // Claim a batch by transitioning to 'sending'. Two-step (select then update)
-  // is fine for low-volume cron; if scaled up, move the claim into a transaction.
+  // The query only finds candidates. Each row is rechecked and claimed atomically.
   let due: EmailReminder[];
   try {
     const snap = await db
@@ -189,30 +188,52 @@ export async function processDueReminders(limit = 50): Promise<{
   }
   if (due.length === 0) return { attempted: 0, sent: 0, failed: 0 };
 
+  let attempted = 0;
   let sent = 0;
   let failed = 0;
-  for (const row of due) {
-    const docRef = db.collection('email_reminders').doc(row.id);
-    const attempts = (row.attempts ?? 0) + 1;
-    await docRef.update({ status: 'sending', attempts });
-
-    const result = await sendEmail({
-      to: row.recipient_email,
-      subject: row.subject,
-      html: row.body_html,
-      text: row.body_text || undefined,
+  for (const candidate of due) {
+    const docRef = db.collection('email_reminders').doc(candidate.id);
+    const row = await db.runTransaction(async tx => {
+      const snap = await tx.get(docRef);
+      if (!snap.exists) return null;
+      const current = adminRowOf<Omit<EmailReminder, 'kind'> & { kind: string }>(snap);
+      const sendAt = Date.parse(current.send_at);
+      if (current.status !== 'pending' || !Number.isFinite(sendAt) || sendAt > Date.now()) return null;
+      const attempts = (current.attempts ?? 0) + 1;
+      tx.update(docRef, { status: 'sending', attempts });
+      return { ...current, attempts };
     });
+    if (!row) continue;
+    attempted += 1;
 
-    if (result.ok) {
+    try {
+      // Poll invitations are opt-in updates. Recheck just before sending so
+      // an unsubscribe made after queueing still prevents delivery.
+      if (row.kind === 'poll_invite') {
+        const subscribers = await db.collection('alerts_subscribers')
+          .where('email', '==', row.recipient_email).get();
+        if (!subscribers.docs.length || !subscribers.docs.every(s => s.data().email_opt_in === true)) {
+          await docRef.update({ status: 'cancelled', error: 'Poll invitation cancelled: recipient is not opted in.' });
+          continue;
+        }
+      }
+      const result = await sendEmail({
+        to: row.recipient_email,
+        subject: row.subject,
+        html: row.body_html,
+        text: row.body_text || undefined,
+        idempotencyKey: `email-reminder/${row.id}`,
+      });
+      if (!result.ok) throw new Error(result.error);
       await docRef.update({ status: 'sent', sent_at: Timestamp.now(), error: null });
       sent += 1;
-    } else {
+    } catch (error) {
       await docRef.update({
-        status: attempts >= 3 ? 'failed' : 'pending',
-        error: result.error,
+        status: row.attempts >= 3 ? 'failed' : 'pending',
+        error: error instanceof Error ? error.message : String(error),
       });
       failed += 1;
     }
   }
-  return { attempted: due.length, sent, failed };
+  return { attempted, sent, failed };
 }

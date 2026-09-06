@@ -565,9 +565,9 @@ flowchart LR
 
 ---
 
-### Recurring Events
+### One-off events and legacy series
 
-The system supports recurring meeting series using a "materialized instances" strategy:
+New events are created individually after meeting dates are confirmed through member polls. Recurring-series creation is disabled. Legacy series records retain the "materialized instances" representation:
 
 - Each occurrence is a **concrete row** in the `events` table sharing a `series_id`
 - `recurrence_rule` stores an RRULE-lite string (e.g. `FREQ=WEEKLY;INTERVAL=2;BYDAY=TU`)
@@ -580,7 +580,6 @@ The system supports recurring meeting series using a "materialized instances" st
 |----------|-------------|
 | `getUpcomingEvents()` | All future events, sorted by date |
 | `createEvent(event)` | Single event insert |
-| `createRecurringSeries(args)` | Bulk-insert series via `buildSeriesRows()` |
 | `updateEvent(id, updates)` | Update single instance |
 | `deleteEvent(id)` / `deleteSeries(seriesId)` | Delete single or full series |
 | `getEventById(id)` | Fetch by UUID |

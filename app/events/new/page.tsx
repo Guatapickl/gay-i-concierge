@@ -3,10 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Calendar, MapPin, FileText } from 'lucide-react';
-import { createEvent, createRecurringSeries } from '@/lib/events';
+import { createEvent } from '@/lib/events';
 import AgendaEditor from '@/components/AgendaEditor';
-import RecurrencePicker from '@/components/RecurrencePicker';
-import type { AgendaItem, RecurrenceConfig } from '@/types/supabase';
+import type { AgendaItem } from '@/types/supabase';
 import { Button, FormInput, FormTextarea, Alert } from '@/components/ui';
 
 export default function NewEventPage() {
@@ -16,10 +15,6 @@ export default function NewEventPage() {
   const [dateTime, setDateTime] = useState('');
   const [location, setLocation] = useState('');
   const [agenda, setAgenda] = useState<AgendaItem[]>([]);
-  const [recurrence, setRecurrence] = useState<RecurrenceConfig>({
-    frequency: 'none',
-    count: 8,
-  });
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -40,7 +35,7 @@ export default function NewEventPage() {
           New Event
         </h1>
         <p className="text-foreground-muted mt-1">
-          Schedule a one-off meeting or a recurring series
+          Create a one-off event. Monthly meeting dates are chosen through member polls; confirm the selected date before creating the meeting.
         </p>
       </div>
 
@@ -53,38 +48,19 @@ export default function NewEventPage() {
           const finalAgenda = cleanedAgenda();
           const agendaArg = finalAgenda.length ? finalAgenda : undefined;
 
-          if (recurrence.frequency === 'none') {
-            const success = await createEvent({
-              title: title.trim(),
-              description: description.trim() || null,
-              event_datetime: dateTime,
-              location: location.trim() || null,
-              agenda: agendaArg,
-            });
-            setSaving(false);
-            if (success) {
-              setMessage('Event created');
-              setTimeout(() => router.push('/events'), 800);
-            } else {
-              setMessage('Failed to create event. Check console for errors.');
-            }
-            return;
-          }
-
-          const rows = await createRecurringSeries({
+          const success = await createEvent({
             title: title.trim(),
             description: description.trim() || null,
-            baseDateTime: dateTime,
+            event_datetime: dateTime,
             location: location.trim() || null,
-            agenda: agendaArg ?? null,
-            recurrence,
+            agenda: agendaArg,
           });
           setSaving(false);
-          if (rows) {
-            setMessage(`Created series of ${rows.length} meetings`);
+          if (success) {
+            setMessage('Event created');
             setTimeout(() => router.push('/events'), 800);
           } else {
-            setMessage('Failed to create recurring series. Check console for errors.');
+            setMessage('Failed to create event. Check console for errors.');
           }
         }}
       >
@@ -144,14 +120,6 @@ export default function NewEventPage() {
         </div>
 
         <div className="card p-6">
-          <RecurrencePicker
-            value={recurrence}
-            onChange={setRecurrence}
-            baseDateTime={dateTime}
-          />
-        </div>
-
-        <div className="card p-6">
           <AgendaEditor
             value={agenda}
             onChange={setAgenda}
@@ -161,11 +129,7 @@ export default function NewEventPage() {
 
         <div className="flex items-center gap-3">
           <Button type="submit" variant="primary" disabled={saving}>
-            {saving
-              ? 'Saving…'
-              : recurrence.frequency === 'none'
-                ? 'Create event'
-                : `Create series of ${recurrence.count}`}
+            {saving ? 'Saving…' : 'Create event'}
           </Button>
           <Button
             type="button"

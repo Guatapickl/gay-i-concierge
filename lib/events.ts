@@ -1,8 +1,7 @@
-import { addDoc, deleteDoc, doc, getDocs, limit as qLimit, orderBy, query, Timestamp, updateDoc, where, writeBatch } from 'firebase/firestore';
+import { addDoc, deleteDoc, getDocs, limit as qLimit, orderBy, query, Timestamp, updateDoc, where, writeBatch } from 'firebase/firestore';
 import { db } from './firebase/client';
 import { chunk, col, getRow, listRows, nowIso, payloadOf, ref, rowOf } from './firebase/db';
-import { Event, AgendaItem, RecurrenceConfig } from '@/types/supabase';
-import { buildSeriesRows } from './recurrence';
+import { Event, AgendaItem } from '@/types/supabase';
 
 const byDate = (a: Event, b: Event) =>
   new Date(a.event_datetime).getTime() - new Date(b.event_datetime).getTime();
@@ -112,36 +111,6 @@ export async function getUpcomingSeriesEvents(seriesId: string, limit = 12): Pro
   } catch (err) {
     console.error('Error fetching series events:', (err as Error).message);
     return [];
-  }
-}
-
-/**
- * Create a one-off event or a recurring series in a single call. Returns the
- * inserted rows (one for non-recurring, N for series) or null on error.
- */
-export async function createRecurringSeries(args: {
-  title: string;
-  description: string | null;
-  baseDateTime: string;
-  location: string | null;
-  agenda?: AgendaItem[] | null;
-  recurrence: RecurrenceConfig;
-}): Promise<Event[] | null> {
-  const rows = buildSeriesRows(args);
-  try {
-    const created_at = nowIso();
-    const batch = writeBatch(db);
-    const out: Event[] = rows.map(r => {
-      const d = doc(col('events'));
-      const row = { ...r, created_at };
-      batch.set(d, payloadOf(row));
-      return { id: d.id, ...row } as Event;
-    });
-    await batch.commit();
-    return out;
-  } catch (err) {
-    console.error('Failed to create recurring series:', (err as Error).message);
-    return null;
   }
 }
 

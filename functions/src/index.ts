@@ -27,3 +27,20 @@ export const remindersTick = onSchedule(
     logger.info('reminders tick ok', { body: body.slice(0, 500) });
   }
 );
+
+async function invokeAutomation(path: string) {
+  const res = await fetch(`${SITE_URL.value().replace(/\/$/, '')}${path}`, {
+    method: 'POST', headers: { Authorization: `Bearer ${CRON_SECRET.value()}` },
+    signal: AbortSignal.timeout(120000),
+  });
+  if (!res.ok) throw new Error(`Automation ${path} failed: ${res.status}`);
+  logger.info('Automation completed', { path, result: await res.json() });
+}
+export const newsTick = onSchedule(
+  { schedule: '0 8 * * *', timeZone: 'America/New_York', secrets: [CRON_SECRET], region: 'us-east4', timeoutSeconds: 180 },
+  () => invokeAutomation('/api/cron/news')
+);
+export const meetingPollTick = onSchedule(
+  { schedule: '0 9 * * *', timeZone: 'America/New_York', secrets: [CRON_SECRET], region: 'us-east4', timeoutSeconds: 180 },
+  () => invokeAutomation('/api/cron/meeting-polls')
+);

@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
-import { adminDb } from '@/lib/firebase/admin';
-import { adminPayloadOf, adminRowOf } from '@/lib/firebase/adminDb';
+import { adminDb, isAdminUid } from '@/lib/firebase/admin';
+import { adminRowOf } from '@/lib/firebase/adminDb';
 import { callerFromRequest } from '../_lib/caller';
+import { ingestNews } from '@/lib/news-store';
+import { normalizeNewsItem } from '@/lib/news-ingestion';
 import type { NewsItem } from '@/types/supabase';
 
 export const runtime = 'nodejs';
@@ -11,8 +13,8 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
 
   // Pagination parameters
-  const limit = parseInt(searchParams.get('limit') || '20', 10);
-  const page = parseInt(searchParams.get('page') || '1', 10);
+  const limit = Math.max(1, Math.min(100, parseInt(searchParams.get('limit') || '20', 10) || 20));
+  const page = Math.max(1, Math.min(1000, parseInt(searchParams.get('page') || '1', 10) || 1));
   const offset = (page - 1) * limit;
 
   try {
@@ -44,55 +46,19 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  // Authentication check (Bearer ID token or __session cookie)
   const user = await callerFromRequest(request);
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!await isAdminUid(user.uid)) return NextResponse.json({ error: 'Admin only' }, { status: 403 });
+  let item;
+  try { item = normalizeNewsItem(await request.json()); }
+  catch { return NextResponse.json({ error: 'Invalid request body' }, { status: 400 }); }
+  if (!item) return NextResponse.json({ error: 'A title, summary and valid source URL are required' }, { status: 400 });
   try {
-    const body = await request.json();
-    const {
-      title,
-      summary,
-      source_url,
-      source_name,
-      tag,
-      tag_color,
-      published_at,
-      is_hot,
-      relevance_score,
-    } = body;
-
-    if (!title || !summary || !source_url) {
-      return NextResponse.json(
-        { error: 'Missing required fields: title, summary, source_url' },
-        { status: 400 }
-      );
-    }
-
-    const row = {
-      title,
-      summary,
-      source_url,
-      source_name: source_name || null,
-      tag: tag || null,
-      tag_color: tag_color || null,
-      published_at: published_at || new Date().toISOString(),
-      ingested_at: new Date().toISOString(),
-      is_hot: is_hot || false,
-      relevance_score: relevance_score || null,
-    };
-
-    try {
-      const ref = adminDb().collection('news_items').doc();
-      await ref.set(adminPayloadOf(row));
-      const data = adminRowOf<NewsItem>(await ref.get());
-      return NextResponse.json({ data }, { status: 201 });
-    } catch (e) {
-      return NextResponse.json({ error: e instanceof Error ? e.message : 'insert failed' }, { status: 500 });
-    }
-  } catch {
-    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+    const counts = await ingestNews([item]);
+    if (counts.skipped) return NextResponse.json({ error: 'This source was removed by the owner' }, { status: 409 });
+    return NextResponse.json({ ok: true, ...counts }, { status: counts.inserted ? 201 : 200 });
+  } catch (error) {
+    console.error('News creation failed', error);
+    return NextResponse.json({ error: 'Could not add this story' }, { status: 500 });
   }
 }
