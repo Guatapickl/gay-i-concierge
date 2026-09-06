@@ -7,7 +7,8 @@ Gay I Club · September 6, 2026
 - [ ] Review [gayiclub.com](https://gayiclub.com) on your phone and computer. Sign in with your normal club account. Try light mode and type in “What should we discuss?” and other forms.
 - [x] Confirm September poll dates: **September 12, 13, 19, and 20**. These are saved; the last weekend is excluded.
 - [ ] Open [September’s poll](https://gayiclub.com/vote/september-2026). When ready, use the admin control to email members the invitation. No synthetic poll invitations were broadcast during testing.
-- [ ] Provide the default meeting time (New York) and location or meeting link. Automatic booking waits for these details; a location of “to be confirmed” is acceptable if that is your choice.
+- [x] Private meeting location configured in server-only settings. Event details and addresses require member sign-in.
+- [ ] Provide the default meeting start time in New York. Automatic booking still waits for that time.
 - [x] September’s exception: close voting **September 11 at 6 p.m. New York time**. The four approved dates stay unchanged.
 - [ ] Review the owner results report after the poll closes. A clear points winner is scheduled automatically once defaults are configured. For a tie, answer the Praxis questionnaire (or choose a tied date on the poll page). After booking, use “Email the result” if you want a separate member announcement.
 - [ ] After each meeting, answer the Praxis availability questionnaire for the following month. Mark every offered Saturday/Sunday Available or Unavailable. Only your available dates become a member poll. No response or no available dates means no member poll.

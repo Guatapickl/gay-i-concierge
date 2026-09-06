@@ -39,3 +39,9 @@ it('redirects signed-out directory and member-detail requests to sign-in', () =>
   expect(middleware(new NextRequest(`https://gayiclub.com${path}`)).headers.get('location')).toBe('https://gayiclub.com/auth/sign-in');
  }
 });
+
+it('keeps calendar and event locations behind sign-in', () => {
+ for (const path of ['/calendar', '/events', '/events/private-meeting']) {
+  expect(middleware(new NextRequest(`https://gayiclub.com${path}`)).headers.get('location')).toBe('https://gayiclub.com/auth/sign-in');
+ }
+});

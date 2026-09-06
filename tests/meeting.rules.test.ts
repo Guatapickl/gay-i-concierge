@@ -15,6 +15,13 @@ it.skipIf(process.env.RUN_FIREBASE_RULES_TESTS !== '1')('poll ballots are server
   try {
     const { user } = await signInAnonymously(auth);
     const prefix = `rules-${user.uid}`;
+    const eventPath = `events/${prefix}`;
+    await seed(eventPath, { title: { stringValue: 'Private meeting fixture' }, location: { stringValue: 'Private fixture address' } });
+    // No public direct document reads or list queries may expose a meeting address.
+    expect((await fetch(`${base}/${eventPath}`)).status).toBe(403);
+    expect((await fetch(`${base}:runQuery`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ structuredQuery: { from: [{ collectionId: 'events' }] } }) })).status).toBe(403);
+    expect((await getDoc(doc(db, eventPath))).data()?.location).toBe('Private fixture address');
+
     for (const [name, offset] of [['open', 60000], ['expired', -60000]] as const) {
       const id = `${prefix}-${name}`;
       await seed(`meeting_polls/${id}`, { status: { stringValue: 'open' }, closes_at: { timestampValue: new Date(Date.now()+offset).toISOString() } });

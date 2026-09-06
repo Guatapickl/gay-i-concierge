@@ -252,15 +252,14 @@ export function pollResultEmail(poll: PollForEmail, event: Event) {
 <h1 style="margin:0 0 12px;font-size:22px;">${escapeHtml(event.title)}</h1>
 <p style="margin:0 0 6px;line-height:1.5;">Thanks for voting on “${escapeHtml(poll.title)}”. The winning date is:</p>
 <p style="margin:0 0 16px;font-size:18px;font-weight:700;">${escapeHtml(when)}</p>
-${event.location ? `<p style="margin:0 0 16px;color:${PALETTE.muted};">${escapeHtml(event.location)}</p>` : ''}
-${event.description ? `<p style="margin:0 0 20px;line-height:1.5;">${escapeHtml(event.description)}</p>` : ''}
+<p style="margin:0 0 16px;">Sign in to view the meeting location and details.</p>
 ${button('RSVP & add to calendar', eventUrl)}
 <p style="margin:20px 0 0;color:${PALETTE.muted};font-size:13px;">RSVP on the site to get a reminder the day before and an hour before. Have a topic you want covered? Suggest it on the event page.</p>`;
   const text = [
     event.title,
     '',
     `Winning date: ${when}`,
-    event.location || '',
+    'Sign in to view the meeting location and details.',
     '',
     `RSVP: ${eventUrl}`,
   ].join('\n');

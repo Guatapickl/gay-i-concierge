@@ -45,9 +45,9 @@ service cloud.firestore {
       allow delete: if owns('user_id');
     }
 
-    // ---- events: public read, admin write
+    // ---- events: member-only details and addresses, admin write
     match /events/{eventId} {
-      allow read: if true;
+      allow read: if signedIn();
       allow create, update, delete: if isAdmin();
     }
 

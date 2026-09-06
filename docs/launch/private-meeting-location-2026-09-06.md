@@ -1,0 +1,7 @@
+# Private meeting location
+
+Robert supplied the meeting location and explicitly required that it not become public. The actual address is stored only in the live server-only meeting_automation_config/default document as defaultMeetingLocation. Do not copy it into source code, public documentation, source-controlled fixtures, or vault notes.
+
+Event documents previously allowed public database reads despite the event page sign-in redirect. Firestore rules now require sign-in to read events or query the event collection; calendar navigation also redirects guests to sign-in. Signed-in club members can see the location of a booked meeting. Existing server-only config/outcome/email-queue access restrictions remain. The public homepage returns the guest landing page, with no server-loaded events. Event sharing includes its title, description and protected link, with no location field. Member calendar exports and private RSVP/reminder emails can contain the location as part of normal meeting participation. Broad poll-result announcements omit both location and description and link to the signed-in event page, because the email subscriber list can include unbound accounts.
+
+Two emulator rules suites passed, including explicit anonymous event GET and list query rejection and successful signed-in event read. The calendar redirect regression and poll outcome tests passed (36 tests). The production build passed. Location is configured; default meeting time remains pending, so no meeting was automatically booked. Deployment verification follows below.
