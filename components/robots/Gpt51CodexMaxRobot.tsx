@@ -54,9 +54,11 @@ export default function Gpt51CodexMaxRobot({ className = "" }: RobotProps) {
             <ellipse cx="180" cy="320" rx="150" ry="250" fill="url(#halo)" className="animate-pulse" />
 
             {/* Floating rings */}
-            <g className="animate-spin-slow" transform="translate(180 420)">
-                <ellipse cx="0" cy="0" rx="120" ry="28" fill="none" stroke="url(#pride-rainbow)" strokeWidth="4" opacity="0.6" />
-                <ellipse cx="0" cy="0" rx="70" ry="16" fill="none" stroke="url(#electric-cyan)" strokeWidth="3" opacity="0.5" />
+            <g transform="translate(180 420)">
+                <g className="animate-spin-slow">
+                    <ellipse cx="0" cy="0" rx="120" ry="28" fill="none" stroke="url(#pride-rainbow)" strokeWidth="4" opacity="0.6" />
+                    <ellipse cx="0" cy="0" rx="70" ry="16" fill="none" stroke="url(#electric-cyan)" strokeWidth="3" opacity="0.5" />
+                </g>
             </g>
 
             {/* Body */}

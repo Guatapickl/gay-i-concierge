@@ -1,0 +1,286 @@
+[
+  {
+    "ms": 7,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 113,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 223,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 338,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 454,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 568,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 681,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 793,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 910,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 1024,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 1136,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 1246,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 1360,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 1467,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 1578,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 1694,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 1808,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 1914,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 2027,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 2141,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 2254,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 2367,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 2475,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 2590,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 2703,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 2813,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 2920,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 3037,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 3146,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 3260,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 3376,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 3489,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 3603,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 3716,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 3828,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 3945,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 4062,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 4178,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 4293,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 4408,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 4522,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 4635,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 4748,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 4860,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 4976,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 5090,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 5203,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 5318,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 5428,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 5543,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 5658,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 5771,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 5885,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 5998,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 6113,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 6225,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 6340,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 6452,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 6564,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 6676,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 6790,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 6904,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 7016,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 7127,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 7241,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 7355,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 7470,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 7582,
+    "transform": "matrix(1, 0, 0, 1, 0, -90)"
+  },
+  {
+    "ms": 7693,
+    "transform": "matrix(1, 0, 0, 1, 0, -89.9521)"
+  },
+  {
+    "ms": 7806,
+    "transform": "matrix(1, 0, 0, 1, 0, -21.086)"
+  },
+  {
+    "ms": 7914,
+    "transform": "matrix(1, 0, 0, 1, 0, 0)"
+  }
+]

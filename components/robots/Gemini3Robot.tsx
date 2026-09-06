@@ -152,7 +152,7 @@ export default function Gemini3Robot({ className = "" }: { className?: string })
 
                     {/* Core Reactor */}
                     <circle cx="400" cy="520" r="30" fill="#111" stroke="#333" strokeWidth="2" />
-                    <circle cx="400" cy="520" r="25" fill="none" stroke="url(#rainbow-gradient)" strokeWidth="3" className="animate-spin-slow" />
+                    <circle cx="400" cy="520" r="25" fill="none" stroke="url(#rainbow-gradient)" strokeWidth="3" className="animate-spin-slow" style={{ transformOrigin: '400px 520px' }} />
                     <circle cx="400" cy="520" r="15" fill="#00ffff" filter="url(#intense-glow)" className="animate-pulse" />
                     <path d="M400 500 L400 540 M380 520 L420 520" stroke="#fff" strokeWidth="2" opacity="0.5" />
 
@@ -168,7 +168,7 @@ export default function Gemini3Robot({ className = "" }: { className?: string })
                 <g>
                     {/* Right Arm */}
                     <circle cx="280" cy="480" r="50" fill="url(#metal-gradient)" stroke="#333" strokeWidth="2" />
-                    <circle cx="280" cy="480" r="30" fill="none" stroke="#00ffff" strokeWidth="2" strokeDasharray="10 5" className="animate-spin-slow" />
+                    <circle cx="280" cy="480" r="30" fill="none" stroke="#00ffff" strokeWidth="2" strokeDasharray="10 5" className="animate-spin-slow" style={{ transformOrigin: '280px 480px' }} />
                     <path d="M250 510 L230 650 L280 650 L290 510 Z" fill="url(#dark-metal)" stroke="#333" strokeWidth="2" />
                     <path d="M250 530 L290 530 M245 560 L285 560 M240 590 L280 590" stroke="#333" strokeWidth="1" opacity="0.5" /> {/* Detail Lines */}
 
@@ -179,7 +179,7 @@ export default function Gemini3Robot({ className = "" }: { className?: string })
 
                     {/* Left Arm */}
                     <circle cx="520" cy="480" r="50" fill="url(#metal-gradient)" stroke="#333" strokeWidth="2" />
-                    <circle cx="520" cy="480" r="30" fill="none" stroke="#00ffff" strokeWidth="2" strokeDasharray="10 5" className="animate-spin-slow" style={{ animationDirection: 'reverse' }} />
+                    <circle cx="520" cy="480" r="30" fill="none" stroke="#00ffff" strokeWidth="2" strokeDasharray="10 5" className="animate-spin-slow" style={{ animationDirection: 'reverse', transformOrigin: '520px 480px' }} />
                     <path d="M550 510 L570 650 L520 650 L510 510 Z" fill="url(#dark-metal)" stroke="#333" strokeWidth="2" />
                     <path d="M550 530 L510 530 M555 560 L515 560 M560 590 L520 590" stroke="#333" strokeWidth="1" opacity="0.5" /> {/* Detail Lines */}
 
@@ -220,7 +220,7 @@ export default function Gemini3Robot({ className = "" }: { className?: string })
 
                 {/* HUD Overlay Effects */}
                 <g stroke="#00ffff" strokeWidth="1" fill="none" opacity="0.3">
-                    <circle cx="400" cy="380" r="250" strokeDasharray="10 20" className="animate-spin-slow" />
+                    <circle cx="400" cy="380" r="250" strokeDasharray="10 20" className="animate-spin-slow" style={{ transformOrigin: '400px 380px' }} />
                     <path d="M100 100 L150 100 L130 120" stroke="#ff00cc" strokeWidth="2" />
                     <path d="M700 100 L650 100 L670 120" stroke="#ff00cc" strokeWidth="2" />
                 </g>
