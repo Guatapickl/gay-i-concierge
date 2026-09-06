@@ -1,0 +1,17 @@
+{
+  "at": "2026-09-06T14:22:28.772Z",
+  "/community": {
+    "status": 307,
+    "redirect": "https://gayiclub.com/auth/sign-in"
+  },
+  "/community/member-check": {
+    "status": 307,
+    "redirect": "https://gayiclub.com/auth/sign-in"
+  },
+  "forgedCookieRejected": true,
+  "homeCopyUpdated": true,
+  "homeHasPaperClub": false,
+  "signedInCommunityStatus": 200,
+  "signedInRedirected": false,
+  "temporaryAccountDeleted": true
+}
