@@ -85,7 +85,7 @@ export default function RobotShowcasePage() {
       <header className="card p-6 md:p-8 space-y-3">
         <div className="flex items-center gap-2 text-primary text-xs font-mono uppercase tracking-wider"><Award className="w-4 h-4" /> Robot gallery</div>
         <h1 className="page-heading">Flagship Showcase</h1>
-        <p className="text-sm text-foreground-muted max-w-2xl">{robots.length} original robot artworks. Explore the details and vote for your favorites.</p>
+        <p className="text-sm text-foreground-muted max-w-2xl">Original robot artworks. Explore the details and vote for your favorites.</p>
         <p className="text-sm text-foreground-muted">You can vote for more than one robot. Each vote is saved to your account; select “Voted” to remove it whenever you change your mind.</p>
       </header>
 
