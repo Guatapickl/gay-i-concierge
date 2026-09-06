@@ -43,3 +43,12 @@ Do not follow the old Supabase restoration or Netlify setup steps in archived la
 - [ ] Complete actual application email-flow tests; the mailbox self-test alone does not prove them.
 
 Google rewrote the submitted plus-address From to praxis@vibeshiftai.com. Gayiclub.com has no receiving MX records. See [mail findings](mail-findings-2026-09-06.md); the site still uses Resend, and that end-to-end delivery retest is pending credential access.
+
+## Live release update
+
+- [x] Publish the redesign and matching privacy rules to https://gayiclub.com.
+- [x] Verify live sign-in sessions, protected profile, safe directory fields, privacy denial, canonical redirects and public legal/SEO files.
+- [x] Remove the exact temporary test account.
+- [ ] Review the live site with your normal account and send any changes you want.
+
+Support/email follow-ups above remain open. No local server is needed. See [release note](release-2026-09-06.md).

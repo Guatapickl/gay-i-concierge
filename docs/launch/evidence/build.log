@@ -9,7 +9,7 @@
  ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
    Creating an optimized production build ...
 [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
- ✓ Compiled successfully in 1534.0ms
+ ✓ Compiled successfully in 1580.8ms
    Running TypeScript ...
    Collecting page data using 15 workers ...
 [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
@@ -34,7 +34,7 @@
    Generating static pages using 15 workers (11/44)
    Generating static pages using 15 workers (22/44)
    Generating static pages using 15 workers (33/44)
- ✓ Generating static pages using 15 workers (44/44) in 509.1ms
+ ✓ Generating static pages using 15 workers (44/44) in 540.2ms
    Finalizing page optimization ...
 
 Route (app)

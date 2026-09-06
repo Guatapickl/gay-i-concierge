@@ -56,26 +56,26 @@ Smoke tests passed (0 failure(s)).
 
  RUN  v3.2.4 /Users/robertwashko/Documents/ChatGPT/GayIClub/relaunch
 
- ✓ tests/tokens-rateLimit.test.ts (3 tests) 3ms
  ✓ tests/calendar.test.ts (2 tests) 2ms
- ✓ tests/session.route.test.ts (2 tests) 4ms
- ✓ tests/middleware.test.ts (4 tests) 4ms
- ✓ tests/chat.route.test.ts (2 tests) 5ms
- ✓ tests/invite.route.test.ts (2 tests) 8ms
- ✓ tests/polls.lib.test.ts (3 tests) 3ms
+ ✓ tests/tokens-rateLimit.test.ts (3 tests) 4ms
+ ✓ tests/invite.route.test.ts (2 tests) 6ms
+ ✓ tests/chat.route.test.ts (2 tests) 4ms
+ ✓ tests/session.route.test.ts (4 tests) 6ms
+ ✓ tests/middleware.test.ts (8 tests) 6ms
+ ✓ tests/polls.lib.test.ts (3 tests) 2ms
  ✓ tests/announcements.lib.test.ts (5 tests) 5ms
- ✓ tests/rsvp.lib.test.ts (4 tests) 14ms
- ✓ tests/event-list-item.test.tsx (2 tests) 20ms
- ✓ tests/directory.route.test.ts (4 tests) 212ms
+ ✓ tests/rsvp.lib.test.ts (4 tests) 23ms
+ ✓ tests/directory.route.test.ts (4 tests) 192ms
  ✓ tests/rsvp.route.test.ts (1 test) 4ms
- ✓ tests/alerts.routes.test.ts (13 tests) 11ms
+ ✓ tests/event-list-item.test.tsx (2 tests) 19ms
 stderr | tests/privacy.rules.test.ts > private data denies other members and preserves ownership
-[2026-09-06T12:37:52.156Z]  @firebase/firestore: Firestore (11.10.0): GrpcConnection RPC 'Write' stream 0x2c555cc3 error. Code: 7 Message: 7 PERMISSION_DENIED:
+[2026-09-06T13:16:33.609Z]  @firebase/firestore: Firestore (11.10.0): GrpcConnection RPC 'Write' stream 0x2426a858 error. Code: 7 Message: 7 PERMISSION_DENIED:
 evaluation error at L37:24 for 'update' @ L37, false for 'update' @ L37
 
- ✓ tests/privacy.rules.test.ts (1 test) 169ms
+ ✓ tests/alerts.routes.test.ts (13 tests) 11ms
+ ✓ tests/privacy.rules.test.ts (1 test) 161ms
 
  Test Files  14 passed (14)
-      Tests  48 passed (48)
-   Start at  08:37:51
-   Duration  524ms (transform 419ms, setup 0ms, collect 1.80s, tests 463ms, environment 1ms, prepare 754ms)
+      Tests  54 passed (54)
+   Start at  09:16:33
+   Duration  479ms (transform 426ms, setup 0ms, collect 1.68s, tests 444ms, environment 1ms, prepare 712ms)

@@ -1,0 +1,113 @@
+{
+  "checkedAt": "2026-09-06T13:21:37.434Z",
+  "routes": [
+    {
+      "url": "https://gayiclub.com/",
+      "status": 200,
+      "location": null,
+      "robots": null,
+      "contentType": "text/html; charset=utf-8",
+      "hasRedesign": true,
+      "securityHeaders": {
+        "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+        "x-frame-options": "DENY",
+        "x-content-type-options": "nosniff",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline' https://apis.google.com https://www.gstatic.com https://vibeshiftai.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https:; connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://firebaseinstallations.googleapis.com https://www.googleapis.com https://vibeshiftai.com; frame-src https://gayiclub.firebaseapp.com https://accounts.google.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+      }
+    },
+    {
+      "url": "https://www.gayiclub.com/",
+      "status": 308,
+      "location": "https://gayiclub.com/",
+      "robots": null,
+      "contentType": "text/html; charset=UTF-8",
+      "hasRedesign": false
+    },
+    {
+      "url": "http://gayiclub.com/",
+      "status": 301,
+      "location": "https://gayiclub.com:443/",
+      "robots": null,
+      "contentType": "text/html; charset=UTF-8",
+      "hasRedesign": false
+    },
+    {
+      "url": "https://gayiclub.com/auth/sign-in",
+      "status": 200,
+      "location": null,
+      "robots": null,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "https://gayiclub.com/auth/sign-up",
+      "status": 200,
+      "location": null,
+      "robots": null,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "https://gayiclub.com/events",
+      "status": 307,
+      "location": "https://gayiclub.com/auth/sign-in",
+      "robots": null,
+      "contentType": "text/html; charset=UTF-8"
+    },
+    {
+      "url": "https://gayiclub.com/privacy-policy",
+      "status": 200,
+      "location": null,
+      "robots": null,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "https://gayiclub.com/terms-of-use",
+      "status": 200,
+      "location": null,
+      "robots": null,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "https://gayiclub.com/accessibility",
+      "status": 200,
+      "location": null,
+      "robots": null,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "https://gayiclub.com/robots.txt",
+      "status": 200,
+      "location": null,
+      "robots": null,
+      "contentType": "text/plain"
+    },
+    {
+      "url": "https://gayiclub.com/sitemap.xml",
+      "status": 200,
+      "location": null,
+      "robots": null,
+      "contentType": "application/xml"
+    },
+    {
+      "url": "https://gayiclub.com/.well-known/security.txt",
+      "status": 200,
+      "location": null,
+      "robots": null,
+      "contentType": "text/plain; charset=UTF-8"
+    },
+    {
+      "url": "https://gayiclub-web--gayiclub.us-east4.hosted.app/",
+      "status": 200,
+      "location": null,
+      "robots": "noindex, nofollow",
+      "contentType": "text/html; charset=utf-8"
+    }
+  ],
+  "socialImage": {
+    "status": 200,
+    "width": 1200,
+    "height": 630
+  },
+  "sameOriginEmptySessionStatus": 400,
+  "crossOriginEmptySessionStatus": 403
+}

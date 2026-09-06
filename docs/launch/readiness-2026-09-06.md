@@ -11,7 +11,7 @@ Owner review: https://gayiclub.com. Earlier local previews were engineering test
 | Check | Status | Evidence and remaining work |
 |---|---|---|
 | Approved scope | pass | Robert explicitly selected all 14 supplied redesign references. Source references retained in `Gayiclub.com redesign review/`. |
-| Build and regression tests | pass | `evidence/build.log`, `evidence/emulator-build.log`, `evidence/tests-final.log`: production builds pass; 48 tests pass including actual emulator privacy denials. `evidence/lint.log`: zero errors, 46 warnings in existing code/test patterns. |
+| Build and regression tests | pass | `evidence/build.log`, `evidence/emulator-build.log`, `evidence/tests-final.log`: production builds pass; 54 tests pass including actual emulator privacy denials. `evidence/lint.log`: zero errors, 46 warnings in existing code/test patterns. |
 | Mobile, tablet, desktop | fail | All 15 main member views checked at 375,768,1280px; zero horizontal overflow after final fixes. Screenshots `evidence/mobile-*.png`, `768-*.png`, `1280-*.png`; `responsive-routes.json`. Public dark/light captures also saved. Drawer, Events tab and profile fixes independently verified. Remaining nested/dynamic/error-form states and keyboard-up phone coverage are incomplete; Robert’s real-phone review remains requested. |
 | Links and metadata | fail | Canonical host/preview indexing verified. 34 static URLs returned 200 or deliberate 307 redirects (`evidence/links.json`). Of 4 live resource links, 2 returned 200; ChatGPT bot403 and Streamlit redirect loop require browser confirmation. Auth/new-form metadata made unique. Remaining dynamic/content-generated links and per-record metadata are not fully verified. |
 | Forms and follow-up emails | fail | Local emulator sign-in, RSVP/cancel and privacy checks pass. Unit tests cover confirmation/error paths and same-origin session protection. Actual verification, magic link, reset, opt-in/out and RSVP email arrival at Robert’s inbox remain unverified. No membership was emailed. |
@@ -21,10 +21,10 @@ Owner review: https://gayiclub.com. Earlier local previews were engineering test
 | Legal, privacy, security | pass | Fixed-path canonical legal documents plus code-derived site disclosures; neutral owner/contact; security headers verified on local production build. Directory API uses an allowlist; contact data, saved news and alert records are owner/admin only. API session origin and RSVP access tests pass. Policy discloses AI providers, generated SVGs, join-date visibility, feedback data and no automatic purge. |
 | Fleet support standards | fail | Public feedback relay token registered and widget available. Praxis project routing still needs coordinated configuration/restart; account-request receipts, support registry workflow and cross-project beta sync are not implemented. Profile checkbox truthfully stores local interest only. `support-mapping-handoff.md` and `source-audit-2026-09-06.md`. Robert’s decision requested on deferring shared service. |
 | Sender/inbox | fail | Resend verifies gayiclub.com only. Neutral From uses that domain; Reply-To is praxis+gayiclub@vibeshiftai.com. Exact fleet plus-address From requires verification or approved mailbox sending. Support inbox delivery/reply needs an actual check. |
-| Domain/platform | fail | Existing Firebase apex/www ownership, hosting and certificates active; Cloudflare records backed up; no DNS change expected. Final reviewed code has not been deployed to a separate platform preview. Verify production environment names, headers and auth on platform before live release. |
+| Domain/platform | pass | Existing Firebase apex/www ownership, hosting and certificates active; Cloudflare records backed up; no DNS change expected. Robert chose live review. Final reviewed code is deployed on Firebase; live headers, routes, sign-in session and directory privacy checks passed. See release-2026-09-06.md. |
 | Backup/rollback | pass | Private Firestore, auth-record, DNS and hosting snapshots stored outside deployment; pre-launch Git tag at base; before screenshots. `cutover-2026-09-06.md` contains forward and rollback procedure. This is not a proven full auth/password restore or disaster-recovery drill. |
 | Independent review | fail | `independent-review-2026-09-06.md`: different-model final verdict fail because declared integration, delivery, platform and owner gates remain. All sampled app defects passed final retest. |
-| Owner approval | fail | `robert-checklist-2026-09-06.md` prepared. Approval of the final readiness report/release window remains required. |
+| Owner approval | pass | Robert explicitly authorized pushing live for review despite the outstanding checklist rows. |
 
 ## Owner actions versus engineering work
 
@@ -52,3 +52,5 @@ See `mail-findings-2026-09-06.md`. Praxis SMTP and IMAP work; the club plus-addr
 ## Explicit live-review authorization
 
 Robert: “please just push your changes live and I'll review on the live site.” The application release and matching privacy rules are authorized despite the documented outstanding support/email and broader QA items. Those items remain follow-up work and are not falsely marked passed. See the release note for final runtime evidence.
+
+Final release evidence: [release note](release-2026-09-06.md). The final proxy-host correction passed independent bounded review and 54 tests; remaining broader integration/QA rows stay open.

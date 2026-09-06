@@ -1,0 +1,33 @@
+{
+  "status": {
+    "latestReadyRevisionName": "gayiclub-web-build-2026-09-06-003",
+    "traffic": [
+      {
+        "revisionName": "gayiclub-web-build-2026-09-04-001",
+        "tag": "t-158114189",
+        "url": "https://t-158114189---gayiclub-web-hddnvmzulq-uk.a.run.app"
+      },
+      {
+        "revisionName": "gayiclub-web-build-2026-09-04-002",
+        "tag": "t-158114190",
+        "url": "https://t-158114190---gayiclub-web-hddnvmzulq-uk.a.run.app"
+      },
+      {
+        "revisionName": "gayiclub-web-build-2026-09-04-003",
+        "tag": "t-158114191",
+        "url": "https://t-158114191---gayiclub-web-hddnvmzulq-uk.a.run.app"
+      },
+      {
+        "revisionName": "gayiclub-web-build-2026-09-06-001",
+        "tag": "t-2982868891",
+        "url": "https://t-2982868891---gayiclub-web-hddnvmzulq-uk.a.run.app"
+      },
+      {
+        "percent": 100,
+        "revisionName": "gayiclub-web-build-2026-09-06-003",
+        "tag": "t-2982868889",
+        "url": "https://t-2982868889---gayiclub-web-hddnvmzulq-uk.a.run.app"
+      }
+    ]
+  }
+}

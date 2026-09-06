@@ -1,0 +1,13 @@
+{
+  "checkedAt": "2026-09-06T13:22:22.605Z",
+  "uid": "launch-qa-20260906-live",
+  "temporaryAccountCreated": true,
+  "firebaseSignInStatus": 200,
+  "sessionStatus": 200,
+  "sessionCookieSet": true,
+  "protectedProfileStatus": 200,
+  "directoryStatus": 200,
+  "directoryLeaksPrivateField": false,
+  "otherProfileReadStatus": 403,
+  "temporaryAccountDeleted": true
+}
