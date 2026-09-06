@@ -1,0 +1,56 @@
+{
+  "at": "2026-09-06T15:30:01.848Z",
+  "locationConfigured": true,
+  "timeConfigured": false,
+  "checks": [
+    {
+      "name": "Public event document denied",
+      "status": 403
+    },
+    {
+      "name": "Public event list denied",
+      "status": 403
+    },
+    {
+      "name": "Private default settings denied",
+      "status": 403
+    },
+    {
+      "path": "/calendar",
+      "status": 307,
+      "destination": "https://gayiclub.com/auth/sign-in"
+    },
+    {
+      "path": "/events",
+      "status": 307,
+      "destination": "https://gayiclub.com/auth/sign-in"
+    },
+    {
+      "path": "/events/privacy-read-probe",
+      "status": 307,
+      "destination": "https://gayiclub.com/auth/sign-in"
+    },
+    {
+      "path": "/",
+      "status": 200,
+      "addressAbsent": true
+    },
+    {
+      "path": "/privacy-policy",
+      "status": 200,
+      "addressAbsent": true
+    },
+    {
+      "path": "/sitemap.xml",
+      "status": 200,
+      "addressAbsent": true
+    },
+    {
+      "path": "/robots.txt",
+      "status": 200,
+      "addressAbsent": true
+    }
+  ],
+  "events": 0,
+  "queuedEmails": 0
+}
