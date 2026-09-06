@@ -1,0 +1,92 @@
+{
+  "at": "2026-09-06T14:50:23.846Z",
+  "checks": [
+    {
+      "name": "Unauthenticated outcome job rejected",
+      "status": 401,
+      "expected": 401,
+      "body": {
+        "error": "unauthorized"
+      }
+    },
+    {
+      "name": "Authenticated outcome check before deadline",
+      "status": 200,
+      "expected": 200,
+      "body": {
+        "processed": 0,
+        "booked": 0,
+        "reportsQueued": 0,
+        "ties": 0,
+        "errors": []
+      }
+    },
+    {
+      "name": "Owner question feed",
+      "status": 200,
+      "expected": 200,
+      "body": {
+        "requests": []
+      }
+    },
+    {
+      "name": "Unauthenticated ballot rejected",
+      "status": 401,
+      "expected": 401,
+      "body": {
+        "error": "Sign in to vote."
+      }
+    },
+    {
+      "name": "Incomplete ballot rejected without saving",
+      "status": 400,
+      "expected": 400,
+      "body": {
+        "error": "Rank each date you can attend or mark it unavailable."
+      }
+    },
+    {
+      "name": "Member booking rejected",
+      "status": 403,
+      "expected": 403,
+      "body": {
+        "error": "Admin access required."
+      }
+    },
+    {
+      "name": "Private owner decisions rejected",
+      "status": 403,
+      "expected": 403,
+      "body": {
+        "error": {
+          "code": 403,
+          "message": "Missing or insufficient permissions.",
+          "status": "PERMISSION_DENIED"
+        }
+      }
+    },
+    {
+      "name": "Ballot read query supports live indexes",
+      "status": 200,
+      "expected": 200,
+      "body": [
+        {
+          "readTime": "2026-09-06T14:50:25.620843Z"
+        }
+      ]
+    }
+  ],
+  "state": {
+    "deadline": "2026-09-11T22:00:00.000Z",
+    "optionIds": [
+      "september-2026-12",
+      "september-2026-13",
+      "september-2026-19",
+      "september-2026-20"
+    ],
+    "legacyVotes": 0,
+    "ballots": 0,
+    "events": 0,
+    "queuedEmails": 0
+  }
+}
