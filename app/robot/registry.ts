@@ -4,11 +4,13 @@ import Gemini3Robot from '@/components/robots/Gemini3Robot';
 import Gpt51CodexMaxRobot from '@/components/robots/Gpt51CodexMaxRobot';
 import Gpt6Robot from '@/components/robots/Gpt6Robot';
 import Opus45Robot from '@/components/robots/Opus45Robot';
+import PraxisCouncilRobot from '@/components/robots/PraxisCouncilRobot';
 import { ROBOT_SHOWCASE, type RobotShowcaseEntry } from '@/lib/robot-showcase';
 import type React from 'react';
 
 export type RobotEntry = RobotShowcaseEntry & { component: React.ComponentType<{ className?: string }> };
 const artwork: Record<string, RobotEntry['component']> = {
+  'praxis-council-afterimage': PraxisCouncilRobot,
   'claude-fable-5-1': Fable51Robot,
   'gpt-6-open-seat': Gpt6Robot,
   'claude-fable-5': Fable5Robot,
