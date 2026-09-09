@@ -1,0 +1,57 @@
+{
+  "mode": "live",
+  "startedAt": "2026-09-09T09:40:14.288Z",
+  "steps": [
+    {
+      "step": "sign-in",
+      "redirectedAway": true,
+      "sessionCookie": true
+    },
+    {
+      "step": "layout-dark",
+      "ready": true,
+      "cardTop": 12,
+      "cardBottom": 537,
+      "cardWidth": 350,
+      "svgTop": 163,
+      "svgBottom": 404,
+      "svgWidth": 241,
+      "innerHeight": 844,
+      "scrollWidth": 390,
+      "clientWidth": 390
+    },
+    {
+      "step": "screenshot",
+      "name": "live-mobile-dark"
+    },
+    {
+      "step": "layout-light",
+      "cardTop": 12,
+      "cardBottom": 537,
+      "cardWidth": 350,
+      "svgTop": 163,
+      "svgBottom": 404,
+      "svgWidth": 241,
+      "innerHeight": 844,
+      "scrollWidth": 390,
+      "clientWidth": 390
+    },
+    {
+      "step": "screenshot",
+      "name": "live-mobile-light"
+    },
+    {
+      "step": "activate",
+      "isOpen": true
+    },
+    {
+      "step": "screenshot",
+      "name": "live-mobile-dark-open"
+    },
+    {
+      "step": "sign-out",
+      "sessionDeleteStatus": 200
+    }
+  ],
+  "finishedAt": "2026-09-09T09:40:27.437Z"
+}

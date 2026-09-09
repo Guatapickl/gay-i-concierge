@@ -1,0 +1,48 @@
+{
+  "mode": "local",
+  "startedAt": "2026-09-09T09:40:05.077Z",
+  "steps": [
+    {
+      "step": "layout-dark",
+      "ready": true,
+      "cardTop": 12,
+      "cardBottom": 519,
+      "cardWidth": 358,
+      "svgTop": 164,
+      "svgBottom": 411,
+      "svgWidth": 248,
+      "innerHeight": 844,
+      "scrollWidth": 390,
+      "clientWidth": 390
+    },
+    {
+      "step": "screenshot",
+      "name": "gallery-mobile-dark"
+    },
+    {
+      "step": "layout-light",
+      "cardTop": 12,
+      "cardBottom": 519,
+      "cardWidth": 358,
+      "svgTop": 164,
+      "svgBottom": 411,
+      "svgWidth": 248,
+      "innerHeight": 844,
+      "scrollWidth": 390,
+      "clientWidth": 390
+    },
+    {
+      "step": "screenshot",
+      "name": "gallery-mobile-light"
+    },
+    {
+      "step": "activate",
+      "isOpen": true
+    },
+    {
+      "step": "screenshot",
+      "name": "gallery-mobile-dark-open"
+    }
+  ],
+  "finishedAt": "2026-09-09T09:40:13.223Z"
+}
