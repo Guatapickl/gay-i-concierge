@@ -1,0 +1,310 @@
+{
+  "name": "projects/gayiclub/locations/us-east4/backends/gayiclub-web/builds/build-2026-09-09-001",
+  "state": "READY",
+  "image": "us-east4-docker.pkg.dev/gayiclub/firebaseapphosting-images/gayiclub-web:build-2026-09-09-001",
+  "config": {
+    "runConfig": {
+      "cpu": 1,
+      "memoryMib": 512,
+      "concurrency": 80,
+      "maxInstances": 4
+    },
+    "env": [
+      {
+        "variable": "NEXT_PUBLIC_SITE_URL",
+        "value": "https://gayiclub.com",
+        "availability": [
+          "BUILD",
+          "RUNTIME"
+        ]
+      },
+      {
+        "variable": "NEXT_PUBLIC_FIREBASE_API_KEY",
+        "value": "AIzaSyBHNWH7BsH3CkLidpkgoojOE-ArDfoOZIU",
+        "availability": [
+          "BUILD",
+          "RUNTIME"
+        ]
+      },
+      {
+        "variable": "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN",
+        "value": "gayiclub.firebaseapp.com",
+        "availability": [
+          "BUILD",
+          "RUNTIME"
+        ]
+      },
+      {
+        "variable": "NEXT_PUBLIC_FIREBASE_PROJECT_ID",
+        "value": "gayiclub",
+        "availability": [
+          "BUILD",
+          "RUNTIME"
+        ]
+      },
+      {
+        "variable": "NEXT_PUBLIC_FIREBASE_APP_ID",
+        "value": "1:692568338842:web:431417ac41fa188e2a0a23",
+        "availability": [
+          "BUILD",
+          "RUNTIME"
+        ]
+      },
+      {
+        "variable": "EMAIL_FROM",
+        "value": "VibeShift AI Support \u003cnoreply@gayiclub.com\u003e",
+        "availability": [
+          "BUILD",
+          "RUNTIME"
+        ]
+      },
+      {
+        "variable": "RESEND_API_KEY",
+        "secret": "projects/692568338842/secrets/RESEND_API_KEY/versions/4",
+        "availability": [
+          "BUILD",
+          "RUNTIME"
+        ]
+      },
+      {
+        "variable": "CRON_SECRET",
+        "secret": "projects/692568338842/secrets/CRON_SECRET/versions/1",
+        "availability": [
+          "BUILD",
+          "RUNTIME"
+        ]
+      },
+      {
+        "variable": "NEWS_INGEST_SECRET",
+        "secret": "projects/692568338842/secrets/NEWS_INGEST_SECRET/versions/2",
+        "availability": [
+          "BUILD",
+          "RUNTIME"
+        ]
+      },
+      {
+        "variable": "OPENAI_API_KEY",
+        "secret": "projects/692568338842/secrets/OPENAI_API_KEY/versions/1",
+        "availability": [
+          "BUILD",
+          "RUNTIME"
+        ]
+      },
+      {
+        "variable": "ANTHROPIC_API_KEY",
+        "secret": "projects/692568338842/secrets/ANTHROPIC_API_KEY/versions/1",
+        "availability": [
+          "BUILD",
+          "RUNTIME"
+        ]
+      },
+      {
+        "variable": "GOOGLE_API_KEY",
+        "secret": "projects/692568338842/secrets/GOOGLE_API_KEY/versions/1",
+        "availability": [
+          "BUILD",
+          "RUNTIME"
+        ]
+      },
+      {
+        "variable": "FIREBASE_CONFIG",
+        "value": "{\"databaseURL\":\"\",\"projectId\":\"gayiclub\",\"storageBucket\":\"gayiclub.firebasestorage.app\"}",
+        "availability": [
+          "BUILD",
+          "RUNTIME"
+        ]
+      },
+      {
+        "variable": "FIREBASE_WEBAPP_CONFIG",
+        "value": "{\"apiKey\":\"AIzaSyBHNWH7BsH3CkLidpkgoojOE-ArDfoOZIU\",\"appId\":\"1:692568338842:web:431417ac41fa188e2a0a23\",\"authDomain\":\"gayiclub.firebaseapp.com\",\"databaseURL\":\"\",\"messagingSenderId\":\"692568338842\",\"projectId\":\"gayiclub\",\"storageBucket\":\"gayiclub.firebasestorage.app\"}",
+        "availability": [
+          "BUILD"
+        ]
+      },
+      {
+        "variable": "NG_TRUST_PROXY_HEADERS",
+        "value": "X-Forwarded-Host",
+        "availability": [
+          "RUNTIME"
+        ]
+      },
+      {
+        "variable": "NG_ALLOWED_HOSTS",
+        "value": "gayiclub-web-692568338842.us-east4.run.app,gayiclub-web-hddnvmzulq-uk.a.run.app,t-3005039260---gayiclub-web-hddnvmzulq-uk.a.run.app,gayiclub-web--gayiclub.us-east4.hosted.app,gayiclub.com,www.gayiclub.com",
+        "availability": [
+          "RUNTIME"
+        ]
+      }
+    ],
+    "effectiveEnv": [
+      {
+        "variable": "NEXT_PUBLIC_SITE_URL",
+        "value": "https://gayiclub.com",
+        "availability": [
+          "BUILD",
+          "RUNTIME"
+        ],
+        "origin": "APPHOSTING_YAML",
+        "originFileName": "apphosting.yaml"
+      },
+      {
+        "variable": "NEXT_PUBLIC_FIREBASE_API_KEY",
+        "value": "AIzaSyBHNWH7BsH3CkLidpkgoojOE-ArDfoOZIU",
+        "availability": [
+          "BUILD",
+          "RUNTIME"
+        ],
+        "origin": "APPHOSTING_YAML",
+        "originFileName": "apphosting.yaml"
+      },
+      {
+        "variable": "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN",
+        "value": "gayiclub.firebaseapp.com",
+        "availability": [
+          "BUILD",
+          "RUNTIME"
+        ],
+        "origin": "APPHOSTING_YAML",
+        "originFileName": "apphosting.yaml"
+      },
+      {
+        "variable": "NEXT_PUBLIC_FIREBASE_PROJECT_ID",
+        "value": "gayiclub",
+        "availability": [
+          "BUILD",
+          "RUNTIME"
+        ],
+        "origin": "APPHOSTING_YAML",
+        "originFileName": "apphosting.yaml"
+      },
+      {
+        "variable": "NEXT_PUBLIC_FIREBASE_APP_ID",
+        "value": "1:692568338842:web:431417ac41fa188e2a0a23",
+        "availability": [
+          "BUILD",
+          "RUNTIME"
+        ],
+        "origin": "APPHOSTING_YAML",
+        "originFileName": "apphosting.yaml"
+      },
+      {
+        "variable": "EMAIL_FROM",
+        "value": "VibeShift AI Support \u003cnoreply@gayiclub.com\u003e",
+        "availability": [
+          "BUILD",
+          "RUNTIME"
+        ],
+        "origin": "APPHOSTING_YAML",
+        "originFileName": "apphosting.yaml"
+      },
+      {
+        "variable": "RESEND_API_KEY",
+        "secret": "projects/692568338842/secrets/RESEND_API_KEY/versions/4",
+        "availability": [
+          "BUILD",
+          "RUNTIME"
+        ],
+        "origin": "APPHOSTING_YAML",
+        "originFileName": "apphosting.yaml"
+      },
+      {
+        "variable": "CRON_SECRET",
+        "secret": "projects/692568338842/secrets/CRON_SECRET/versions/1",
+        "availability": [
+          "BUILD",
+          "RUNTIME"
+        ],
+        "origin": "APPHOSTING_YAML",
+        "originFileName": "apphosting.yaml"
+      },
+      {
+        "variable": "NEWS_INGEST_SECRET",
+        "secret": "projects/692568338842/secrets/NEWS_INGEST_SECRET/versions/2",
+        "availability": [
+          "BUILD",
+          "RUNTIME"
+        ],
+        "origin": "APPHOSTING_YAML",
+        "originFileName": "apphosting.yaml"
+      },
+      {
+        "variable": "OPENAI_API_KEY",
+        "secret": "projects/692568338842/secrets/OPENAI_API_KEY/versions/1",
+        "availability": [
+          "BUILD",
+          "RUNTIME"
+        ],
+        "origin": "APPHOSTING_YAML",
+        "originFileName": "apphosting.yaml"
+      },
+      {
+        "variable": "ANTHROPIC_API_KEY",
+        "secret": "projects/692568338842/secrets/ANTHROPIC_API_KEY/versions/1",
+        "availability": [
+          "BUILD",
+          "RUNTIME"
+        ],
+        "origin": "APPHOSTING_YAML",
+        "originFileName": "apphosting.yaml"
+      },
+      {
+        "variable": "GOOGLE_API_KEY",
+        "secret": "projects/692568338842/secrets/GOOGLE_API_KEY/versions/1",
+        "availability": [
+          "BUILD",
+          "RUNTIME"
+        ],
+        "origin": "APPHOSTING_YAML",
+        "originFileName": "apphosting.yaml"
+      },
+      {
+        "variable": "FIREBASE_CONFIG",
+        "value": "{\"databaseURL\":\"\",\"projectId\":\"gayiclub\",\"storageBucket\":\"gayiclub.firebasestorage.app\"}",
+        "availability": [
+          "BUILD",
+          "RUNTIME"
+        ],
+        "origin": "FIREBASE_SYSTEM"
+      },
+      {
+        "variable": "FIREBASE_WEBAPP_CONFIG",
+        "value": "{\"apiKey\":\"AIzaSyBHNWH7BsH3CkLidpkgoojOE-ArDfoOZIU\",\"appId\":\"1:692568338842:web:431417ac41fa188e2a0a23\",\"authDomain\":\"gayiclub.firebaseapp.com\",\"databaseURL\":\"\",\"messagingSenderId\":\"692568338842\",\"projectId\":\"gayiclub\",\"storageBucket\":\"gayiclub.firebasestorage.app\"}",
+        "availability": [
+          "BUILD"
+        ],
+        "origin": "FIREBASE_SYSTEM"
+      },
+      {
+        "variable": "NG_TRUST_PROXY_HEADERS",
+        "value": "X-Forwarded-Host",
+        "availability": [
+          "RUNTIME"
+        ],
+        "origin": "FIREBASE_SYSTEM"
+      },
+      {
+        "variable": "NG_ALLOWED_HOSTS",
+        "value": "gayiclub-web-692568338842.us-east4.run.app,gayiclub-web-hddnvmzulq-uk.a.run.app,t-3005039260---gayiclub-web-hddnvmzulq-uk.a.run.app,gayiclub-web--gayiclub.us-east4.hosted.app,gayiclub.com,www.gayiclub.com",
+        "availability": [
+          "RUNTIME"
+        ],
+        "origin": "FIREBASE_SYSTEM"
+      }
+    ]
+  },
+  "source": {
+    "archive": {
+      "rootDirectory": "/",
+      "userStorageUri": "gs://firebaseapphosting-sources-692568338842-us-east4/gayiclub-web--5714-5rRWaEg9KzIj-.zip"
+    }
+  },
+  "buildLogsUri": "https://console.cloud.google.com/cloud-build/builds;region=us-east4/bd7e8c2e-0b49-4c3d-b1cc-6714164d5ca9?project=692568338842",
+  "createTime": "2026-09-09T09:27:07.923819518Z",
+  "updateTime": "2026-09-09T09:29:29.710769Z",
+  "labels": {
+    "deployment-tool": "cli-firebase"
+  },
+  "uid": "31583d1b-7aa9-448d-9014-9e48abe00212",
+  "etag": "JTiygkhcjb4knmdRVZyfRWqvySQMf3ELOkFtlHN7ljw",
+  "reconciling": false
+}

@@ -1,0 +1,120 @@
+{
+  "startedAt": "2026-09-09T09:30:25.433Z",
+  "steps": [
+    {
+      "step": "sign-in",
+      "redirectedAway": true,
+      "path": "/",
+      "sessionCookie": true
+    },
+    {
+      "step": "gallery",
+      "artworkReady": true,
+      "url": "https://gayiclub.com/robot",
+      "title": "Flagship Showcase · Gay I Club",
+      "cards": [
+        {
+          "name": "Afterimage",
+          "model": "Praxis · Cooperative Council · 2026-09-09",
+          "hasSvg": true
+        },
+        {
+          "name": "Kin",
+          "model": "Claude Fable 5.1",
+          "hasSvg": true
+        },
+        {
+          "name": "The Open Seat",
+          "model": "GPT-6 · Codex",
+          "hasSvg": true
+        },
+        {
+          "name": "The Storyweaver",
+          "model": "Fable 5",
+          "hasSvg": true
+        },
+        {
+          "name": "Coral Opus",
+          "model": "Claude Opus 4.5",
+          "hasSvg": true
+        },
+        {
+          "name": "Prismatic Pulse",
+          "model": "GPT-5.1 Codex Max",
+          "hasSvg": true
+        },
+        {
+          "name": "GAY-I UNIT 01",
+          "model": "Gemini 3",
+          "hasSvg": true
+        }
+      ],
+      "afterimageCount": 1,
+      "afterimageTitle": "Afterimage, the Night Architect",
+      "afterimageViewBox": "0 0 800 800",
+      "buttons": [
+        "LIGHT",
+        "P",
+        "Newest",
+        "Top voted",
+        "Refresh votes",
+        "Vote",
+        "Vote",
+        "Vote",
+        "Vote",
+        "Vote",
+        "Vote",
+        "Vote"
+      ],
+      "bodyHasSignInPrompt": false
+    },
+    {
+      "step": "screenshot",
+      "name": "live-desktop-dark"
+    },
+    {
+      "step": "screenshot",
+      "name": "live-desktop-light"
+    },
+    {
+      "step": "activate",
+      "clicked": true,
+      "isOpen": true
+    },
+    {
+      "step": "screenshot",
+      "name": "live-desktop-dark-open"
+    },
+    {
+      "step": "top-voted",
+      "sortButton": "Top voted",
+      "order": [
+        "Kin",
+        "Afterimage",
+        "The Open Seat",
+        "The Storyweaver",
+        "Coral Opus",
+        "Prismatic Pulse",
+        "GAY-I UNIT 01"
+      ]
+    },
+    {
+      "step": "screenshot",
+      "name": "live-mobile-dark"
+    },
+    {
+      "step": "screenshot",
+      "name": "live-mobile-light"
+    },
+    {
+      "step": "mobile",
+      "scrollWidth": 390,
+      "clientWidth": 390
+    },
+    {
+      "step": "sign-out",
+      "sessionDeleteStatus": 200
+    }
+  ],
+  "finishedAt": "2026-09-09T09:30:45.344Z"
+}

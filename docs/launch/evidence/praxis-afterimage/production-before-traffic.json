@@ -1,0 +1,16 @@
+{
+  "name": "projects/gayiclub/locations/us-east4/backends/gayiclub-web/traffic",
+  "reconciling": false,
+  "createTime": "2026-09-09T09:18:54.767132645Z",
+  "updateTime": "2026-09-04T14:17:49.229481Z",
+  "etag": "IEzvwavgZg3o7Olr79KUoKrmPK1QlPMBQCZYd1j8OKE",
+  "uid": "",
+  "current": {
+    "splits": [
+      {
+        "build": "projects/692568338842/locations/us-east4/backends/gayiclub-web/builds/build-2026-09-06-016",
+        "percent": 100
+      }
+    ]
+  }
+}
