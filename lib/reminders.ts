@@ -217,6 +217,16 @@ export async function processDueReminders(limit = 50): Promise<{
           continue;
         }
       }
+      // Organizer meeting reminders go to every account holder, but an
+      // explicit unsubscribe made after queueing still wins.
+      if (row.kind === 'meeting_reminder') {
+        const subscribers = await db.collection('alerts_subscribers')
+          .where('email', '==', row.recipient_email).get();
+        if (subscribers.docs.some(s => s.data().email_opt_in === false)) {
+          await docRef.update({ status: 'cancelled', error: 'Meeting reminder cancelled: recipient unsubscribed from club email.' });
+          continue;
+        }
+      }
       const result = await sendEmail({
         to: row.recipient_email,
         subject: row.subject,

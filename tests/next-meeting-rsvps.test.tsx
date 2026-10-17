@@ -1,8 +1,15 @@
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import NextMeetingRsvps, { attendeeLabel, type RsvpViewState } from '@/components/NextMeetingRsvps';
 import type { NextMeetingRsvps as Data } from '@/lib/rsvp';
+
+// The reminder panel's client reaches Firebase Auth at import time; static
+// markup never runs its effects, so a stub keeps this test free of Firebase.
+vi.mock('@/lib/meetingReminderClient', () => ({
+  requestMeetingReminder: vi.fn(),
+  MeetingReminderClientError: class extends Error {},
+}));
 
 const meeting = { id: 'poll-next', title: 'Gay I Club Meeting', event_datetime: '2099-09-13T22:30:00.000Z', location: 'The usual place' };
 const later = { id: 'later', title: 'October meetup', event_datetime: '2099-10-11T22:30:00.000Z', location: null };
@@ -36,6 +43,8 @@ describe('NextMeetingRsvps', () => {
     expect(zero).toContain('0 RSVPs');
     expect(zero).toContain('No RSVPs yet');
     expect(zero).toContain('data-state="zero-rsvps"');
+    expect(zero).toContain('Email members a reminder');
+    expect(none).not.toContain('Email members a reminder');
     expect(zero).not.toContain('No upcoming meeting');
     expect(zero).not.toContain('<select');
   });

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Calendar, CalendarX, Clock, MapPin, RefreshCw, ShieldAlert, Users } from 'lucide-react';
 import type { MeetingAttendee, MeetingSummary, NextMeetingRsvps as NextMeetingRsvpsData } from '@/lib/rsvp';
 import { Alert, Button, LoadingSpinner } from '@/components/ui';
+import MeetingReminderPanel from '@/components/MeetingReminderPanel';
 
 /**
  * Presentational half of the organizer's "Next meeting RSVPs" view. Every
@@ -181,6 +182,8 @@ function Ready({ data, refreshing, onRefresh, onSelectEvent }: { data: NextMeeti
           {attendees.map((attendee, index) => <AttendeeRow key={attendee.id} attendee={attendee} position={index + 1} />)}
         </ol>
       )}
+
+      <MeetingReminderPanel key={event.id} eventId={event.id} eventTitle={event.title || 'Untitled event'} />
     </div>
   );
 }

@@ -20,7 +20,10 @@ const PALETTE = {
   primaryText: '#0a0a0a',
 };
 
-function shell(opts: { title: string; preheader: string; body: string }) {
+const OPT_IN_FOOTER = `You're receiving this because you opted in to club emails.`;
+
+function shell(opts: { title: string; preheader: string; body: string; footer?: string }) {
+  const footer = opts.footer ?? OPT_IN_FOOTER;
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -40,7 +43,7 @@ function shell(opts: { title: string; preheader: string; body: string }) {
 ${opts.body}
 </td></tr>
 <tr><td style="padding:20px 28px;border-top:1px solid ${PALETTE.border};color:${PALETTE.muted};font-size:12px;">
-You're receiving this because you opted in to club emails.<br>
+${footer}<br>
 <a href="${SITE_URL}/alerts/unsubscribe" style="color:${PALETTE.muted};">Unsubscribe</a>
 </td></tr>
 </table>
@@ -173,6 +176,105 @@ ${events.map(e => `- ${e.title} (${new Date(e.event_datetime).toLocaleString()})
 Open the hub: ${SITE_URL}/hub`;
 
   return { subject, html: shell({ title: subject, preheader, body }), text };
+}
+
+/** Where and when a meeting happens, in the club's local time zone. */
+export function formatMeetingWhen(iso: string): string {
+  return new Date(iso).toLocaleString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZone: 'America/New_York',
+    timeZoneName: 'short',
+  });
+}
+
+export type MeetingReminderOptions = {
+  /** Organizer's note to members; plain text, line breaks preserved. */
+  note?: string | null;
+  /** Whether this recipient already has an RSVP for the meeting. */
+  hasRsvped?: boolean;
+};
+
+/**
+ * Organizer-sent reminder about an upcoming meeting, addressed to every
+ * member with a club account (not only RSVPed or opted-in members), so the
+ * footer explains the account relationship instead of an opt-in.
+ */
+export function meetingReminderEmail(event: Event, opts: MeetingReminderOptions = {}) {
+  const when = formatMeetingWhen(event.event_datetime);
+  const eventUrl = `${SITE_URL}/events/${event.id}`;
+  const subject = `Reminder: ${event.title} on ${new Date(event.event_datetime).toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'America/New_York',
+  })}`;
+  const preheader = `${event.title} is coming up: ${when}`;
+  const note = (opts.note ?? '').trim();
+  const noteHtml = note
+    ? `<table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;background:${PALETTE.bg};border:1px solid ${PALETTE.border};border-radius:8px;margin:16px 0;">
+<tr><td style="padding:16px;line-height:1.55;color:${PALETTE.text};">${escapeHtml(note).replace(/\r?\n/g, '<br>')}</td></tr>
+</table>`
+    : '';
+  const agendaHtml =
+    Array.isArray(event.agenda) && event.agenda.length > 0
+      ? `<h3 style="margin:24px 0 8px;font-size:16px;color:${PALETTE.text};">Agenda</h3>
+<ul style="padding-left:18px;color:${PALETTE.muted};margin:0;">
+${event.agenda
+  .map(
+    item =>
+      `<li style="margin-bottom:6px;"><strong style="color:${PALETTE.text};">${escapeHtml(item.title)}</strong>${item.time ? ` <span style="color:${PALETTE.muted};">· ${escapeHtml(item.time)}</span>` : ''}${item.speaker ? ` <em style="color:${PALETTE.muted};">— ${escapeHtml(item.speaker)}</em>` : ''}</li>`
+  )
+  .join('')}
+</ul>`
+      : '';
+  const rsvpLine = opts.hasRsvped
+    ? `<p style="margin:16px 0 0;color:${PALETTE.muted};">You're already RSVP'd. If your plans changed, you can update that on the event page.</p>`
+    : `<p style="margin:16px 0 0;color:${PALETTE.muted};">Haven't RSVP'd yet? Let us know you're coming so we can plan for you.</p>`;
+
+  const body = `
+<h2 style="margin:0 0 8px;font-size:22px;color:${PALETTE.text};">${escapeHtml(event.title)}</h2>
+<p style="margin:0 0 4px;color:${PALETTE.muted};">🗓 ${escapeHtml(when)}</p>
+${event.location ? `<p style="margin:0 0 4px;color:${PALETTE.muted};">📍 ${escapeHtml(event.location)}</p>` : ''}
+${noteHtml}
+${event.description ? `<p style="margin:16px 0 0;line-height:1.55;">${escapeHtml(event.description)}</p>` : ''}
+${agendaHtml}
+${rsvpLine}
+<div style="margin:24px 0 0;">
+${button(opts.hasRsvped ? 'View the meeting' : 'RSVP now', eventUrl)}
+</div>`;
+
+  const text = [
+    `Reminder: ${event.title}`,
+    when,
+    event.location ? `Location: ${event.location}` : null,
+    '',
+    note || null,
+    note ? '' : null,
+    event.description || null,
+    event.description ? '' : null,
+    ...(Array.isArray(event.agenda) && event.agenda.length > 0
+      ? ['Agenda:', ...event.agenda.map(item => `- ${item.title}${item.time ? ` (${item.time})` : ''}`), '']
+      : []),
+    opts.hasRsvped ? "You're already RSVP'd." : "Haven't RSVP'd yet? Let us know you're coming.",
+    `Event page: ${eventUrl}`,
+  ]
+    .filter((line): line is string => line !== null)
+    .join('\n');
+
+  return {
+    subject,
+    html: shell({
+      title: subject,
+      preheader,
+      body,
+      footer: `You're receiving this because you have a Gay I Club account at gayiclub.com.`,
+    }),
+    text,
+  };
 }
 
 function escapeHtml(s: string): string {

@@ -158,16 +158,18 @@ export type EmailReminder = {
   event_id: string | null;
   recipient_email: string;
   recipient_user_id: string | null;
-  kind: 'event_reminder' | 'rsvp_confirmation' | 'agenda_published' | 'event_cancelled' | 'digest' | 'custom';
+  kind: 'event_reminder' | 'rsvp_confirmation' | 'agenda_published' | 'event_cancelled' | 'digest' | 'custom' | 'poll_invite' | 'poll_result' | 'meeting_reminder';
   subject: string;
   body_html: string;
   body_text: string | null;
   send_at: string;
   sent_at: string | null;
-  status: 'pending' | 'sending' | 'sent' | 'failed' | 'skipped';
+  status: 'pending' | 'sending' | 'sent' | 'failed' | 'skipped' | 'cancelled';
   error: string | null;
   attempts: number;
   created_at: string;
+  /** Groups the rows of one organizer-sent blast (meeting_reminder). */
+  batch_id?: string | null;
 };
 
 /**

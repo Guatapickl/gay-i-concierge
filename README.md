@@ -38,6 +38,25 @@ SUPABASE_SERVICE_ROLE_KEY=...  # server-only, used by alerts endpoints in produc
 
 Note: Ensure Supabase RLS policies allow the intended anon operations or move sensitive mutations server-side.
 
+## Sending a meeting reminder email
+
+Organizers can email everyone who has signed up at gayiclub.com about an upcoming meeting.
+
+- **On the site**: sign in as an organizer (listed in `app_admins`), open `/events/rsvps` (the dashboard's "See who's RSVP'd" button), pick the meeting, and use **Email members a reminder**. The panel shows how many members will receive it, lets you add a note, and asks for confirmation before sending.
+- **Who receives it**: every enabled Firebase Auth account with an email address, minus members who unsubscribed from club email (`alerts_subscribers.email_opt_in == false`). Each member is reminded once per meeting unless you tick "Include members who already received a reminder".
+- **What it contains**: meeting title, date and time (Eastern), location, your note, the description and agenda, and an RSVP button (or "View the meeting" for members who already RSVP'd). The email is built by `meetingReminderEmail` in `lib/emailTemplates.ts`.
+- **How it is delivered**: rows are queued in `email_reminders` with `kind: "meeting_reminder"` and sent through Resend right away; anything that fails is retried by the 10-minute reminder cron. Each send is tagged with a `batch_id` for auditing.
+- **From automation** (Praxis or a script), call the same route with the cron secret:
+
+```bash
+curl -s -X POST https://gayiclub.com/api/events/remind \
+  -H "Authorization: Bearer $CRON_SECRET" \
+  -H "Content-Type: application/json" \
+  -d '{"dry_run": true}'
+```
+
+Body fields, all optional: `event_id` (defaults to the next upcoming meeting), `note`, `dry_run` (preview only), `resend` (include members already reminded). The response reports `recipient_count`, `queued`, `already_reminded`, `unsubscribed` and `delivery` counts; recipient addresses are never returned.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
