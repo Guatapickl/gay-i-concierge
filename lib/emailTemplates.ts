@@ -7,6 +7,7 @@
 import type { Event } from '@/types/supabase';
 import { describeRecurrence } from './recurrence';
 import { articleHost } from './agendaArticles';
+import { RSVP_LABELS, RSVP_STATUSES, rsvpAnswerUrl, type RsvpStatus } from './rsvpStatus';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gayiclub.com';
 
@@ -109,7 +110,7 @@ View event: ${SITE_URL}/events/${event.id}`;
   return { subject, html: shell({ title: subject, preheader, body }), text };
 }
 
-export function rsvpConfirmationEmail(event: Event) {
+export function rsvpConfirmationEmail(event: Event, status: RsvpStatus = 'yes') {
   const when = new Date(event.event_datetime).toLocaleString(undefined, {
     weekday: 'long',
     month: 'long',
@@ -117,11 +118,15 @@ export function rsvpConfirmationEmail(event: Event) {
     hour: 'numeric',
     minute: '2-digit',
   });
-  const subject = `You're in: ${event.title}`;
-  const preheader = `RSVP confirmed for ${event.title} on ${when}`;
+  const maybe = status === 'maybe';
+  const subject = maybe ? `Marked as maybe: ${event.title}` : `You're in: ${event.title}`;
+  const preheader = maybe ? `You might come to ${event.title} on ${when}` : `RSVP confirmed for ${event.title} on ${when}`;
+  const changeUrl = `${SITE_URL}/events/${event.id}`;
   const body = `
-<h2 style="margin:0 0 8px;font-size:22px;color:${PALETTE.text};">You're on the list</h2>
-<p style="margin:0 0 16px;color:${PALETTE.muted};">Thanks for RSVPing — see you on ${escapeHtml(when)}.</p>
+<h2 style="margin:0 0 8px;font-size:22px;color:${PALETTE.text};">${maybe ? "We've got you down as a maybe" : "You're on the list"}</h2>
+<p style="margin:0 0 16px;color:${PALETTE.muted};">${maybe
+    ? `Thanks for letting us know. If your plans firm up, <a href="${changeUrl}" style="color:${PALETTE.primary};">update your answer</a> so we can plan for you.`
+    : `Thanks for RSVPing — see you on ${escapeHtml(when)}.`}</p>
 <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;background:${PALETTE.bg};border:1px solid ${PALETTE.border};border-radius:8px;margin:16px 0;">
 <tr><td style="padding:16px;">
 <strong style="color:${PALETTE.text};">${escapeHtml(event.title)}</strong><br>
@@ -132,12 +137,12 @@ ${event.location ? `<br><span style="color:${PALETTE.muted};">📍 ${escapeHtml(
 <div style="margin:8px 0 0;">
 ${button('View details', `${SITE_URL}/events/${event.id}`)}
 </div>
-<p style="margin:24px 0 0;color:${PALETTE.muted};font-size:13px;">We'll send a reminder the day before and a heads-up an hour before the meeting starts.</p>`;
+<p style="margin:24px 0 0;color:${PALETTE.muted};font-size:13px;">We'll send a reminder the day before and a heads-up an hour before the meeting starts.${maybe ? '' : ' Plans changed? You can update your answer on the event page.'}</p>`;
 
-  const text = `You're on the list for ${event.title}
+  const text = `${maybe ? `You're down as a maybe for ${event.title}` : `You're on the list for ${event.title}`}
 ${when}${event.location ? `\nLocation: ${event.location}` : ''}
 
-We'll send a reminder before the meeting.
+We'll send a reminder before the meeting.${maybe ? ' If your plans firm up, update your answer on the event page.' : ''}
 
 View details: ${SITE_URL}/events/${event.id}`;
 
@@ -194,9 +199,21 @@ export function formatMeetingWhen(iso: string): string {
 export type MeetingReminderOptions = {
   /** Organizer's note to members; plain text, line breaks preserved. */
   note?: string | null;
-  /** Whether this recipient already has an RSVP for the meeting. */
-  hasRsvped?: boolean;
+  /** This recipient's current answer for the meeting, if any. */
+  rsvpStatus?: RsvpStatus | null;
 };
+
+/** Three answer buttons (yes / maybe / no), the current answer highlighted. */
+function answerButtons(eventId: string, current: RsvpStatus | null | undefined) {
+  return RSVP_STATUSES.map(status => {
+    const selected = status === current;
+    const href = rsvpAnswerUrl(SITE_URL, eventId, status);
+    const style = selected
+      ? `display:inline-block;background:${PALETTE.primary};color:${PALETTE.primaryText};padding:12px 18px;border-radius:8px;text-decoration:none;font-weight:600;margin:0 8px 8px 0;`
+      : `display:inline-block;background:${PALETTE.bg};color:${PALETTE.text};border:1px solid ${PALETTE.border};padding:11px 18px;border-radius:8px;text-decoration:none;font-weight:600;margin:0 8px 8px 0;`;
+    return `<a href="${href}" style="${style}">${escapeHtml(RSVP_LABELS[status].action)}${selected ? ' ✓' : ''}</a>`;
+  }).join('');
+}
 
 /**
  * Organizer-sent reminder about an upcoming meeting, addressed to every
@@ -231,9 +248,10 @@ ${event.agenda
   .join('')}
 </ul>`
       : '';
-  const rsvpLine = opts.hasRsvped
-    ? `<p style="margin:16px 0 0;color:${PALETTE.muted};">You're already RSVP'd. If your plans changed, you can update that on the event page.</p>`
-    : `<p style="margin:16px 0 0;color:${PALETTE.muted};">Haven't RSVP'd yet? Let us know you're coming so we can plan for you.</p>`;
+  const current = opts.rsvpStatus ?? null;
+  const rsvpLine = current
+    ? `<p style="margin:16px 0 0;color:${PALETTE.muted};">Your answer so far: <strong style="color:${PALETTE.text};">${escapeHtml(RSVP_LABELS[current].short)}</strong>. Plans changed? Pick a different answer below.</p>`
+    : `<p style="margin:16px 0 0;color:${PALETTE.muted};">Can you make it? Let us know so we can plan for you.</p>`;
 
   const body = `
 <h2 style="margin:0 0 8px;font-size:22px;color:${PALETTE.text};">${escapeHtml(event.title)}</h2>
@@ -243,9 +261,10 @@ ${noteHtml}
 ${event.description ? `<p style="margin:16px 0 0;line-height:1.55;">${escapeHtml(event.description)}</p>` : ''}
 ${agendaHtml}
 ${rsvpLine}
-<div style="margin:24px 0 0;">
-${button(opts.hasRsvped ? 'View the meeting' : 'RSVP now', eventUrl)}
-</div>`;
+<div style="margin:16px 0 0;">
+${answerButtons(event.id, current)}
+</div>
+<p style="margin:12px 0 0;color:${PALETTE.muted};font-size:13px;"><a href="${eventUrl}" style="color:${PALETTE.primary};">Open the event page</a> for the full details.</p>`;
 
   const text = [
     `Reminder: ${event.title}`,
@@ -259,7 +278,9 @@ ${button(opts.hasRsvped ? 'View the meeting' : 'RSVP now', eventUrl)}
     ...(Array.isArray(event.agenda) && event.agenda.length > 0
       ? ['Agenda:', ...event.agenda.map(item => `- ${item.title}${item.time ? ` (${item.time})` : ''}`), '']
       : []),
-    opts.hasRsvped ? "You're already RSVP'd." : "Haven't RSVP'd yet? Let us know you're coming.",
+    current ? `Your answer so far: ${RSVP_LABELS[current].short}. Plans changed? Pick a different answer:` : 'Can you make it? Let us know:',
+    ...RSVP_STATUSES.map(status => `- ${RSVP_LABELS[status].action}: ${rsvpAnswerUrl(SITE_URL, event.id, status)}`),
+    '',
     `Event page: ${eventUrl}`,
   ]
     .filter((line): line is string => line !== null)

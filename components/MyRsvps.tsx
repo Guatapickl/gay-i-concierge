@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { getEventsByIds } from '@/lib/events';
-import { getRsvpedEventIds, deleteRsvp } from '@/lib/rsvp';
+import { getRsvpStatuses, deleteRsvp, type RsvpStatus } from '@/lib/rsvp';
+import { isAttending } from '@/lib/rsvpStatus';
 import { currentUser } from '@/lib/firebase/authClient';
 import type { Event } from '@/types/supabase';
 import { Alert, LoadingSpinner } from '@/components/ui';
@@ -13,6 +14,7 @@ export default function MyRsvps() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [answers, setAnswers] = useState<Record<string, RsvpStatus>>({});
 
   useEffect(() => {
     (async () => {
@@ -23,7 +25,9 @@ export default function MyRsvps() {
         setLoading(false);
         return;
       }
-      const ids = await getRsvpedEventIds(uid);
+      const statuses = await getRsvpStatuses(uid);
+      setAnswers(statuses);
+      const ids = Object.keys(statuses).filter(id => isAttending(statuses[id]));
       const data = await getEventsByIds(ids);
       const now = new Date();
       const futureEvents = data
@@ -65,6 +69,7 @@ export default function MyRsvps() {
             key={event.id}
             event={event}
             isRsvped={true}
+            rsvpStatus={answers[event.id] ?? 'yes'}
             showViewAgenda={false}
             onCancelRsvp={async () => {
               if (!userId) return;

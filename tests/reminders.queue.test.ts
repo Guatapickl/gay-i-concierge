@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 type Row = Record<string, unknown>;
-const state = vi.hoisted(() => ({ rows: new Map<string, Row>(), optedIn: true, serial: Promise.resolve(), beforeClaim: null as null | (() => void) }));
+const state = vi.hoisted(() => ({ rows: new Map<string, Row>(), optedIn: true, rsvp: { exists: true, status: 'yes' as string | undefined }, serial: Promise.resolve(), beforeClaim: null as null | (() => void) }));
 vi.mock('@/lib/firebase/admin', () => ({ adminDb: () => ({
   collection: (name: string) => {
     const query = {
@@ -8,7 +8,13 @@ vi.mock('@/lib/firebase/admin', () => ({ adminDb: () => ({
       get: async () => name === 'alerts_subscribers'
         ? { empty: false, docs: [{ data: () => ({ email_opt_in: state.optedIn }) }] }
         : { docs: [...state.rows].filter(([, row]) => row.status === 'pending').map(([id, row]) => ({ id, exists: true, data: () => ({ ...row }) })) },
-      doc: (id: string) => ({ id, update: async (data: Row) => { state.rows.set(id, { ...state.rows.get(id), ...data }); } }),
+      doc: (id: string) => ({
+        id,
+        update: async (data: Row) => { state.rows.set(id, { ...state.rows.get(id), ...data }); },
+        get: async () => name === 'rsvps'
+          ? { exists: state.rsvp.exists, data: () => ({ status: state.rsvp.status }) }
+          : { exists: state.rows.has(id), data: () => ({ ...state.rows.get(id) }) },
+      }),
     };
     return query;
   },
@@ -29,7 +35,7 @@ import { sendEmail } from '@/lib/email';
 import { processDueReminders } from '@/lib/reminders';
 
 beforeEach(() => {
-  vi.clearAllMocks(); state.rows.clear(); state.optedIn = true; state.serial = Promise.resolve(); state.beforeClaim = null;
+  vi.clearAllMocks(); state.rows.clear(); state.optedIn = true; state.rsvp = { exists: true, status: 'yes' }; state.serial = Promise.resolve(); state.beforeClaim = null;
   state.rows.set('queue-1', { status: 'pending', kind: 'poll_invite', send_at: '2020-01-01T00:00:00Z', attempts: 0, recipient_email: 'member@example.com', subject: 'Vote', body_html: '<p>Vote</p>' });
 });
 describe('reminder delivery claims', () => {
@@ -49,6 +55,24 @@ describe('reminder delivery claims', () => {
     await processDueReminders();
     expect(sendEmail).not.toHaveBeenCalled();
     expect(state.rows.get('queue-1')?.status).toBe('cancelled');
+  });
+  it('cancels an event reminder when the member withdrew or said they cannot make it', async () => {
+    state.rows.set('queue-1', { ...state.rows.get('queue-1'), kind: 'event_reminder', event_id: 'ev-1', recipient_user_id: 'u-1' });
+    state.rsvp = { exists: true, status: 'no' };
+    await processDueReminders();
+    expect(sendEmail).not.toHaveBeenCalled();
+    expect(state.rows.get('queue-1')?.status).toBe('cancelled');
+
+    state.rows.set('queue-1', { ...state.rows.get('queue-1'), status: 'pending' });
+    state.rsvp = { exists: false, status: undefined };
+    await processDueReminders();
+    expect(sendEmail).not.toHaveBeenCalled();
+
+    state.rows.set('queue-1', { ...state.rows.get('queue-1'), status: 'pending' });
+    state.rsvp = { exists: true, status: 'maybe' };
+    await processDueReminders();
+    expect(sendEmail).toHaveBeenCalledTimes(1);
+    expect(state.rows.get('queue-1')?.status).toBe('sent');
   });
   it('retains nonpoll delivery and stable provider keys across retries', async () => {
     state.optedIn = false;

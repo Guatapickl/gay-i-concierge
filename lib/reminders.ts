@@ -9,6 +9,7 @@ import { adminDb } from './firebase/admin';
 import { adminPayloadOf, adminRowOf } from './firebase/adminDb';
 import { eventReminderEmail, rsvpConfirmationEmail } from './emailTemplates';
 import { sendEmail } from './email';
+import { isAttending, rsvpStatusOf, type RsvpStatus } from './rsvpStatus';
 import type { Event, EmailReminder } from '@/types/supabase';
 
 const REMINDER_OFFSETS_HOURS = [24, 1] as const;
@@ -26,8 +27,9 @@ async function getEvent(eventId: string): Promise<Event | null> {
 }
 
 /**
- * Schedule the standard reminder set (24h and 1h before) for every RSVPed
- * subscriber to a given event. Idempotent: skips already-queued reminders.
+ * Schedule the standard reminder set (24h and 1h before) for every
+ * subscriber who answered yes or maybe to a given event. Idempotent: skips
+ * already-queued reminders.
  */
 export async function scheduleEventReminders(eventId: string): Promise<{
   scheduled: number;
@@ -39,7 +41,12 @@ export async function scheduleEventReminders(eventId: string): Promise<{
 
   // Pull RSVPed users and their email opt-ins
   const rsvps = await db.collection('rsvps').where('event_id', '==', eventId).get();
-  const userIds = Array.from(new Set(rsvps.docs.map(d => d.data().profile_id as string).filter(Boolean)));
+  const userIds = Array.from(new Set(
+    rsvps.docs
+      .filter(d => isAttending(rsvpStatusOf(d.data())))
+      .map(d => d.data().profile_id as string)
+      .filter(Boolean),
+  ));
   if (userIds.length === 0) return { scheduled: 0, skipped: 0 };
 
   const userEmails = new Map<string, string>();
@@ -123,6 +130,7 @@ export async function scheduleEventReminders(eventId: string): Promise<{
 export async function enqueueRsvpConfirmation(args: {
   eventId: string;
   userId: string;
+  status?: RsvpStatus;
 }): Promise<boolean> {
   const db = adminDb();
   const [event, profileSnap] = await Promise.all([
@@ -136,7 +144,7 @@ export async function enqueueRsvpConfirmation(args: {
   const subs = await db.collection('alerts_subscribers').where('email', '==', email).limit(1).get();
   if (subs.empty || !subs.docs[0].data().email_opt_in) return false;
 
-  const { subject, html, text } = rsvpConfirmationEmail(event);
+  const { subject, html, text } = rsvpConfirmationEmail(event, args.status ?? 'yes');
   try {
     await db.collection('email_reminders').add(adminPayloadOf({
       event_id: args.eventId,
@@ -214,6 +222,15 @@ export async function processDueReminders(limit = 50): Promise<{
           .where('email', '==', row.recipient_email).get();
         if (!subscribers.docs.length || !subscribers.docs.every(s => s.data().email_opt_in === true)) {
           await docRef.update({ status: 'cancelled', error: 'Poll invitation cancelled: recipient is not opted in.' });
+          continue;
+        }
+      }
+      // Event reminders follow the member's current answer: a withdrawn
+      // RSVP or a "can't make it" given after queueing stops the reminder.
+      if (row.kind === 'event_reminder' && row.event_id && row.recipient_user_id) {
+        const rsvp = await db.collection('rsvps').doc(`${row.event_id}_${row.recipient_user_id}`).get();
+        if (!rsvp.exists || !isAttending(rsvpStatusOf(rsvp.data() ?? {}))) {
+          await docRef.update({ status: 'cancelled', error: 'Event reminder cancelled: member is no longer going.' });
           continue;
         }
       }

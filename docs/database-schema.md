@@ -306,7 +306,7 @@ Central table for club meetings. Supports both one-off events and recurring seri
 
 ### rsvps
 
-Tracks member RSVPs to events. One RSVP per user per event (enforced by unique constraint).
+Tracks each member's answer to an event: going, maybe, or can't make it. One row per user per event (Firestore doc id `${event_id}_${profile_id}`).
 
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
@@ -314,11 +314,13 @@ Tracks member RSVPs to events. One RSVP per user per event (enforced by unique c
 | `profile_id` | `uuid` | NOT NULL, FK → `auth.users(id)` ON DELETE CASCADE | RSVP owner |
 | `event_id` | `uuid` | NOT NULL, FK → `events(id)` ON DELETE CASCADE | Target event |
 | `event_date` | `timestamptz` | nullable | Denormalized event date |
-| `created_at` | `timestamptz` | default `now()` | |
+| `status` | `text` | `yes` / `maybe` / `no`; missing means `yes` (rows written before answers existed) | The member's answer |
+| `created_at` | `timestamptz` | default `now()` | First answer |
+| `updated_at` | `timestamptz` | nullable | Last change of answer |
 
-**Unique constraint**: `(profile_id, event_id)` — prevents duplicate RSVPs.
+**Unique constraint**: `(profile_id, event_id)` — prevents duplicate RSVPs. Members may update their own row (rules allow `update` when `profile_id` is theirs) so they can change their answer; deleting the row withdraws the answer.
 
-**RSVP flow**: Client calls `POST /api/rsvp` with `event_id`. The API route validates the auth token, inserts the RSVP, and enqueues a confirmation email via `email_reminders`. Falls back to direct Supabase insert if the API is unavailable.
+**RSVP flow**: Client calls `POST /api/events/rsvp` with `event_id` and `status` (default `yes`). The API route validates the auth token, upserts the answer, and, when the member says yes or maybe for the first time or changes their answer, enqueues a confirmation email via `email_reminders` and schedules event reminders. A `no` sends nothing, and the reminder cron cancels queued event reminders for members who later say no or withdraw. Links of the form `/events/<id>?rsvp=yes|maybe|no` (used by the organizer reminder email) record the answer once the member is signed in; the sign-in page returns to that link via `?next=`.
 
 ---
 

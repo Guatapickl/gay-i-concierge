@@ -111,10 +111,10 @@ describe('GET /api/events/attendees (organizer RSVP view)', () => {
     s.user = { uid: ORGANIZER, email: 'organizer@example.com' };
     s.upcoming = [laterMeeting, nextMeeting];
     s.rsvps = [
-      { id: 'poll-next_second', data: { event_id: 'poll-next', profile_id: 'second', created_at: '2099-09-02T10:00:00.000Z' } },
+      { id: 'poll-next_second', data: { event_id: 'poll-next', profile_id: 'second', status: 'maybe', created_at: '2099-09-02T10:00:00.000Z' } },
       { id: 'poll-next_first', data: { event_id: 'poll-next', profile_id: 'first', created_at: '2099-09-02T09:00:00.000Z' } },
-      { id: 'poll-next_third', data: { event_id: 'poll-next', profile_id: 'third', created_at: '2099-09-02T11:00:00.000Z' } },
-      { id: 'poll-next_fourth', data: { event_id: 'poll-next', profile_id: 'fourth', created_at: '2099-09-02T12:00:00.000Z' } },
+      { id: 'poll-next_third', data: { event_id: 'poll-next', profile_id: 'third', status: 'no', created_at: '2099-09-02T11:00:00.000Z' } },
+      { id: 'poll-next_fourth', data: { event_id: 'poll-next', profile_id: 'fourth', status: 'yes', created_at: '2099-09-02T12:00:00.000Z' } },
       { id: 'later_first', data: { event_id: 'later', profile_id: 'first', created_at: '2099-09-02T13:00:00.000Z' } },
     ];
     s.profiles.set('first', { full_name: 'Robert Washko', email: 'robert@example.com' });
@@ -130,11 +130,13 @@ describe('GET /api/events/attendees (organizer RSVP view)', () => {
     expect(body.is_next_meeting).toBe(true);
     expect(body.upcoming_events.map((e: { id: string }) => e.id)).toEqual(['poll-next', 'later']);
     expect(body.count).toBe(4);
+    // A row without `status` predates answers and counts as going.
+    expect(body.counts).toEqual({ yes: 2, maybe: 1, no: 1 });
     expect(body.attendees).toEqual([
-      { id: 'poll-next_first', profile_id: 'first', name: 'Robert Washko', email: null, rsvped_at: '2099-09-02T09:00:00.000Z' },
-      { id: 'poll-next_second', profile_id: 'second', name: 'Display Name Only', email: null, rsvped_at: '2099-09-02T10:00:00.000Z' },
-      { id: 'poll-next_third', profile_id: 'third', name: null, email: 'third-profile@example.com', rsvped_at: '2099-09-02T11:00:00.000Z' },
-      { id: 'poll-next_fourth', profile_id: 'fourth', name: null, email: null, rsvped_at: '2099-09-02T12:00:00.000Z' },
+      { id: 'poll-next_first', profile_id: 'first', name: 'Robert Washko', email: null, status: 'yes', rsvped_at: '2099-09-02T09:00:00.000Z' },
+      { id: 'poll-next_second', profile_id: 'second', name: 'Display Name Only', email: null, status: 'maybe', rsvped_at: '2099-09-02T10:00:00.000Z' },
+      { id: 'poll-next_third', profile_id: 'third', name: null, email: 'third-profile@example.com', status: 'no', rsvped_at: '2099-09-02T11:00:00.000Z' },
+      { id: 'poll-next_fourth', profile_id: 'fourth', name: null, email: null, status: 'yes', rsvped_at: '2099-09-02T12:00:00.000Z' },
     ]);
     // Auth is only consulted for members without a profile name.
     expect(fake.getUsers).toHaveBeenCalledTimes(1);
@@ -146,7 +148,7 @@ describe('GET /api/events/attendees (organizer RSVP view)', () => {
     fake.state.user = { uid: ORGANIZER, email: null };
 
     const none = await (await GET(request())).json();
-    expect(none).toMatchObject({ event: null, is_next_meeting: false, upcoming_events: [], count: 0, attendees: [] });
+    expect(none).toMatchObject({ event: null, is_next_meeting: false, upcoming_events: [], count: 0, counts: { yes: 0, maybe: 0, no: 0 }, attendees: [] });
 
     fake.state.upcoming = [nextMeeting];
     const empty = await (await GET(request())).json();

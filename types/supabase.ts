@@ -67,7 +67,10 @@ export type Rsvp = {
   profile_id: string;
   event_id: string;
   event_date?: string;
+  /** The member's answer. Missing on rows written before answers existed, which means yes. */
+  status?: 'yes' | 'maybe' | 'no';
   created_at: string;
+  updated_at?: string | null;
 };
 
 /**

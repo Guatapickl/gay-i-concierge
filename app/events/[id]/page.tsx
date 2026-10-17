@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -10,12 +10,15 @@ import {
   MapPin,
   Share2,
   Check,
+  HelpCircle,
+  X,
   Users,
   Repeat,
 } from 'lucide-react';
 import type { Event } from '@/types/supabase';
 import { getEventById } from '@/lib/events';
-import { getRsvpedEventIds, saveRsvp, deleteRsvp, getEventAttendees } from '@/lib/rsvp';
+import { getRsvpStatuses, saveRsvp, deleteRsvp, getEventAttendees, type RsvpCounts, type RsvpStatus } from '@/lib/rsvp';
+import { RSVP_LABELS, applyAnswer, parseRsvpStatus } from '@/lib/rsvpStatus';
 import { currentUser } from '@/lib/firebase/authClient';
 import { isCurrentUserAdmin } from '@/lib/isAdmin';
 import { describeRecurrence } from '@/lib/recurrence';
@@ -24,18 +27,27 @@ import CalendarExportButtons from '@/components/CalendarExportButtons';
 import AgendaSuggestions from '@/components/AgendaSuggestions';
 import { Button, Alert } from '@/components/ui';
 
+const ANSWER_MESSAGES: Record<RsvpStatus, (title: string) => string> = {
+  yes: title => `You're going to "${title}"!`,
+  maybe: title => `Marked as maybe for "${title}". Update your answer when you know more.`,
+  no: title => `Noted: you can't make "${title}". Thanks for letting us know.`,
+};
+
 export default function EventDetailsPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const eventId = Array.isArray(params?.id) ? params?.id[0] : (params?.id as string | undefined);
+  // `?rsvp=yes|maybe|no` arrives from the answer buttons in reminder emails.
+  const requestedAnswer = parseRsvpStatus(searchParams.get('rsvp'));
 
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<{ text: string; variant: 'success' | 'error' | 'info' } | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
-  const [isRsvped, setIsRsvped] = useState(false);
+  const [answer, setAnswer] = useState<RsvpStatus | null>(null);
   const [rsvpLoading, setRsvpLoading] = useState(false);
-  const [attendeeCount, setAttendeeCount] = useState(0);
+  const [counts, setCounts] = useState<RsvpCounts>({ yes: 0, maybe: 0, no: 0 });
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
@@ -47,45 +59,70 @@ export default function EventDetailsPage() {
         getEventAttendees(eventId),
       ]);
       setEvent(e);
-      setAttendeeCount(attendees.count);
+      setCounts(attendees.counts);
       const uid = user?.uid || null;
       setUserId(uid);
+      let current: RsvpStatus | null = null;
       if (uid) {
-        const [ids, admin] = await Promise.all([getRsvpedEventIds(uid), isCurrentUserAdmin(uid)]);
-        setIsRsvped(ids.includes(eventId));
+        const [statuses, admin] = await Promise.all([getRsvpStatuses(uid), isCurrentUserAdmin(uid)]);
+        current = statuses[eventId] ?? null;
+        setAnswer(current);
         setIsAdmin(admin);
       }
       setLoading(false);
+
+      // Apply an answer carried in the link (from a reminder email) once the
+      // member is signed in, then drop it from the URL so a reload does not
+      // answer again.
+      if (requestedAnswer && e && uid && new Date(e.event_datetime).getTime() >= Date.now()) {
+        if (requestedAnswer !== current) {
+          const ok = await saveRsvp(uid, e.id, requestedAnswer);
+          if (ok) {
+            setAnswer(requestedAnswer);
+            setCounts(prev => applyAnswer(prev, current, requestedAnswer));
+            setMessage({ text: ANSWER_MESSAGES[requestedAnswer](e.title), variant: 'success' });
+          } else {
+            setMessage({ text: 'We could not save your answer. Please try again below.', variant: 'error' });
+          }
+        } else {
+          setMessage({ text: `${RSVP_LABELS[requestedAnswer].sentence}: that is already your answer for "${e.title}".`, variant: 'info' });
+        }
+        router.replace(`/events/${encodeURIComponent(e.id)}`);
+      } else if (requestedAnswer && !uid) {
+        setMessage({ text: 'Sign in to record your answer.', variant: 'info' });
+      }
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- requestedAnswer is read once per page load
   }, [eventId]);
 
-  const handleRsvp = async () => {
+  const handleAnswer = async (status: RsvpStatus) => {
     if (!userId) {
       setMessage({ text: 'Please sign in to RSVP.', variant: 'info' });
       return;
     }
+    if (status === answer) return;
     setRsvpLoading(true);
-    const ok = await saveRsvp(userId, event!.id);
+    const ok = await saveRsvp(userId, event!.id, status);
     if (ok) {
-      setIsRsvped(true);
-      setAttendeeCount(prev => prev + 1);
-      setMessage({ text: `You're going to "${event!.title}"!`, variant: 'success' });
+      setCounts(prev => applyAnswer(prev, answer, status));
+      setAnswer(status);
+      setMessage({ text: ANSWER_MESSAGES[status](event!.title), variant: 'success' });
     } else {
-      setMessage({ text: 'Failed to RSVP. Please try again.', variant: 'error' });
+      setMessage({ text: 'Failed to save your answer. Please try again.', variant: 'error' });
     }
     setRsvpLoading(false);
   };
 
-  const handleCancelRsvp = async () => {
-    if (!userId) return;
+  const handleClearAnswer = async () => {
+    if (!userId || !answer) return;
     setRsvpLoading(true);
     const ok = await deleteRsvp(userId, event!.id);
     if (ok) {
-      setIsRsvped(false);
-      setAttendeeCount(prev => Math.max(0, prev - 1));
-      setMessage({ text: `Canceled RSVP for "${event!.title}".`, variant: 'success' });
+      setCounts(prev => applyAnswer(prev, answer, null));
+      setAnswer(null);
+      setMessage({ text: `Cleared your answer for "${event!.title}".`, variant: 'success' });
     } else {
-      setMessage({ text: 'Failed to cancel RSVP.', variant: 'error' });
+      setMessage({ text: 'Failed to clear your answer.', variant: 'error' });
     }
     setRsvpLoading(false);
   };
@@ -183,10 +220,16 @@ export default function EventDetailsPage() {
                 {recurrence}
               </span>
             )}
-            {attendeeCount > 0 && (
+            {counts.yes > 0 && (
               <span className="badge badge-cyan">
                 <Users className="w-3 h-3" />
-                {attendeeCount} {attendeeCount === 1 ? 'attendee' : 'attendees'}
+                {counts.yes} going
+              </span>
+            )}
+            {counts.maybe > 0 && (
+              <span className="badge">
+                <HelpCircle className="w-3 h-3" />
+                {counts.maybe} maybe
               </span>
             )}
           </div>
@@ -226,33 +269,46 @@ export default function EventDetailsPage() {
       {/* Action bar */}
       <div className="card p-5">
         <div className="flex flex-wrap items-center gap-3">
-          {/* RSVP */}
+          {/* RSVP answer */}
           {!isPast && (
-            isRsvped ? (
-              <div className="flex items-center gap-3">
-                <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-success">
-                  <Check className="w-4 h-4" />
-                  RSVPed
-                </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleCancelRsvp}
-                  disabled={rsvpLoading}
-                >
-                  {rsvpLoading ? 'Canceling…' : 'Cancel RSVP'}
-                </Button>
-              </div>
-            ) : (
+            <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Are you coming?" data-testid="rsvp-answer">
+              <span className="text-sm text-foreground-muted mr-1">{answer ? 'Your answer:' : 'Are you coming?'}</span>
               <Button
-                variant="primary"
-                size="md"
-                onClick={handleRsvp}
+                variant={answer === 'yes' ? 'success' : 'primary'}
+                size="sm"
+                onClick={() => void handleAnswer('yes')}
                 disabled={rsvpLoading}
+                aria-pressed={answer === 'yes'}
               >
-                {rsvpLoading ? 'Saving…' : 'RSVP to this event'}
+                <Check className="w-4 h-4" />
+                {RSVP_LABELS.yes.action}
               </Button>
-            )
+              <Button
+                variant={answer === 'maybe' ? 'outline' : 'secondary'}
+                size="sm"
+                onClick={() => void handleAnswer('maybe')}
+                disabled={rsvpLoading}
+                aria-pressed={answer === 'maybe'}
+              >
+                <HelpCircle className="w-4 h-4" />
+                {RSVP_LABELS.maybe.action}
+              </Button>
+              <Button
+                variant={answer === 'no' ? 'outline' : 'secondary'}
+                size="sm"
+                onClick={() => void handleAnswer('no')}
+                disabled={rsvpLoading}
+                aria-pressed={answer === 'no'}
+              >
+                <X className="w-4 h-4" />
+                {RSVP_LABELS.no.action}
+              </Button>
+              {answer && (
+                <Button variant="ghost" size="sm" onClick={() => void handleClearAnswer()} disabled={rsvpLoading}>
+                  {rsvpLoading ? 'Saving…' : 'Clear'}
+                </Button>
+              )}
+            </div>
           )}
 
           {/* Calendar exports */}

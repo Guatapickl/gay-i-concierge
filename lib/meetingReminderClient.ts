@@ -13,7 +13,7 @@ export type MeetingReminderResponse = {
   subject: string;
   event: { id: string; title: string; event_datetime: string; location: string | null };
   recipient_count: number;
-  recipients: { user_id: string; has_rsvped: boolean }[];
+  recipients: { user_id: string; rsvp_status: 'yes' | 'maybe' | 'no' | null }[];
   unsubscribed: number;
   already_reminded: number;
   unreachable: number;

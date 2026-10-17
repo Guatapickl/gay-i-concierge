@@ -4,11 +4,11 @@ import {middleware} from '../middleware';
 describe('public launch assets',()=>{
  it('keeps the sign-in redirect on the public Firebase host',()=>{
   const r=middleware(new NextRequest('http://localhost:8080/events?from=home',{headers:{'x-forwarded-host':'gayiclub.com'}}));
-  expect(r.headers.get('location')).toBe('https://gayiclub.com/auth/sign-in?from=home');
+  expect(r.headers.get('location')).toBe('https://gayiclub.com/auth/sign-in?next=%2Fevents%3Ffrom%3Dhome');
  });
  it('does not redirect to an unrecognized forwarded host',()=>{
   const r=middleware(new NextRequest('https://gayiclub.com/events',{headers:{'x-forwarded-host':'attacker.example'}}));
-  expect(r.headers.get('location')).toBe('https://gayiclub.com/auth/sign-in');
+  expect(r.headers.get('location')).toBe('https://gayiclub.com/auth/sign-in?next=%2Fevents');
  });
  it('redirects forwarded www traffic to the canonical host preserving path/query',()=>{
   const r=middleware(new NextRequest('http://localhost:8080/news?q=ai',{headers:{'x-forwarded-host':'www.gayiclub.com'}}));
@@ -36,12 +36,17 @@ describe('public launch assets',()=>{
 
 it('redirects signed-out directory and member-detail requests to sign-in', () => {
  for (const path of ['/community', '/community/member-id']) {
-  expect(middleware(new NextRequest(`https://gayiclub.com${path}`)).headers.get('location')).toBe('https://gayiclub.com/auth/sign-in');
+  expect(middleware(new NextRequest(`https://gayiclub.com${path}`)).headers.get('location')).toBe(`https://gayiclub.com/auth/sign-in?next=${encodeURIComponent(path)}`);
  }
 });
 
 it('keeps calendar and event locations behind sign-in', () => {
  for (const path of ['/calendar', '/events', '/events/private-meeting']) {
-  expect(middleware(new NextRequest(`https://gayiclub.com${path}`)).headers.get('location')).toBe('https://gayiclub.com/auth/sign-in');
+  expect(middleware(new NextRequest(`https://gayiclub.com${path}`)).headers.get('location')).toBe(`https://gayiclub.com/auth/sign-in?next=${encodeURIComponent(path)}`);
  }
+});
+
+it('sends an RSVP answer link through sign-in and back', () => {
+ const r = middleware(new NextRequest('https://gayiclub.com/events/ev-1?rsvp=maybe'));
+ expect(r.headers.get('location')).toBe('https://gayiclub.com/auth/sign-in?next=%2Fevents%2Fev-1%3Frsvp%3Dmaybe');
 });

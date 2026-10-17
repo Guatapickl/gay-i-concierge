@@ -5,6 +5,7 @@ import {
   enqueueRsvpConfirmation,
   scheduleEventReminders,
 } from '@/lib/reminders';
+import { countRsvps, isAttending, parseRsvpStatus, rsvpStatusOf, type RsvpStatus } from '@/lib/rsvpStatus';
 
 export const runtime = 'nodejs';
 
@@ -20,7 +21,7 @@ function chunk<T>(arr: T[], size = 30): T[][] {
   return out;
 }
 
-type RsvpRow = { id: string; event_id: string; profile_id: string; created_at: string | null };
+type RsvpRow = { id: string; event_id: string; profile_id: string; status?: unknown; created_at: string | null };
 
 /* ─── GET  /api/events/rsvp?event_id=...&check=true ──────────────── */
 
@@ -29,8 +30,11 @@ type RsvpRow = { id: string; event_id: string; profile_id: string; created_at: s
  *
  * Query params:
  *   event_id  (required)  — the event to query
- *   check     (optional)  — if "true", returns only { rsvped: boolean } for
- *                           the authenticated user instead of the attendee list
+ *   check     (optional)  — if "true", returns only the authenticated user's
+ *                           answer ({ rsvped, status }) instead of the list
+ *
+ * The attendee list carries each member's answer. `count` is the number of
+ * members going; `counts` breaks every answer down.
  */
 export async function GET(req: NextRequest) {
   const eventId = req.nextUrl.searchParams.get('event_id');
@@ -45,10 +49,11 @@ export async function GET(req: NextRequest) {
   const db = adminDb();
 
   if (checkOnly) {
-    // ── Check if the current user has RSVPed ──
+    // ── The current user's answer ──
     try {
       const snap = await db.collection('rsvps').doc(rsvpId(eventId, user.uid)).get();
-      return NextResponse.json({ rsvped: snap.exists });
+      const status = snap.exists ? rsvpStatusOf(snap.data() ?? {}) : null;
+      return NextResponse.json({ rsvped: isAttending(status), status });
     } catch (e) {
       return NextResponse.json({ error: e instanceof Error ? e.message : 'lookup failed' }, { status: 500 });
     }
@@ -83,20 +88,28 @@ export async function GET(req: NextRequest) {
     id: r.id,
     profile_id: r.profile_id,
     name: profileMap[r.profile_id] ?? null,
+    status: rsvpStatusOf(r) ?? 'yes',
     rsvped_at: r.created_at,
   }));
+  const counts = countRsvps(rsvps);
 
-  return NextResponse.json({ event_id: eventId, count: attendees.length, attendees }, { headers: { 'Cache-Control': 'private, no-store' } });
+  return NextResponse.json(
+    { event_id: eventId, count: counts.yes, counts, attendees },
+    { headers: { 'Cache-Control': 'private, no-store' } },
+  );
 }
 
-/* ─── POST  /api/events/rsvp  { event_id } ───────────────────────── */
+/* ─── POST  /api/events/rsvp  { event_id, status? } ──────────────── */
 
 /**
- * Create an RSVP for the authenticated user. Enqueues a confirmation email
- * and schedules event reminders as side-effects (best-effort).
+ * Record the authenticated user's answer for an event: yes (default),
+ * maybe or no. Answering again replaces the earlier answer. A confirmation
+ * email goes out when a member says yes or maybe for the first time or
+ * changes their answer; event reminders are scheduled for everyone who is
+ * going or might go.
  */
 export async function POST(req: NextRequest) {
-  let body: { event_id?: string };
+  let body: { event_id?: string; status?: unknown };
   try {
     body = await req.json();
   } catch {
@@ -104,6 +117,10 @@ export async function POST(req: NextRequest) {
   }
   if (!body.event_id) {
     return NextResponse.json({ error: 'event_id required' }, { status: 400 });
+  }
+  const status: RsvpStatus | null = body.status === undefined ? 'yes' : parseRsvpStatus(body.status);
+  if (!status) {
+    return NextResponse.json({ error: 'status must be yes, maybe or no' }, { status: 400 });
   }
 
   const user = await userFromRequest(req);
@@ -119,17 +136,24 @@ export async function POST(req: NextRequest) {
   }
   const event = adminRowOf<{ id: string; event_datetime: string | null }>(eventSnap);
 
-  // Insert RSVP row — idempotent thanks to the deterministic doc id
+  // Upsert the answer — idempotent thanks to the deterministic doc id
+  let previous: RsvpStatus | null = null;
   try {
     const ref = db.collection('rsvps').doc(rsvpId(body.event_id, user.uid));
     const existing = await ref.get();
-    if (!existing.exists) {
+    const now = new Date().toISOString();
+    if (existing.exists) {
+      previous = rsvpStatusOf(existing.data() ?? {});
+      if (previous !== status) await ref.update(adminPayloadOf({ status, updated_at: now }));
+    } else {
       await ref.set(
         adminPayloadOf({
           profile_id: user.uid,
           event_id: body.event_id,
           event_date: event.event_datetime,
-          created_at: new Date().toISOString(),
+          status,
+          created_at: now,
+          updated_at: now,
         }),
       );
     }
@@ -138,18 +162,21 @@ export async function POST(req: NextRequest) {
   }
 
   // Side-effects — best-effort, never fail the RSVP for email issues
+  const changed = previous !== status;
   await Promise.allSettled([
-    enqueueRsvpConfirmation({ eventId: body.event_id, userId: user.uid }),
-    scheduleEventReminders(body.event_id),
+    changed && isAttending(status)
+      ? enqueueRsvpConfirmation({ eventId: body.event_id, userId: user.uid, status })
+      : Promise.resolve(false),
+    isAttending(status) ? scheduleEventReminders(body.event_id) : Promise.resolve(null),
   ]);
 
-  return NextResponse.json({ ok: true, event_id: body.event_id, profile_id: user.uid });
+  return NextResponse.json({ ok: true, event_id: body.event_id, profile_id: user.uid, status, previous_status: previous });
 }
 
 /* ─── DELETE  /api/events/rsvp?event_id=...  ─────────────────────── */
 
 /**
- * Cancel an RSVP for the authenticated user.
+ * Withdraw the authenticated user's answer for an event.
  */
 export async function DELETE(req: NextRequest) {
   const eventId = req.nextUrl.searchParams.get('event_id');

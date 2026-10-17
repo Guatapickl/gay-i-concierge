@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { Timestamp, type Firestore } from 'firebase-admin/firestore';
 import { adminAuth, adminDb, isAdminUid, userFromRequest } from '@/lib/firebase/admin';
 import { adminRowOf } from '@/lib/firebase/adminDb';
+import { countRsvps, rsvpStatusOf, type RsvpCounts, type RsvpStatus } from '@/lib/rsvpStatus';
 
 export const runtime = 'nodejs';
 
@@ -16,6 +17,8 @@ export const runtime = 'nodejs';
  *   `event_datetime` is still in the future (the dashboard's "Next meetup"
  *   convention). With `event_id`, that event is shown instead, and
  *   `is_next_meeting` says whether it is also the next one.
+ * - Every answer is listed (going, maybe, can't make it) with `status`;
+ *   `counts` totals them and `count` is the number of answers.
  * - Names come from `user_profiles.full_name`, then the Firebase Auth display
  *   name. A sign-in email is included only when neither exists, so the
  *   organizer can still tell who the RSVP belongs to; contact details are
@@ -39,11 +42,12 @@ export type MeetingAttendeeRecord = {
   profile_id: string;
   name: string | null;
   email: string | null;
+  status: RsvpStatus;
   rsvped_at: string | null;
 };
 
 type EventRow = MeetingSummaryRecord & Record<string, unknown>;
-type RsvpRow = { id: string; event_id: string; profile_id: string; created_at: string | null };
+type RsvpRow = { id: string; event_id: string; profile_id: string; status?: unknown; created_at: string | null };
 
 function chunk<T>(arr: T[], size: number): T[][] {
   const out: T[][] = [];
@@ -60,7 +64,7 @@ function summarize(row: EventRow): MeetingSummaryRecord {
   };
 }
 
-async function loadAttendees(db: Firestore, eventId: string): Promise<MeetingAttendeeRecord[]> {
+async function loadAttendees(db: Firestore, eventId: string): Promise<{ attendees: MeetingAttendeeRecord[]; counts: RsvpCounts }> {
   const snap = await db
     .collection('rsvps')
     .where('event_id', '==', eventId)
@@ -91,16 +95,18 @@ async function loadAttendees(db: Firestore, eventId: string): Promise<MeetingAtt
     }
   }
 
-  return rsvps.map(r => {
+  const attendees = rsvps.map(r => {
     const name = names.get(r.profile_id) ?? null;
     return {
       id: r.id,
       profile_id: r.profile_id,
       name,
       email: name ? null : emails.get(r.profile_id) ?? null,
+      status: rsvpStatusOf(r) ?? 'yes',
       rsvped_at: r.created_at ?? null,
     };
   });
+  return { attendees, counts: countRsvps(rsvps) };
 }
 
 export async function GET(req: NextRequest) {
@@ -135,13 +141,14 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    const attendees = selected ? await loadAttendees(db, selected.id) : [];
+    const { attendees, counts } = selected ? await loadAttendees(db, selected.id) : { attendees: [], counts: { yes: 0, maybe: 0, no: 0 } };
     return NextResponse.json(
       {
         event: selected,
         is_next_meeting: selected !== null && selected.id === upcoming[0]?.id,
         upcoming_events: upcoming,
         count: attendees.length,
+        counts,
         attendees,
         generated_at: new Date().toISOString(),
       },

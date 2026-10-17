@@ -1,6 +1,9 @@
 import { deleteDoc, setDoc, where } from 'firebase/firestore';
 import { authHeader } from './firebase/authClient';
 import { listRows, nowIso, payloadOf, ref } from './firebase/db';
+import { isAttending, rsvpStatusOf, type RsvpCounts, type RsvpStatus } from './rsvpStatus';
+
+export type { RsvpStatus, RsvpCounts } from './rsvpStatus';
 
 /* ─── Types ──────────────────────────────────────────────────────── */
 
@@ -8,12 +11,15 @@ export type Attendee = {
   id: string;
   profile_id: string;
   name: string | null;
+  status: RsvpStatus;
   rsvped_at: string;
 };
 
 export type AttendeeListResponse = {
   event_id: string;
+  /** Members who answered "yes". */
   count: number;
+  counts: RsvpCounts;
   attendees: Attendee[];
 };
 
@@ -36,18 +42,19 @@ async function authHeaders(): Promise<Record<string, string> | null> {
 /* ─── Public API ─────────────────────────────────────────────────── */
 
 /**
- * Save an RSVP. Posts through `/api/events/rsvp` so the server can also
- * enqueue the confirmation email and any reminder rows. Falls back to a
- * direct write if the API path errors (e.g. dev without admin credentials).
+ * Save an RSVP answer (yes, maybe or no). Posts through `/api/events/rsvp`
+ * so the server can also enqueue the confirmation email and any reminder
+ * rows. Falls back to a direct write if the API path errors (e.g. dev
+ * without admin credentials).
  */
-export async function saveRsvp(profileId: string, eventId: string): Promise<boolean> {
+export async function saveRsvp(profileId: string, eventId: string, status: RsvpStatus = 'yes'): Promise<boolean> {
   try {
     const headers = await authHeaders();
     if (headers) {
       const res = await fetch('/api/events/rsvp', {
         method: 'POST',
         headers,
-        body: JSON.stringify({ event_id: eventId }),
+        body: JSON.stringify({ event_id: eventId, status }),
       });
       if (res.ok) return true;
       // fall through to direct insert on server error
@@ -57,9 +64,10 @@ export async function saveRsvp(profileId: string, eventId: string): Promise<bool
   }
 
   try {
+    const now = nowIso();
     await setDoc(
       ref('rsvps', rsvpDocId(eventId, profileId)),
-      payloadOf({ profile_id: profileId, event_id: eventId, created_at: nowIso() }),
+      payloadOf({ profile_id: profileId, event_id: eventId, status, created_at: now, updated_at: now }),
     );
     return true;
   } catch (err) {
@@ -95,23 +103,34 @@ export async function deleteRsvp(profileId: string, eventId: string): Promise<bo
 }
 
 /**
- * Get event IDs that the profile has RSVPed for.
+ * Every answer the member has given, keyed by event id.
  */
-export async function getRsvpedEventIds(profileId: string): Promise<string[]> {
+export async function getRsvpStatuses(profileId: string): Promise<Record<string, RsvpStatus>> {
   try {
-    const rows = await listRows<{ event_id: string }>('rsvps', where('profile_id', '==', profileId));
-    return rows.map(r => r.event_id);
+    const rows = await listRows<{ event_id: string; status?: unknown }>('rsvps', where('profile_id', '==', profileId));
+    const out: Record<string, RsvpStatus> = {};
+    for (const row of rows) out[row.event_id] = rsvpStatusOf(row) ?? 'yes';
+    return out;
   } catch (err) {
     console.error('Failed to load RSVPs:', (err as Error).message);
-    return [];
+    return {};
   }
 }
 
 /**
- * Check if the current user has RSVPed to a specific event via the API.
- * Returns null if the user is not authenticated.
+ * Event IDs the member is going to, or might go to. Members who answered
+ * "no" are not included.
  */
-export async function checkRsvpStatus(eventId: string): Promise<boolean | null> {
+export async function getRsvpedEventIds(profileId: string): Promise<string[]> {
+  const statuses = await getRsvpStatuses(profileId);
+  return Object.entries(statuses).filter(([, status]) => isAttending(status)).map(([eventId]) => eventId);
+}
+
+/**
+ * The current user's answer for an event via the API: null when signed out
+ * or unanswered.
+ */
+export async function checkRsvpStatus(eventId: string): Promise<RsvpStatus | null> {
   try {
     const headers = await authHeaders();
     if (!headers) return null;
@@ -121,7 +140,7 @@ export async function checkRsvpStatus(eventId: string): Promise<boolean | null> 
     );
     if (!res.ok) return null;
     const data = await res.json();
-    return data.rsvped ?? null;
+    return rsvpStatusOf(data.status ? { status: data.status } : null);
   } catch {
     return null;
   }
@@ -140,7 +159,7 @@ export async function getEventAttendees(eventId: string): Promise<AttendeeListRe
     return await res.json();
   } catch (err) {
     console.error('Failed to load attendees:', err);
-    return { event_id: eventId, count: 0, attendees: [] };
+    return { event_id: eventId, count: 0, counts: { yes: 0, maybe: 0, no: 0 }, attendees: [] };
   }
 }
 
@@ -159,6 +178,7 @@ export type MeetingAttendee = {
   name: string | null;
   /** Only present when the member has no name on file; never alongside a name. */
   email: string | null;
+  status: RsvpStatus;
   rsvped_at: string | null;
 };
 
@@ -167,7 +187,9 @@ export type NextMeetingRsvps = {
   event: MeetingSummary | null;
   is_next_meeting: boolean;
   upcoming_events: MeetingSummary[];
+  /** Every answer, including "can't make it". */
   count: number;
+  counts: RsvpCounts;
   attendees: MeetingAttendee[];
   generated_at: string;
 };

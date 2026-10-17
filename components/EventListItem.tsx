@@ -1,13 +1,17 @@
 import React from 'react';
 import Link from 'next/link';
-import { Calendar, MapPin, Clock, Check, Pencil } from 'lucide-react';
+import { Calendar, MapPin, Clock, Check, HelpCircle, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui';
 import CalendarExportButtons from '@/components/CalendarExportButtons';
 import type { Event } from '@/types/supabase';
+import { RSVP_LABELS, type RsvpStatus } from '@/lib/rsvpStatus';
 
 interface EventListItemProps {
   event: Event;
+  /** Going or maybe. */
   isRsvped?: boolean;
+  /** The member's answer, when known; refines the "RSVPed" label. */
+  rsvpStatus?: RsvpStatus | null;
   isAdmin?: boolean;
   isRsvpPending?: boolean;
   onRsvp?: () => void;
@@ -18,6 +22,7 @@ interface EventListItemProps {
 const EventListItem: React.FC<EventListItemProps> = ({
   event,
   isRsvped = false,
+  rsvpStatus = null,
   isAdmin = false,
   isRsvpPending = false,
   onRsvp,
@@ -83,9 +88,9 @@ const EventListItem: React.FC<EventListItemProps> = ({
             {/* RSVP Actions */}
             {isRsvped ? (
               <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-success">
-                  <Check className="w-4 h-4" />
-                  RSVPed
+                <span className={`inline-flex items-center gap-1.5 text-sm font-medium ${rsvpStatus === 'maybe' ? 'text-foreground-muted' : 'text-success'}`}>
+                  {rsvpStatus === 'maybe' ? <HelpCircle className="w-4 h-4" /> : <Check className="w-4 h-4" />}
+                  {rsvpStatus === 'maybe' ? RSVP_LABELS.maybe.short : RSVP_LABELS.yes.short}
                 </span>
                 {onCancelRsvp && (
                   <Button

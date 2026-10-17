@@ -30,8 +30,8 @@ const MEMBER = 'member-uid';
 const planned = (overrides: Record<string, unknown> = {}) => ({
   event: { id: 'ev-next', title: 'Gay I Club Meeting', event_datetime: '2099-09-13T22:30:00.000Z', location: null },
   recipients: [
-    { email: 'joey@example.com', user_id: 'u-joey', has_rsvped: true },
-    { email: 'robert@example.com', user_id: 'u-robert', has_rsvped: false },
+    { email: 'joey@example.com', user_id: 'u-joey', rsvp_status: 'yes' },
+    { email: 'robert@example.com', user_id: 'u-robert', rsvp_status: null },
   ],
   unsubscribed: 1,
   already_reminded: 0,
@@ -111,8 +111,8 @@ describe('POST /api/events/remind', () => {
     expect(body.delivery).toEqual({ attempted: 2, sent: 2, failed: 0 });
     expect(JSON.stringify(body)).not.toContain('@example.com');
     expect(body.recipients).toEqual([
-      { user_id: 'u-joey', has_rsvped: true },
-      { user_id: 'u-robert', has_rsvped: false },
+      { user_id: 'u-joey', rsvp_status: 'yes' },
+      { user_id: 'u-robert', rsvp_status: null },
     ]);
   });
 

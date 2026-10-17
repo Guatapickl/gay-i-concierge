@@ -27,7 +27,7 @@ vi.mock('firebase/firestore', async importOriginal => {
   };
 });
 
-import { saveRsvp, deleteRsvp, getRsvpedEventIds, rsvpDocId, getEventAttendees, getNextMeetingRsvps, RsvpViewError } from '@/lib/rsvp';
+import { saveRsvp, deleteRsvp, getRsvpedEventIds, getRsvpStatuses, rsvpDocId, getEventAttendees, getNextMeetingRsvps, RsvpViewError } from '@/lib/rsvp';
 
 describe('lib/rsvp', () => {
   const realFetch = global.fetch;
@@ -46,7 +46,12 @@ describe('lib/rsvp', () => {
     expect(ok).toBe(true);
     expect(setDoc).toHaveBeenCalledWith(
       { name: 'rsvps', id: 'event-1_user-1' },
-      expect.objectContaining({ profile_id: 'user-1', event_id: 'event-1' }),
+      expect.objectContaining({ profile_id: 'user-1', event_id: 'event-1', status: 'yes' }),
+    );
+    await saveRsvp('user-1', 'event-1', 'no');
+    expect(setDoc).toHaveBeenLastCalledWith(
+      { name: 'rsvps', id: 'event-1_user-1' },
+      expect.objectContaining({ status: 'no' }),
     );
   });
 
@@ -64,9 +69,14 @@ describe('lib/rsvp', () => {
         'Content-Type': 'application/json',
         Authorization: 'Bearer session-token',
       },
-      body: JSON.stringify({ event_id: 'event-1' }),
+      body: JSON.stringify({ event_id: 'event-1', status: 'yes' }),
     });
     expect(setDoc).not.toHaveBeenCalled();
+
+    await saveRsvp('user-1', 'event-1', 'maybe');
+    expect(fetchMock).toHaveBeenLastCalledWith('/api/events/rsvp', expect.objectContaining({
+      body: JSON.stringify({ event_id: 'event-1', status: 'maybe' }),
+    }));
   });
 
   it('deleteRsvp deletes the composite-key doc', async () => {
@@ -74,10 +84,11 @@ describe('lib/rsvp', () => {
     expect(deleteDoc).toHaveBeenCalledWith({ name: 'rsvps', id: 'event-9_user-2' });
   });
 
-  it('getRsvpedEventIds returns event_id list', async () => {
-    rsvpRows = [{ event_id: 'e1' }, { event_id: 'e2' }];
+  it('getRsvpedEventIds lists events the member is going to or might go to', async () => {
+    rsvpRows = [{ event_id: 'e1' }, { event_id: 'e2', status: 'maybe' }, { event_id: 'e3', status: 'no' }];
     const ids = await getRsvpedEventIds('user-7');
     expect(ids).toEqual(['e1', 'e2']);
+    await expect(getRsvpStatuses('user-7')).resolves.toEqual({ e1: 'yes', e2: 'maybe', e3: 'no' });
     expect(getDocs).toHaveBeenCalledWith(expect.objectContaining({
       name: 'rsvps',
       constraints: [{ where: ['profile_id', '==', 'user-7'] }],
@@ -98,7 +109,7 @@ describe('lib/rsvp organizer view (getNextMeetingRsvps)', () => {
 
   it('requests the organizer endpoint with the bearer token and no caching', async () => {
     auth.token = 'organizer-token';
-    const payload = { event: null, is_next_meeting: false, upcoming_events: [], count: 0, attendees: [], generated_at: 'now' };
+    const payload = { event: null, is_next_meeting: false, upcoming_events: [], count: 0, counts: { yes: 0, maybe: 0, no: 0 }, attendees: [], generated_at: 'now' };
     const fetchMock = vi.fn().mockImplementation(async () => new Response(JSON.stringify(payload), { status: 200 }));
     global.fetch = fetchMock as unknown as typeof fetch;
     await expect(getNextMeetingRsvps()).resolves.toEqual(payload);
@@ -124,6 +135,6 @@ describe('lib/rsvp organizer view (getNextMeetingRsvps)', () => {
     global.fetch = vi.fn().mockRejectedValue(new TypeError('Failed to fetch')) as unknown as typeof fetch;
     await expect(getNextMeetingRsvps()).rejects.toMatchObject({ status: null, message: 'Could not reach the server (Failed to fetch).' });
     const legacy = await getEventAttendees('event-1');
-    expect(legacy).toEqual({ event_id: 'event-1', count: 0, attendees: [] });
+    expect(legacy).toEqual({ event_id: 'event-1', count: 0, counts: { yes: 0, maybe: 0, no: 0 }, attendees: [] });
   });
 });

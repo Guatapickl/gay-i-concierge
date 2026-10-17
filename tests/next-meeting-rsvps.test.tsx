@@ -13,7 +13,7 @@ vi.mock('@/lib/meetingReminderClient', () => ({
 
 const meeting = { id: 'poll-next', title: 'Gay I Club Meeting', event_datetime: '2099-09-13T22:30:00.000Z', location: 'The usual place' };
 const later = { id: 'later', title: 'October meetup', event_datetime: '2099-10-11T22:30:00.000Z', location: null };
-const base: Data = { event: meeting, is_next_meeting: true, upcoming_events: [meeting], count: 0, attendees: [], generated_at: '2099-09-13T12:00:00.000Z' };
+const base: Data = { event: meeting, is_next_meeting: true, upcoming_events: [meeting], count: 0, counts: { yes: 0, maybe: 0, no: 0 }, attendees: [], generated_at: '2099-09-13T12:00:00.000Z' };
 const render = (state: RsvpViewState) => renderToStaticMarkup(<NextMeetingRsvps state={state} />);
 
 describe('NextMeetingRsvps', () => {
@@ -40,7 +40,7 @@ describe('NextMeetingRsvps', () => {
     const zero = render({ status: 'ready', data: base });
     expect(zero).toContain('Gay I Club Meeting');
     expect(zero).toContain('Next meeting');
-    expect(zero).toContain('0 RSVPs');
+    expect(zero).toContain('0 going');
     expect(zero).toContain('No RSVPs yet');
     expect(zero).toContain('data-state="zero-rsvps"');
     expect(zero).toContain('Email members a reminder');
@@ -50,12 +50,19 @@ describe('NextMeetingRsvps', () => {
   });
 
   it('lists attendees with a headcount, meeting date and name fallbacks', () => {
-    const html = render({ status: 'ready', data: { ...base, count: 3, attendees: [
-      { id: 'a', profile_id: 'uid-a', name: 'Robert Washko', email: null, rsvped_at: '2099-09-11T18:05:56.000Z' },
-      { id: 'b', profile_id: 'uid-b', name: null, email: 'member@example.com', rsvped_at: '2099-09-11T18:00:54.000Z' },
-      { id: 'c', profile_id: 'uid-c', name: null, email: null, rsvped_at: null },
+    const html = render({ status: 'ready', data: { ...base, count: 3, counts: { yes: 1, maybe: 1, no: 1 }, attendees: [
+      { id: 'a', profile_id: 'uid-a', name: 'Robert Washko', email: null, status: 'yes', rsvped_at: '2099-09-11T18:05:56.000Z' },
+      { id: 'b', profile_id: 'uid-b', name: null, email: 'member@example.com', status: 'maybe', rsvped_at: '2099-09-11T18:00:54.000Z' },
+      { id: 'c', profile_id: 'uid-c', name: null, email: null, status: 'no', rsvped_at: null },
     ] } });
-    expect(html).toContain('3 RSVPs');
+    expect(html).toContain('1 going');
+    expect(html).toContain('1 maybe');
+    expect(html).toContain('1 can&#x27;t make it');
+    expect(html).toContain('data-rsvp-group="yes"');
+    expect(html).toContain('data-rsvp-group="maybe"');
+    expect(html).toContain('data-rsvp-group="no"');
+    expect(html.indexOf('Robert Washko')).toBeLessThan(html.indexOf('member@example.com'));
+    expect(html.indexOf('member@example.com')).toBeLessThan(html.indexOf('Account ID uid-c'));
     expect(html).toContain('Robert Washko');
     expect(html).toContain('member@example.com');
     expect(html).toContain('sign-in email is shown');
@@ -78,6 +85,6 @@ describe('NextMeetingRsvps', () => {
   });
 
   it('never shows an email next to a name', () => {
-    expect(attendeeLabel({ id: 'x', profile_id: 'p', name: 'Named', email: 'leak@example.com', rsvped_at: null })).toEqual({ primary: 'Named', note: null });
+    expect(attendeeLabel({ id: 'x', profile_id: 'p', name: 'Named', email: 'leak@example.com', status: 'yes', rsvped_at: null })).toEqual({ primary: 'Named', note: null });
   });
 });

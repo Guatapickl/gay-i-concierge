@@ -96,7 +96,7 @@ export default function MeetingReminderPanel({ eventId, eventTitle }: Props) {
         <div className="min-w-0">
           <h2 id="meeting-reminder-heading" className="text-lg font-display font-semibold">Email members a reminder</h2>
           <p className="text-sm text-foreground-muted mt-1">
-            Goes to everyone who has signed up at gayiclub.com, with the meeting details, agenda and an RSVP button.
+            Goes to everyone who has signed up at gayiclub.com, with the meeting details, agenda and one-click answers (going, maybe, can&apos;t make it).
             Members who unsubscribed from club email are left out.
           </p>
         </div>
@@ -175,9 +175,13 @@ function Recipients({ state, onRetry }: { state: PreviewState; onRetry: () => vo
     );
   }
   const d = state.data;
-  const rsvped = d.recipients.filter(r => r.has_rsvped).length;
+  const going = d.recipients.filter(r => r.rsvp_status === 'yes').length;
+  const maybe = d.recipients.filter(r => r.rsvp_status === 'maybe').length;
+  const declined = d.recipients.filter(r => r.rsvp_status === 'no').length;
   const parts: string[] = [];
-  if (rsvped > 0) parts.push(`${rsvped} already RSVP'd`);
+  if (going > 0) parts.push(`${going} already going`);
+  if (maybe > 0) parts.push(`${maybe} maybe`);
+  if (declined > 0) parts.push(`${declined} can't make it`);
   if (d.already_reminded > 0) parts.push(`${d.already_reminded} already reminded`);
   if (d.unsubscribed > 0) parts.push(`${d.unsubscribed} unsubscribed`);
   if (d.unreachable > 0) parts.push(`${d.unreachable} without a usable email`);

@@ -58,15 +58,19 @@ describe('planMeetingReminder', () => {
     expect(plan.unsubscribed).toBe(1);
   });
 
-  it('marks who has already RSVPed to the chosen meeting', async () => {
+  it('carries each member\'s current answer for the chosen meeting', async () => {
     db.seed('rsvps', [
       { id: 'ev-next_u-joey', data: { event_id: 'ev-next', profile_id: 'u-joey' } },
+      { id: 'ev-next_u-quiet', data: { event_id: 'ev-next', profile_id: 'u-quiet', status: 'maybe' } },
+      { id: 'ev-next_u-robert', data: { event_id: 'ev-next', profile_id: 'u-robert', status: 'no' } },
       { id: 'ev-later_u-pedro', data: { event_id: 'ev-later', profile_id: 'u-pedro' } },
     ]);
     const { plan } = await planMeetingReminder(deps());
-    const byEmail = Object.fromEntries(plan.recipients.map(r => [r.email, r.has_rsvped]));
-    expect(byEmail['joey@example.com']).toBe(true);
-    expect(byEmail['pedro@example.com']).toBe(false);
+    const byEmail = Object.fromEntries(plan.recipients.map(r => [r.email, r.rsvp_status]));
+    expect(byEmail['joey@example.com']).toBe('yes');
+    expect(byEmail['quiet@example.com']).toBe('maybe');
+    expect(byEmail['robert@example.com']).toBe('no');
+    expect(byEmail['pedro@example.com']).toBeNull();
   });
 
   it('skips members already reminded about this meeting unless resend is requested', async () => {
@@ -138,8 +142,9 @@ describe('sendMeetingReminder', () => {
     const joey = rows.find(r => r.data.recipient_email === 'joey@example.com')!;
     const robert = rows.find(r => r.data.recipient_email === 'robert@example.com')!;
     expect(joey.data.recipient_user_id).toBe('u-joey');
-    expect(String(joey.data.body_text)).toContain("You're already RSVP'd");
-    expect(String(robert.data.body_text)).toContain("Haven't RSVP'd yet");
+    expect(String(joey.data.body_text)).toContain('Your answer so far: Going');
+    expect(String(robert.data.body_text)).toContain('Can you make it?');
+    expect(String(robert.data.body_text)).toContain('/events/ev-next?rsvp=maybe');
   });
 
   it('does not queue a second reminder for the same meeting by accident', async () => {
@@ -168,16 +173,21 @@ describe('meetingReminderEmail', () => {
     expect(html).toContain('have a Gay I Club account');
     expect(html).not.toContain('opted in to club emails');
     expect(html).toContain('/alerts/unsubscribe');
-    expect(html).toContain('RSVP now');
+    expect(html).toContain('/events/ev-next?rsvp=yes');
+    expect(html).toContain('/events/ev-next?rsvp=maybe');
+    expect(html).toContain('/events/ev-next?rsvp=no');
+    expect(html).toContain('Can you make it?');
     expect(text).toContain('Line one\nLine <two>');
+    expect(text).toContain("- Can't make it: https://gayiclub.com/events/ev-next?rsvp=no");
     expect(text).toContain('- Welcome (6:30)');
     expect(text).toContain('/events/ev-next');
   });
 
-  it('changes the call to action for members who already RSVPed', () => {
-    const { html, text } = meetingReminderEmail(NEXT, { hasRsvped: true });
-    expect(html).toContain('View the meeting');
-    expect(html).not.toContain('RSVP now');
-    expect(text).toContain("You're already RSVP'd.");
+  it('shows the current answer and still offers the other two', () => {
+    const { html, text } = meetingReminderEmail(NEXT, { rsvpStatus: 'maybe' });
+    expect(html).toContain('Your answer so far: <strong');
+    expect(html).toContain('Maybe ✓');
+    expect(html).toContain('/events/ev-next?rsvp=no');
+    expect(text).toContain('Your answer so far: Maybe.');
   });
 });

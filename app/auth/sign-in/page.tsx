@@ -9,9 +9,12 @@ import {
   signInWithGoogle as signInWithGoogleFb,
 } from '@/lib/firebase/authClient';
 import { Button, FormInput, Alert } from '@/components/ui';
+import { safeNextPath } from '@/lib/safeNextPath';
 
 export default function SignInPage() {
   const router = useRouter();
+  const destination = () =>
+    safeNextPath(typeof window === 'undefined' ? null : new URLSearchParams(window.location.search).get('next'));
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -38,7 +41,7 @@ export default function SignInPage() {
     try {
       await signInWithPasswordFb(email.trim(), password);
       setMessage('Signed in!');
-      router.push('/');
+      router.push(destination());
       router.refresh();
     } catch (err) {
       setMessage(err instanceof Error ? err.message : 'Failed to sign in.');
@@ -53,7 +56,7 @@ export default function SignInPage() {
     try {
       await signInWithGoogleFb();
       setMessage('Signed in!');
-      router.push('/');
+      router.push(destination());
       router.refresh();
     } catch (err) {
       setMessage(err instanceof Error ? err.message : 'Failed to sign in with Google.');

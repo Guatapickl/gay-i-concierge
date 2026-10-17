@@ -44,7 +44,8 @@ Organizers can email everyone who has signed up at gayiclub.com about an upcomin
 
 - **On the site**: sign in as an organizer (listed in `app_admins`), open `/events/rsvps` (the dashboard's "See who's RSVP'd" button), pick the meeting, and use **Email members a reminder**. The panel shows how many members will receive it, lets you add a note, and asks for confirmation before sending.
 - **Who receives it**: every enabled Firebase Auth account with an email address, minus members who unsubscribed from club email (`alerts_subscribers.email_opt_in == false`). Each member is reminded once per meeting unless you tick "Include members who already received a reminder".
-- **What it contains**: meeting title, date and time (Eastern), location, your note, the description and agenda, and an RSVP button (or "View the meeting" for members who already RSVP'd). The email is built by `meetingReminderEmail` in `lib/emailTemplates.ts`.
+- **What it contains**: meeting title, date and time (Eastern), location, your note, the description and agenda, and three one-click answers (I'm coming / Maybe / Can't make it) that open the event page and record the answer once the member is signed in. A member who already answered sees their answer highlighted and can change it. The email is built by `meetingReminderEmail` in `lib/emailTemplates.ts`.
+- **Answers**: every RSVP is a yes, maybe or no (`rsvps.status`). The event page offers all three, the organizer view groups members by answer, automatic 24h/1h reminders go only to yes and maybe, and a later "no" cancels them.
 - **How it is delivered**: rows are queued in `email_reminders` with `kind: "meeting_reminder"` and sent through Resend right away; anything that fails is retried by the 10-minute reminder cron. Each send is tagged with a `batch_id` for auditing.
 - **From automation** (Praxis or a script), call the same route with the cron secret:
 

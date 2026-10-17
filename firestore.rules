@@ -52,11 +52,12 @@ service cloud.firestore {
     }
 
     // ---- rsvps: doc id = `${event_id}_${profile_id}`
+    // `status` is the member's answer (yes | maybe | no); a row without one means yes.
     match /rsvps/{id} {
       allow read: if owns('profile_id') || isAdmin();
       allow create: if willOwn('profile_id');
       allow delete: if owns('profile_id');
-      allow update: if false;
+      allow update: if owns('profile_id') && willOwn('profile_id');
     }
 
     // ---- alerts: subscription state is edited only through API routes (Admin SDK)

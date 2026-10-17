@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
         ok: true,
         ...result,
         // Recipient addresses stay server-side; the organizer sees counts.
-        recipients: result.recipients.map(r => ({ user_id: r.user_id, has_rsvped: r.has_rsvped })),
+        recipients: result.recipients.map(r => ({ user_id: r.user_id, rsvp_status: r.rsvp_status })),
         recipient_count: result.recipients.length,
         delivery,
         generated_at: new Date().toISOString(),

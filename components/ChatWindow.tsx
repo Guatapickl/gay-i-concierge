@@ -465,6 +465,10 @@ export default function ChatWindow() {
         ]);
       }
     } else {
+      if (response === "no" && nextEventId) {
+        const user = await currentUser();
+        if (user?.uid) void saveRsvp(user.uid, nextEventId, "no");
+      }
       setMessages((prev) => [
         ...prev,
         {

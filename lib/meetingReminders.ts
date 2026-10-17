@@ -19,6 +19,7 @@ import type { Auth } from 'firebase-admin/auth';
 import { adminAuth, adminDb } from './firebase/admin';
 import { adminPayloadOf, adminRowOf } from './firebase/adminDb';
 import { meetingReminderEmail } from './emailTemplates';
+import { rsvpStatusOf, type RsvpStatus } from './rsvpStatus';
 import type { Event } from '@/types/supabase';
 
 export const MEETING_REMINDER_KIND = 'meeting_reminder';
@@ -26,7 +27,8 @@ export const MEETING_REMINDER_KIND = 'meeting_reminder';
 export type MeetingReminderRecipient = {
   email: string;
   user_id: string;
-  has_rsvped: boolean;
+  /** The member's current answer for this meeting, or null when they have not answered. */
+  rsvp_status: RsvpStatus | null;
 };
 
 export type MeetingReminderSummary = {
@@ -156,9 +158,14 @@ async function listAlreadyReminded(db: Firestore, eventId: string): Promise<Set<
   return out;
 }
 
-async function listRsvpedUids(db: Firestore, eventId: string): Promise<Set<string>> {
+async function listRsvpAnswers(db: Firestore, eventId: string): Promise<Map<string, RsvpStatus>> {
   const snap = await db.collection('rsvps').where('event_id', '==', eventId).get();
-  return new Set(snap.docs.map(d => d.data().profile_id).filter((v): v is string => typeof v === 'string'));
+  const out = new Map<string, RsvpStatus>();
+  for (const doc of snap.docs) {
+    const data = doc.data();
+    if (typeof data.profile_id === 'string') out.set(data.profile_id, rsvpStatusOf(data) ?? 'yes');
+  }
+  return out;
 }
 
 export type PlanMeetingReminderArgs = {
@@ -177,10 +184,10 @@ export async function planMeetingReminder(args: PlanMeetingReminderArgs = {}): P
 
   const { byEmail, accounts, unreachable } = await listAccountEmails(auth);
   const emails = Array.from(byEmail.keys());
-  const [unsubscribed, reminded, rsvped] = await Promise.all([
+  const [unsubscribed, reminded, answers] = await Promise.all([
     listUnsubscribedEmails(db, emails),
     args.resend ? Promise.resolve(new Set<string>()) : listAlreadyReminded(db, event.id),
-    listRsvpedUids(db, event.id),
+    listRsvpAnswers(db, event.id),
   ]);
 
   const recipients: MeetingReminderRecipient[] = [];
@@ -191,7 +198,7 @@ export async function planMeetingReminder(args: PlanMeetingReminderArgs = {}): P
       alreadyReminded += 1;
       continue;
     }
-    recipients.push({ email, user_id: uid, has_rsvped: rsvped.has(uid) });
+    recipients.push({ email, user_id: uid, rsvp_status: answers.get(uid) ?? null });
   }
   recipients.sort((a, b) => a.email.localeCompare(b.email));
 
@@ -238,7 +245,7 @@ export async function sendMeetingReminder(args: SendMeetingReminderArgs = {}): P
   for (const part of chunk(plan.recipients, 400)) {
     const batch = db.batch();
     for (const recipient of part) {
-      const { html, text } = meetingReminderEmail(event, { note, hasRsvped: recipient.has_rsvped });
+      const { html, text } = meetingReminderEmail(event, { note, rsvpStatus: recipient.rsvp_status });
       batch.set(
         col.doc(),
         adminPayloadOf({

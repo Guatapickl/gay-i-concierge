@@ -20,9 +20,12 @@ export function middleware(request: NextRequest) {
     const hasSession = !!request.cookies.get(SESSION_COOKIE)?.value
 
     if (!hasSession && isProtectedRoute) {
-        // Redirect to login if accessing a protected route without a session
+        // Redirect to login if accessing a protected route without a session,
+        // remembering the page (and query, e.g. an RSVP answer) to return to.
         const url = new URL(publicUrl)
         url.pathname = '/auth/sign-in'
+        url.search = ''
+        url.searchParams.set('next', `${request.nextUrl.pathname}${request.nextUrl.search}`)
         return NextResponse.redirect(url)
     }
 

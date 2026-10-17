@@ -1,8 +1,9 @@
 "use client";
 
 import Link from 'next/link';
-import { Calendar, CalendarX, Clock, MapPin, RefreshCw, ShieldAlert, Users } from 'lucide-react';
+import { Calendar, CalendarX, Check, Clock, HelpCircle, MapPin, RefreshCw, ShieldAlert, Users, X } from 'lucide-react';
 import type { MeetingAttendee, MeetingSummary, NextMeetingRsvps as NextMeetingRsvpsData } from '@/lib/rsvp';
+import { RSVP_LABELS, RSVP_STATUSES, type RsvpStatus } from '@/lib/rsvpStatus';
 import { Alert, Button, LoadingSpinner } from '@/components/ui';
 import MeetingReminderPanel from '@/components/MeetingReminderPanel';
 
@@ -67,7 +68,7 @@ export default function NextMeetingRsvps({ state, refreshing = false, onRefresh,
         <div>
           <p className="eyebrow mb-2">Organizer tools</p>
           <h1 className="page-heading">Next meeting RSVPs</h1>
-          <p className="text-foreground-muted mt-1">Who has RSVP&apos;d to the club&apos;s next meeting. Visible to organizers only.</p>
+          <p className="text-foreground-muted mt-1">Who is going, who might, and who can&apos;t make the club&apos;s next meeting. Visible to organizers only.</p>
         </div>
         <Link href="/events" className="text-sm text-primary whitespace-nowrap">All events →</Link>
       </div>
@@ -115,6 +116,7 @@ function Body({ state, refreshing, onRefresh, onSelectEvent }: Required<Pick<Pro
 
 function Ready({ data, refreshing, onRefresh, onSelectEvent }: { data: NextMeetingRsvpsData; refreshing: boolean } & Pick<Props, 'onRefresh' | 'onSelectEvent'>) {
   const { event, is_next_meeting: isNext, upcoming_events: upcoming, attendees, count, generated_at: generatedAt } = data;
+  const counts = data.counts ?? { yes: attendees.length, maybe: 0, no: 0 };
 
   if (!event) {
     return (
@@ -148,7 +150,9 @@ function Ready({ data, refreshing, onRefresh, onSelectEvent }: { data: NextMeeti
       <MeetingCard event={event} isNext={isNext} time={time} />
 
       <div className="flex flex-wrap items-center gap-3">
-        <span className="badge badge-cyan"><Users className="w-3 h-3" />{count} {count === 1 ? 'RSVP' : 'RSVPs'}</span>
+        <span className="badge badge-cyan"><Users className="w-3 h-3" />{counts.yes} going</span>
+        <span className="badge"><HelpCircle className="w-3 h-3" />{counts.maybe} maybe</span>
+        <span className="badge"><X className="w-3 h-3" />{counts.no} can&apos;t make it</span>
         <span className="text-xs font-mono text-foreground-muted">Updated {formatRsvpedAt(generatedAt)}</span>
         <div className="ml-auto flex flex-wrap items-center gap-3">
           {showSelector && (
@@ -175,12 +179,24 @@ function Ready({ data, refreshing, onRefresh, onSelectEvent }: { data: NextMeeti
         <div className="card p-8 text-center">
           <Users className="w-6 h-6 mx-auto mb-3 text-primary" />
           <p className="text-lg font-semibold">No RSVPs yet</p>
-          <p className="text-sm text-foreground-muted mt-1 max-w-md mx-auto">This meeting is on the calendar, but nobody has RSVP&apos;d so far. Refresh to check again.</p>
+          <p className="text-sm text-foreground-muted mt-1 max-w-md mx-auto">This meeting is on the calendar, but nobody has answered so far. Refresh to check again.</p>
         </div>
       ) : (
-        <ol className="card divide-y divide-border" aria-label="Attendees">
-          {attendees.map((attendee, index) => <AttendeeRow key={attendee.id} attendee={attendee} position={index + 1} />)}
-        </ol>
+        RSVP_STATUSES.map(status => {
+          const group = attendees.filter(a => (a.status ?? 'yes') === status);
+          if (group.length === 0) return null;
+          return (
+            <section key={status} className="space-y-2" data-rsvp-group={status}>
+              <h3 className="text-sm font-semibold text-foreground-muted flex items-center gap-2">
+                <AnswerIcon status={status} />
+                {RSVP_LABELS[status].short} · {group.length}
+              </h3>
+              <ol className="card divide-y divide-border" aria-label={RSVP_LABELS[status].short}>
+                {group.map((attendee, index) => <AttendeeRow key={attendee.id} attendee={attendee} position={index + 1} />)}
+              </ol>
+            </section>
+          );
+        })
       )}
 
       <MeetingReminderPanel key={event.id} eventId={event.id} eventTitle={event.title || 'Untitled event'} />
@@ -212,6 +228,12 @@ function MeetingCard({ event, isNext, time }: { event: MeetingSummary; isNext: b
   );
 }
 
+function AnswerIcon({ status }: { status: RsvpStatus }) {
+  if (status === 'yes') return <Check className="w-4 h-4 text-success" />;
+  if (status === 'maybe') return <HelpCircle className="w-4 h-4 text-primary" />;
+  return <X className="w-4 h-4 text-foreground-muted" />;
+}
+
 function AttendeeRow({ attendee, position }: { attendee: MeetingAttendee; position: number }) {
   const label = attendeeLabel(attendee);
   return (
@@ -220,7 +242,7 @@ function AttendeeRow({ attendee, position }: { attendee: MeetingAttendee; positi
         <span className="font-medium break-words"><span className="font-mono text-xs text-foreground-muted mr-2">{position}.</span>{label.primary}</span>
         {label.note && <p className="text-xs text-foreground-muted mt-0.5">{label.note}</p>}
       </div>
-      <span className="font-mono text-xs text-foreground-muted whitespace-nowrap">{`RSVP'd ${formatRsvpedAt(attendee.rsvped_at)}`}</span>
+      <span className="font-mono text-xs text-foreground-muted whitespace-nowrap">{`Answered ${formatRsvpedAt(attendee.rsvped_at)}`}</span>
     </li>
   );
 }
