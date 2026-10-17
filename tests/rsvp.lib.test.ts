@@ -27,7 +27,7 @@ vi.mock('firebase/firestore', async importOriginal => {
   };
 });
 
-import { saveRsvp, deleteRsvp, getRsvpedEventIds, rsvpDocId } from '@/lib/rsvp';
+import { saveRsvp, deleteRsvp, getRsvpedEventIds, rsvpDocId, getEventAttendees, getNextMeetingRsvps, RsvpViewError } from '@/lib/rsvp';
 
 describe('lib/rsvp', () => {
   const realFetch = global.fetch;
@@ -82,5 +82,48 @@ describe('lib/rsvp', () => {
       name: 'rsvps',
       constraints: [{ where: ['profile_id', '==', 'user-7'] }],
     }));
+  });
+});
+
+describe('lib/rsvp organizer view (getNextMeetingRsvps)', () => {
+  const realFetch = global.fetch;
+  beforeEach(() => { auth.token = null; global.fetch = realFetch; });
+
+  it('throws a 401 without calling the API when nobody is signed in', async () => {
+    const fetchMock = vi.fn();
+    global.fetch = fetchMock as unknown as typeof fetch;
+    await expect(getNextMeetingRsvps()).rejects.toMatchObject({ name: 'RsvpViewError', status: 401 });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('requests the organizer endpoint with the bearer token and no caching', async () => {
+    auth.token = 'organizer-token';
+    const payload = { event: null, is_next_meeting: false, upcoming_events: [], count: 0, attendees: [], generated_at: 'now' };
+    const fetchMock = vi.fn().mockImplementation(async () => new Response(JSON.stringify(payload), { status: 200 }));
+    global.fetch = fetchMock as unknown as typeof fetch;
+    await expect(getNextMeetingRsvps()).resolves.toEqual(payload);
+    expect(fetchMock).toHaveBeenCalledWith('/api/events/attendees', { headers: { Authorization: 'Bearer organizer-token' }, cache: 'no-store' });
+    await getNextMeetingRsvps('poll-abc/1');
+    expect(fetchMock).toHaveBeenLastCalledWith('/api/events/attendees?event_id=poll-abc%2F1', expect.anything());
+  });
+
+  it('surfaces 403 and 500 responses as errors instead of an empty list', async () => {
+    auth.token = 'member-token';
+    global.fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({ error: 'forbidden: organizers only' }), { status: 403 })) as unknown as typeof fetch;
+    const forbidden = await getNextMeetingRsvps().catch(e => e);
+    expect(forbidden).toBeInstanceOf(RsvpViewError);
+    expect(forbidden.status).toBe(403);
+    expect(forbidden.message).toBe('forbidden: organizers only');
+
+    global.fetch = vi.fn().mockResolvedValue(new Response('boom', { status: 500 })) as unknown as typeof fetch;
+    await expect(getNextMeetingRsvps()).rejects.toMatchObject({ status: 500, message: 'Request failed (HTTP 500).' });
+  });
+
+  it('throws on network failure where getEventAttendees would report zero attendees', async () => {
+    auth.token = 'member-token';
+    global.fetch = vi.fn().mockRejectedValue(new TypeError('Failed to fetch')) as unknown as typeof fetch;
+    await expect(getNextMeetingRsvps()).rejects.toMatchObject({ status: null, message: 'Could not reach the server (Failed to fetch).' });
+    const legacy = await getEventAttendees('event-1');
+    expect(legacy).toEqual({ event_id: 'event-1', count: 0, attendees: [] });
   });
 });

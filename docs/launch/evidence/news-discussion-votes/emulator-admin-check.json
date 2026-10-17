@@ -1,0 +1,525 @@
+{
+  "base": "http://localhost:4191",
+  "tag": "emulator",
+  "role": "admin",
+  "email": "[qa email]",
+  "startedAt": "2026-09-13T23:21:42.569Z",
+  "apiResponses": [
+    {
+      "url": "/api/news/discussion",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:44.688Z"
+    },
+    {
+      "url": "/api/news/discussion",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:44.693Z"
+    },
+    {
+      "url": "/api/news/discussion",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:44.696Z"
+    },
+    {
+      "url": "/api/news/discussion?ids=qa-story-a%2Cqa-story-b",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:48.810Z"
+    },
+    {
+      "url": "/api/news/discussion?ids=qa-story-a%2Cqa-story-b",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:48.817Z"
+    },
+    {
+      "url": "/api/news/discussion",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:50.008Z"
+    },
+    {
+      "url": "/api/news/discussion?ids=qa-story-a%2Cqa-story-b",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:52.495Z"
+    },
+    {
+      "url": "/api/news/discussion?ids=qa-story-a%2Cqa-story-b",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:52.503Z"
+    },
+    {
+      "url": "/api/news/discussion",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:53.676Z"
+    },
+    {
+      "url": "/api/news/discussion?ids=qa-story-a%2Cqa-story-b",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:54.127Z"
+    },
+    {
+      "url": "/api/news/discussion?ids=qa-story-a%2Cqa-story-b",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:54.137Z"
+    },
+    {
+      "url": "/api/news/discussion",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:55.309Z"
+    },
+    {
+      "url": "/api/news/discussion",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:55.717Z"
+    },
+    {
+      "url": "/api/news/discussion?ids=qa-story-a%2Cqa-story-b",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:56.157Z"
+    },
+    {
+      "url": "/api/news/discussion?ids=qa-story-a%2Cqa-story-b",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:56.161Z"
+    },
+    {
+      "url": "/api/news/discussion?agendas=1",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:59.496Z"
+    },
+    {
+      "url": "/api/news/discussion?agendas=1",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:22:03.765Z"
+    },
+    {
+      "url": "/api/news/discussion?agendas=1",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:22:08.324Z"
+    },
+    {
+      "url": "/api/news/discussion?agendas=1",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:22:09.924Z"
+    },
+    {
+      "url": "/api/news/discussion?agendas=1",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:22:45.051Z"
+    },
+    {
+      "url": "/api/news/discussion?agendas=1",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:22:47.683Z"
+    },
+    {
+      "url": "/api/news/discussion?agendas=1",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:22:49.375Z"
+    },
+    {
+      "url": "/api/news/discussion?agendas=1",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:22:51.030Z"
+    }
+  ],
+  "console": [
+    {
+      "type": "error",
+      "text": "Error fetching events: \nfalse for 'list' @ L50"
+    }
+  ],
+  "steps": [
+    {
+      "step": "anonymous-feed",
+      "path": "/news",
+      "voteButtons": 0,
+      "cards": 2
+    },
+    {
+      "step": "anonymous-api",
+      "get": 401,
+      "put": 401,
+      "bogus": 401
+    },
+    {
+      "step": "anonymous-agenda",
+      "state": "signed-out",
+      "rows": 0
+    },
+    {
+      "step": "sign-in",
+      "path": "/",
+      "sessionCookie": true
+    },
+    {
+      "step": "feed-card",
+      "storyId": "qa-story-a",
+      "title": "QA story A: agents that plan their own evals",
+      "hasButton": true,
+      "label": "I want to talk about this",
+      "pressed": "false",
+      "disabled": false,
+      "state": "open",
+      "badge": "1 vote",
+      "status": null,
+      "link": "https://example.com/qa/story-a?utm_source=rss"
+    },
+    {
+      "step": "feed-vote",
+      "title": "QA story A: agents that plan their own evals",
+      "hasButton": true,
+      "label": "I want to talk about this",
+      "pressed": "true",
+      "disabled": false,
+      "state": "voted",
+      "badge": "2 votes",
+      "status": "Counted. Organizers can add this story to the next agenda.",
+      "link": "https://example.com/qa/story-a?utm_source=rss"
+    },
+    {
+      "step": "screenshot",
+      "name": "emulator-admin-news-desktop-dark"
+    },
+    {
+      "step": "screenshot",
+      "name": "emulator-admin-news-desktop-light"
+    },
+    {
+      "step": "feed-reload",
+      "title": "QA story A: agents that plan their own evals",
+      "hasButton": true,
+      "label": "I want to talk about this",
+      "pressed": "true",
+      "disabled": false,
+      "state": "voted",
+      "badge": "2 votes",
+      "status": null,
+      "link": "https://example.com/qa/story-a?utm_source=rss"
+    },
+    {
+      "step": "feed-withdraw",
+      "title": "QA story A: agents that plan their own evals",
+      "hasButton": true,
+      "label": "I want to talk about this",
+      "pressed": "false",
+      "disabled": false,
+      "state": "open",
+      "badge": "1 vote",
+      "status": "Vote withdrawn.",
+      "link": "https://example.com/qa/story-a?utm_source=rss"
+    },
+    {
+      "step": "feed-reload-2",
+      "title": "QA story A: agents that plan their own evals",
+      "hasButton": true,
+      "label": "I want to talk about this",
+      "pressed": "false",
+      "disabled": false,
+      "state": "open",
+      "badge": "1 vote",
+      "status": null,
+      "link": "https://example.com/qa/story-a?utm_source=rss"
+    },
+    {
+      "step": "feed-vote-b",
+      "title": "QA story B: a policy brief on model licensing",
+      "hasButton": true,
+      "label": "I want to talk about this",
+      "pressed": "true",
+      "disabled": false,
+      "state": "voted",
+      "badge": "2 votes",
+      "status": "Counted. Organizers can add this story to the next agenda.",
+      "link": "https://example.com/qa/story-b"
+    },
+    {
+      "step": "screenshot",
+      "name": "emulator-admin-news-mobile-dark"
+    },
+    {
+      "step": "screenshot",
+      "name": "emulator-admin-news-mobile-light"
+    },
+    {
+      "step": "news-mobile",
+      "scrollWidth": 390,
+      "clientWidth": 390
+    },
+    {
+      "step": "agenda-panel",
+      "state": "ready",
+      "rows": [
+        {
+          "id": "qa-story-a",
+          "onDraft": "false",
+          "title": "QA story A: agents that plan their own evals",
+          "link": "https://example.com/qa/story-a?utm_source=rss",
+          "badges": [
+            "2 votes"
+          ],
+          "addLabel": "Add",
+          "addDisabled": false
+        }
+      ],
+      "hasSave": true,
+      "hasSelect": true,
+      "hidden": "1"
+    },
+    {
+      "step": "agenda-select",
+      "status": "Loaded 2 saved items from “QA next meeting”. Saving writes this list back to the event.",
+      "items": [
+        "Welcome & introductions",
+        "Existing feature talk"
+      ]
+    },
+    {
+      "step": "agenda-add",
+      "row": {
+        "id": "qa-story-a",
+        "onDraft": "true",
+        "title": "QA story A: agents that plan their own evals",
+        "link": "https://example.com/qa/story-a?utm_source=rss",
+        "badges": [
+          "On this agenda",
+          "2 votes"
+        ],
+        "addLabel": "Added",
+        "addDisabled": true
+      },
+      "items": [
+        "Welcome & introductions",
+        "Existing feature talk",
+        "QA story A: agents that plan their own evals"
+      ],
+      "links": [
+        "https://example.com/qa/story-a?utm_source=rss"
+      ],
+      "status": "Added “QA story A: agents that plan their own evals” to the agenda."
+    },
+    {
+      "step": "screenshot",
+      "name": "emulator-admin-agenda-desktop-dark"
+    },
+    {
+      "step": "screenshot",
+      "name": "emulator-admin-agenda-desktop-light"
+    },
+    {
+      "step": "agenda-show-discussed",
+      "rowB": {
+        "id": "qa-story-b",
+        "onDraft": "false",
+        "title": "QA story B: a policy brief on model licensing",
+        "link": "https://example.com/qa/story-b",
+        "badges": [
+          "Discussed Aug 1, 2026",
+          "2 votes"
+        ],
+        "addLabel": "Add",
+        "addDisabled": false
+      }
+    },
+    {
+      "step": "agenda-inject",
+      "eventId": "qa-next-meeting",
+      "appended": "Added by another editor after page load",
+      "count": 3
+    },
+    {
+      "step": "agenda-save",
+      "status": "Saved to event. Kept 1 item another editor added since you loaded this agenda.",
+      "items": [
+        "Welcome & introductions",
+        "Existing feature talk",
+        "QA story A: agents that plan their own evals",
+        "Added by another editor after page load"
+      ]
+    },
+    {
+      "step": "event-view:/events/qa-next-meeting",
+      "heading": "QA next meeting",
+      "items": [
+        "Welcome & introductions Existing saved item",
+        "7:15 PM Existing feature talk• Sam",
+        "QA story A: agents that plan their own evals 2 votes from the news feed · Example Lab Read the article ↗ example.com",
+        "Added by another editor after page load• Other organizer Stored while the maker was open"
+      ],
+      "articleLinks": [
+        "https://example.com/qa/story-a?utm_source=rss"
+      ]
+    },
+    {
+      "step": "screenshot",
+      "name": "emulator-admin-event-detail-desktop-dark"
+    },
+    {
+      "step": "event-view:/events/qa-next-meeting/agenda",
+      "heading": "QA next meeting — Agenda",
+      "items": [
+        "Welcome & introductions Existing saved item",
+        "7:15 PM Existing feature talk • Sam",
+        "QA story A: agents that plan their own evals 2 votes from the news feed · Example Lab Read the article ↗ example.com",
+        "Added by another editor after page load • Other organizer Stored while the maker was open"
+      ],
+      "articleLinks": [
+        "https://example.com/qa/story-a?utm_source=rss"
+      ]
+    },
+    {
+      "step": "screenshot",
+      "name": "emulator-admin-event-agenda-desktop-dark"
+    },
+    {
+      "step": "screenshot",
+      "name": "emulator-admin-event-agenda-desktop-light"
+    },
+    {
+      "step": "agenda-reopen",
+      "status": "Loaded 4 saved items from “QA next meeting”. Saving writes this list back to the event.",
+      "row": {
+        "id": "qa-story-a",
+        "onDraft": "true",
+        "title": "QA story A: agents that plan their own evals",
+        "link": "https://example.com/qa/story-a?utm_source=rss",
+        "badges": [
+          "On this agenda",
+          "2 votes"
+        ],
+        "addLabel": "Added",
+        "addDisabled": true
+      },
+      "items": [
+        "Welcome & introductions",
+        "Existing feature talk",
+        "QA story A: agents that plan their own evals",
+        "Added by another editor after page load"
+      ]
+    },
+    {
+      "step": "event-view-after-resave",
+      "heading": "QA next meeting — Agenda",
+      "items": [
+        "Welcome & introductions Existing saved item",
+        "7:15 PM Existing feature talk • Sam",
+        "QA story A: agents that plan their own evals 2 votes from the news feed · Example Lab Read the article ↗ example.com",
+        "Added by another editor after page load • Other organizer Stored while the maker was open"
+      ],
+      "articleLinks": [
+        "https://example.com/qa/story-a?utm_source=rss"
+      ]
+    },
+    {
+      "step": "retry",
+      "url": "/agenda",
+      "reason": "wait: timed out after 30000 ms waiting for the voted articles panel"
+    },
+    {
+      "step": "agenda-switch-before",
+      "items": [
+        "Welcome & introductions",
+        "Existing feature talk",
+        "QA story A: agents that plan their own evals",
+        "Added by another editor after page load",
+        "QA story B: a policy brief on model licensing"
+      ],
+      "rowB": {
+        "id": "qa-story-b",
+        "onDraft": "true",
+        "title": "QA story B: a policy brief on model licensing",
+        "link": "https://example.com/qa/story-b",
+        "badges": [
+          "On this agenda",
+          "Discussed Aug 1, 2026",
+          "2 votes"
+        ],
+        "addLabel": "Added",
+        "addDisabled": true
+      }
+    },
+    {
+      "step": "agenda-switch-empty",
+      "status": "“QA empty meeting” has no saved agenda yet. Kept your 1 draft item; 4 items loaded from the previous event stay with that event.",
+      "items": [
+        "QA story B: a policy brief on model licensing"
+      ],
+      "links": [
+        "https://example.com/qa/story-b"
+      ]
+    },
+    {
+      "step": "screenshot",
+      "name": "emulator-admin-agenda-switch-empty"
+    },
+    {
+      "step": "agenda-save-empty",
+      "status": "Saved to event",
+      "items": [
+        "QA story B: a policy brief on model licensing"
+      ]
+    },
+    {
+      "step": "event-view-empty-meeting",
+      "heading": "QA empty meeting — Agenda",
+      "items": [
+        "QA story B: a policy brief on model licensing 2 votes from the news feed · Example Policy Read the article ↗ example.com"
+      ],
+      "articleLinks": [
+        "https://example.com/qa/story-b"
+      ]
+    },
+    {
+      "step": "agenda-switch-back",
+      "status": "Loaded 4 saved items from “QA next meeting”. Saving writes this list back to the event.",
+      "items": [
+        "Welcome & introductions",
+        "Existing feature talk",
+        "QA story A: agents that plan their own evals",
+        "Added by another editor after page load"
+      ]
+    },
+    {
+      "step": "screenshot",
+      "name": "emulator-admin-agenda-mobile-dark"
+    },
+    {
+      "step": "screenshot",
+      "name": "emulator-admin-agenda-mobile-light"
+    },
+    {
+      "step": "agenda-mobile",
+      "scrollWidth": 390,
+      "clientWidth": 390
+    },
+    {
+      "step": "sign-out",
+      "status": 200
+    }
+  ],
+  "storyId": "qa-story-a",
+  "storyLink": "https://example.com/qa/story-a?utm_source=rss",
+  "result": "passed",
+  "finishedAt": "2026-09-13T23:22:55.477Z"
+}

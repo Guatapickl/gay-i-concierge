@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Plus, ArrowUp, ArrowDown, Trash2, Sparkles, Clock, User, FileText } from 'lucide-react';
 import type { AgendaItem } from '@/types/supabase';
+import { articleHost } from '@/lib/agendaArticles';
 import { Button, FormInput, FormTextarea, Alert } from '@/components/ui';
 
 type Props = {
@@ -168,6 +169,13 @@ export default function AgendaEditor({ value, onChange, meetingContext }: Props)
                 }}
               />
             </div>
+
+            {item.link && articleHost(item.link) && (
+              <p className="text-xs text-foreground-muted break-all">
+                Source link (kept with this item):{' '}
+                <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{articleHost(item.link)}</a>
+              </p>
+            )}
 
             <div className="flex items-center gap-2">
               <button

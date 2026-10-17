@@ -1,0 +1,10 @@
+{
+  "revokeAdmin": {"revoked":"pN8UFoCTWSTtVbADVNKf7ccJXMw2"},
+  "deleteOrganizer": {"deleted":"pN8UFoCTWSTtVbADVNKf7ccJXMw2","email":"praxis.rsvpview.organizer.20260913@example.com"},
+  "deleteMember": {"deleted":"p4bn7qt8Trcm7UxU257WsOsLS542","email":"praxis.rsvpview.member.20260913@example.com"},
+  "adminsAfter": ["d3aef0b9-a32b-469d-ab12-b38e493536c6"],
+  "rsvpsAfter": [{"id":"poll-0b5a2940d5c62a933b8559cadeecb7cc799527a6_BvBkMw3NbFXMsRunTCW1Zl9cPw52","profile_id":"BvBkMw3NbFXMsRunTCW1Zl9cPw52","created_at":"2026-09-11T18:00:54.120Z"},{"id":"poll-0b5a2940d5c62a933b8559cadeecb7cc799527a6_d3aef0b9-a32b-469d-ab12-b38e493536c6","profile_id":"d3aef0b9-a32b-469d-ab12-b38e493536c6","created_at":"2026-09-11T18:05:56.924Z"}],
+  "memberProfileDocCreated": false,
+  "organizerProfileDocCreated": false,
+  "at": "2026-09-13T15:28:56Z"
+}

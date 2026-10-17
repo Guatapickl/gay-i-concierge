@@ -54,6 +54,10 @@ export type AgendaItem = {
   title: string; // e.g., "Welcome & Introductions"
   speaker?: string | null;
   notes?: string | null; // optional details
+  /** Source URL for a news story added from the feed; rendered as a link everywhere the agenda is shown. */
+  link?: string | null;
+  /** Id of the news item the story came from, stable across ingestion refreshes. */
+  news_id?: string | null;
 };
 /**
  * RSVP type reflects the 'rsvps' table schema in Supabase.

@@ -23,19 +23,21 @@ export default function DashboardView() {
   const [posts, setPosts] = useState<FeedPost[]>([]);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     let active = true;
     (async () => {
       try {
         const user = await currentUser();
-        const [events, articles, polls, channelList, feed, profile] = await Promise.all([
+        const [events, articles, polls, channelList, feed, profile, adminRow] = await Promise.all([
           getUpcomingEvents(), getNewsItems(4), getOpenPolls(), getChatChannels(), getFeed(user?.uid || null, 3), user ? getRow<{ full_name?: string }>('user_profiles', user.uid) : null,
+          user ? getRow('app_admins', user.uid) : null,
         ]);
         if (!active) return;
         setName(profile?.full_name?.split(' ')[0] || user?.displayName?.split(' ')[0] || '');
         setEvent(events[0] || null); setNews(articles); setPoll(polls.find(p => isPollOpen(p)) || null);
-        setChannels(channelList); setPosts(feed);
+        setChannels(channelList); setPosts(feed); setIsAdmin(adminRow !== null);
       } catch { if (active) setError(true); }
       finally { if (active) setLoading(false); }
     })();
@@ -58,7 +60,7 @@ export default function DashboardView() {
             <PanelHeader title="Next meetup" href="/calendar" label="Calendar" />
             {event ? <div className="flex gap-5 mt-6">
               <div className="w-16 h-20 shrink-0 border border-border rounded-md bg-surface-elevated flex flex-col items-center justify-center"><span className="eyebrow">{new Date(event.event_datetime).toLocaleDateString(undefined, { month: 'short' })}</span><span className="text-3xl font-display">{new Date(event.event_datetime).getDate()}</span></div>
-              <div className="min-w-0"><h3 className="text-xl font-display font-semibold">{event.title}</h3><p className="text-sm text-foreground-muted mt-2">{new Date(event.event_datetime).toLocaleString(undefined, { weekday: 'short', hour: 'numeric', minute: '2-digit' })}{event.location ? ` · ${event.location}` : ''}</p><div className="flex flex-wrap gap-3 mt-5"><Link href={`/events/${event.id}`} className="btn-brand">View event & RSVP</Link>{Array.isArray(event.agenda) && event.agenda.length > 0 && <Link href={`/events/${event.id}/agenda`} className="btn-secondary">View agenda</Link>}</div></div>
+              <div className="min-w-0"><h3 className="text-xl font-display font-semibold">{event.title}</h3><p className="text-sm text-foreground-muted mt-2">{new Date(event.event_datetime).toLocaleString(undefined, { weekday: 'short', hour: 'numeric', minute: '2-digit' })}{event.location ? ` · ${event.location}` : ''}</p><div className="flex flex-wrap gap-3 mt-5"><Link href={`/events/${event.id}`} className="btn-brand">View event & RSVP</Link>{Array.isArray(event.agenda) && event.agenda.length > 0 && <Link href={`/events/${event.id}/agenda`} className="btn-secondary">View agenda</Link>}{isAdmin && <Link href="/events/rsvps" className="btn-secondary">See who&apos;s RSVP&apos;d</Link>}</div></div>
             </div> : <div className="py-8 text-foreground-muted text-sm"><Calendar className="w-6 h-6 mb-3 text-primary" />No upcoming meetups yet. Check back for the next gathering.</div>}
           </section>
           <section className="card p-6"><PanelHeader title="News feed" href="/news" label="All news" />{news.length ? <ul className="divide-y divide-border mt-3">{news.map(item => <li key={item.id} className="py-4"><a href={item.source_url} target="_blank" rel="noopener noreferrer" className="grid gap-2 sm:grid-cols-[76px_1fr] hover:text-primary"><time className="font-mono text-xs text-foreground-muted">{relativeTime(item.published_at || item.ingested_at)}</time><div><h3 className="font-medium leading-snug">{item.title}</h3><p className="text-xs text-foreground-muted mt-1">{item.source_name || item.tag || 'AI news'}</p></div></a></li>)}</ul> : <p className="py-7 text-sm text-foreground-muted">Check back for the next club news update.</p>}</section>

@@ -1,0 +1,292 @@
+{
+  "base": "https://gayiclub.com",
+  "tag": "live",
+  "role": "member",
+  "email": "[qa email]",
+  "startedAt": "2026-09-13T23:27:23.502Z",
+  "apiResponses": [
+    {
+      "url": "/api/news/discussion",
+      "status": 401,
+      "cacheControl": "no-store",
+      "at": "2026-09-13T23:27:26.451Z"
+    },
+    {
+      "url": "/api/news/discussion",
+      "status": 401,
+      "cacheControl": "no-store",
+      "at": "2026-09-13T23:27:26.620Z"
+    },
+    {
+      "url": "/api/news/discussion",
+      "status": 401,
+      "cacheControl": "no-store",
+      "at": "2026-09-13T23:27:26.695Z"
+    },
+    {
+      "url": "/api/news/discussion?ids=968c32634dc2a1cb83f007064d0bd309276c504696b107928b2bc3d51ba9601b%2C54e57a7acfa8122404ff8ff25a996172465714ba65ffb4ecd72c00199deb8664%2C9",
+      "status": 200,
+      "cacheControl": "no-store",
+      "at": "2026-09-13T23:27:33.666Z"
+    },
+    {
+      "url": "/api/news/discussion?ids=968c32634dc2a1cb83f007064d0bd309276c504696b107928b2bc3d51ba9601b%2C54e57a7acfa8122404ff8ff25a996172465714ba65ffb4ecd72c00199deb8664%2C9",
+      "status": 200,
+      "cacheControl": "no-store",
+      "at": "2026-09-13T23:27:33.924Z"
+    },
+    {
+      "url": "/api/news/discussion",
+      "status": 200,
+      "cacheControl": "no-store",
+      "at": "2026-09-13T23:27:35.007Z"
+    },
+    {
+      "url": "/api/news/discussion?ids=968c32634dc2a1cb83f007064d0bd309276c504696b107928b2bc3d51ba9601b%2C54e57a7acfa8122404ff8ff25a996172465714ba65ffb4ecd72c00199deb8664%2C9",
+      "status": 200,
+      "cacheControl": "no-store",
+      "at": "2026-09-13T23:27:38.436Z"
+    },
+    {
+      "url": "/api/news/discussion?ids=968c32634dc2a1cb83f007064d0bd309276c504696b107928b2bc3d51ba9601b%2C54e57a7acfa8122404ff8ff25a996172465714ba65ffb4ecd72c00199deb8664%2C9",
+      "status": 200,
+      "cacheControl": "no-store",
+      "at": "2026-09-13T23:27:38.677Z"
+    },
+    {
+      "url": "/api/news/discussion",
+      "status": 200,
+      "cacheControl": "no-store",
+      "at": "2026-09-13T23:27:39.834Z"
+    },
+    {
+      "url": "/api/news/discussion?ids=968c32634dc2a1cb83f007064d0bd309276c504696b107928b2bc3d51ba9601b%2C54e57a7acfa8122404ff8ff25a996172465714ba65ffb4ecd72c00199deb8664%2C9",
+      "status": 200,
+      "cacheControl": "no-store",
+      "at": "2026-09-13T23:27:41.519Z"
+    },
+    {
+      "url": "/api/news/discussion?ids=968c32634dc2a1cb83f007064d0bd309276c504696b107928b2bc3d51ba9601b%2C54e57a7acfa8122404ff8ff25a996172465714ba65ffb4ecd72c00199deb8664%2C9",
+      "status": 200,
+      "cacheControl": "no-store",
+      "at": "2026-09-13T23:27:41.588Z"
+    },
+    {
+      "url": "/api/news/discussion",
+      "status": 200,
+      "cacheControl": "no-store",
+      "at": "2026-09-13T23:27:42.831Z"
+    },
+    {
+      "url": "/api/news/discussion?ids=968c32634dc2a1cb83f007064d0bd309276c504696b107928b2bc3d51ba9601b%2C54e57a7acfa8122404ff8ff25a996172465714ba65ffb4ecd72c00199deb8664%2C9",
+      "status": 200,
+      "cacheControl": "no-store",
+      "at": "2026-09-13T23:27:44.274Z"
+    },
+    {
+      "url": "/api/news/discussion?ids=968c32634dc2a1cb83f007064d0bd309276c504696b107928b2bc3d51ba9601b%2C54e57a7acfa8122404ff8ff25a996172465714ba65ffb4ecd72c00199deb8664%2C9",
+      "status": 200,
+      "cacheControl": "no-store",
+      "at": "2026-09-13T23:27:44.502Z"
+    },
+    {
+      "url": "/api/news/discussion?agendas=1",
+      "status": 200,
+      "cacheControl": "no-store",
+      "at": "2026-09-13T23:27:47.955Z"
+    },
+    {
+      "url": "/api/news/discussion?agendas=1",
+      "status": 200,
+      "cacheControl": "no-store",
+      "at": "2026-09-13T23:27:51.309Z"
+    }
+  ],
+  "console": [
+    {
+      "type": "error",
+      "text": "Error fetching events: Missing or insufficient permissions."
+    }
+  ],
+  "steps": [
+    {
+      "step": "anonymous-feed",
+      "path": "/news",
+      "voteButtons": 0,
+      "cards": 60
+    },
+    {
+      "step": "anonymous-api",
+      "get": 401,
+      "put": 401,
+      "bogus": 401
+    },
+    {
+      "step": "anonymous-agenda",
+      "state": "signed-out",
+      "rows": 0
+    },
+    {
+      "step": "sign-in",
+      "path": "/",
+      "sessionCookie": true
+    },
+    {
+      "step": "feed-card",
+      "storyId": "968c32634dc2a1cb83f007064d0bd309276c504696b107928b2bc3d51ba9601b",
+      "title": "Perplexity trusts GPT-6 Astra with end-to-end systems",
+      "hasButton": true,
+      "label": "I want to talk about this",
+      "pressed": "false",
+      "disabled": false,
+      "state": "open",
+      "badge": "0 votes",
+      "status": null,
+      "link": "https://openai.com/index/perplexity-improving-accuracy-with-astra"
+    },
+    {
+      "step": "feed-vote",
+      "title": "Perplexity trusts GPT-6 Astra with end-to-end systems",
+      "hasButton": true,
+      "label": "I want to talk about this",
+      "pressed": "true",
+      "disabled": false,
+      "state": "voted",
+      "badge": "1 vote",
+      "status": "Counted. Organizers can add this story to the next agenda.",
+      "link": "https://openai.com/index/perplexity-improving-accuracy-with-astra"
+    },
+    {
+      "step": "screenshot",
+      "name": "live-member-news-desktop-dark"
+    },
+    {
+      "step": "screenshot",
+      "name": "live-member-news-desktop-light"
+    },
+    {
+      "step": "feed-reload",
+      "title": "Perplexity trusts GPT-6 Astra with end-to-end systems",
+      "hasButton": true,
+      "label": "I want to talk about this",
+      "pressed": "true",
+      "disabled": false,
+      "state": "voted",
+      "badge": "1 vote",
+      "status": null,
+      "link": "https://openai.com/index/perplexity-improving-accuracy-with-astra"
+    },
+    {
+      "step": "feed-withdraw",
+      "title": "Perplexity trusts GPT-6 Astra with end-to-end systems",
+      "hasButton": true,
+      "label": "I want to talk about this",
+      "pressed": "false",
+      "disabled": false,
+      "state": "open",
+      "badge": "0 votes",
+      "status": "Vote withdrawn.",
+      "link": "https://openai.com/index/perplexity-improving-accuracy-with-astra"
+    },
+    {
+      "step": "feed-reload-2",
+      "title": "Perplexity trusts GPT-6 Astra with end-to-end systems",
+      "hasButton": true,
+      "label": "I want to talk about this",
+      "pressed": "false",
+      "disabled": false,
+      "state": "open",
+      "badge": "0 votes",
+      "status": null,
+      "link": "https://openai.com/index/perplexity-improving-accuracy-with-astra"
+    },
+    {
+      "step": "screenshot",
+      "name": "live-member-news-mobile-dark"
+    },
+    {
+      "step": "screenshot",
+      "name": "live-member-news-mobile-light"
+    },
+    {
+      "step": "news-mobile",
+      "scrollWidth": 390,
+      "clientWidth": 390
+    },
+    {
+      "step": "agenda-panel",
+      "state": "ready",
+      "rows": [
+        {
+          "id": "968c32634dc2a1cb83f007064d0bd309276c504696b107928b2bc3d51ba9601b",
+          "onDraft": "false",
+          "title": "Perplexity trusts GPT-6 Astra with end-to-end systems",
+          "link": "https://openai.com/index/perplexity-improving-accuracy-with-astra",
+          "badges": [
+            "1 vote"
+          ],
+          "addLabel": "Add",
+          "addDisabled": false
+        }
+      ],
+      "hasSave": false,
+      "hasSelect": false,
+      "hidden": null
+    },
+    {
+      "step": "agenda-add",
+      "row": {
+        "id": "968c32634dc2a1cb83f007064d0bd309276c504696b107928b2bc3d51ba9601b",
+        "onDraft": "true",
+        "title": "Perplexity trusts GPT-6 Astra with end-to-end systems",
+        "link": "https://openai.com/index/perplexity-improving-accuracy-with-astra",
+        "badges": [
+          "On this agenda",
+          "1 vote"
+        ],
+        "addLabel": "Added",
+        "addDisabled": true
+      },
+      "items": [
+        "Welcome & introductions",
+        "AI news roundup",
+        "Open discussion",
+        "Announcements & next steps",
+        "Perplexity trusts GPT-6 Astra with end-to-end systems"
+      ],
+      "links": [
+        "https://openai.com/index/perplexity-improving-accuracy-with-astra"
+      ],
+      "status": "Added “Perplexity trusts GPT-6 Astra with end-to-end systems” to the agenda."
+    },
+    {
+      "step": "screenshot",
+      "name": "live-member-agenda-desktop-dark"
+    },
+    {
+      "step": "screenshot",
+      "name": "live-member-agenda-desktop-light"
+    },
+    {
+      "step": "screenshot",
+      "name": "live-member-agenda-mobile-dark"
+    },
+    {
+      "step": "screenshot",
+      "name": "live-member-agenda-mobile-light"
+    },
+    {
+      "step": "agenda-mobile",
+      "scrollWidth": 390,
+      "clientWidth": 390
+    },
+    {
+      "step": "sign-out",
+      "status": 200
+    }
+  ],
+  "storyId": "968c32634dc2a1cb83f007064d0bd309276c504696b107928b2bc3d51ba9601b",
+  "storyLink": "https://openai.com/index/perplexity-improving-accuracy-with-astra",
+  "result": "passed",
+  "finishedAt": "2026-09-13T23:27:55.752Z"
+}

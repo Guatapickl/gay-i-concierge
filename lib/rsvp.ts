@@ -143,3 +143,69 @@ export async function getEventAttendees(eventId: string): Promise<AttendeeListRe
     return { event_id: eventId, count: 0, attendees: [] };
   }
 }
+
+/* ─── Organizer view: next meeting RSVPs ─────────────────────────── */
+
+export type MeetingSummary = {
+  id: string;
+  title: string;
+  event_datetime: string | null;
+  location: string | null;
+};
+
+export type MeetingAttendee = {
+  id: string;
+  profile_id: string;
+  name: string | null;
+  /** Only present when the member has no name on file; never alongside a name. */
+  email: string | null;
+  rsvped_at: string | null;
+};
+
+export type NextMeetingRsvps = {
+  /** Null when no meeting is scheduled after now (and none was requested). */
+  event: MeetingSummary | null;
+  is_next_meeting: boolean;
+  upcoming_events: MeetingSummary[];
+  count: number;
+  attendees: MeetingAttendee[];
+  generated_at: string;
+};
+
+export class RsvpViewError extends Error {
+  /** HTTP status of the failed request, or null when the request never completed. */
+  readonly status: number | null;
+  constructor(message: string, status: number | null) {
+    super(message);
+    this.name = 'RsvpViewError';
+    this.status = status;
+  }
+}
+
+/**
+ * Load the organizer's RSVP view for the next meeting, or for `eventId` when
+ * given. Unlike `getEventAttendees`, a failure is thrown (with the HTTP
+ * status when there is one) instead of being reported as an empty list, so
+ * the caller can tell "could not load" apart from "nobody has RSVP'd".
+ */
+export async function getNextMeetingRsvps(eventId?: string | null): Promise<NextMeetingRsvps> {
+  const headers = await authHeader();
+  if (!headers.Authorization) throw new RsvpViewError('Sign in to view RSVPs.', 401);
+  const query = eventId ? `?event_id=${encodeURIComponent(eventId)}` : '';
+  let res: Response;
+  try {
+    res = await fetch(`/api/events/attendees${query}`, { headers, cache: 'no-store' });
+  } catch (err) {
+    throw new RsvpViewError(`Could not reach the server (${(err as Error).message}).`, null);
+  }
+  if (!res.ok) {
+    let detail = '';
+    try {
+      detail = String((await res.json())?.error ?? '');
+    } catch {
+      /* non-JSON error body */
+    }
+    throw new RsvpViewError(detail || `Request failed (HTTP ${res.status}).`, res.status);
+  }
+  return (await res.json()) as NextMeetingRsvps;
+}

@@ -6,6 +6,7 @@
 
 import type { Event } from '@/types/supabase';
 import { describeRecurrence } from './recurrence';
+import { articleHost } from './agendaArticles';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gayiclub.com';
 
@@ -78,7 +79,7 @@ export function eventReminderEmail(event: Event, hoursUntil: number) {
 ${event.agenda
   .map(
     item =>
-      `<li style="margin-bottom:6px;"><strong style="color:${PALETTE.text};">${escapeHtml(item.title)}</strong>${item.time ? ` <span style="color:${PALETTE.muted};">· ${escapeHtml(item.time)}</span>` : ''}${item.speaker ? ` <em style="color:${PALETTE.muted};">— ${escapeHtml(item.speaker)}</em>` : ''}</li>`
+      `<li style="margin-bottom:6px;"><strong style="color:${PALETTE.text};">${escapeHtml(item.title)}</strong>${item.time ? ` <span style="color:${PALETTE.muted};">· ${escapeHtml(item.time)}</span>` : ''}${item.speaker ? ` <em style="color:${PALETTE.muted};">— ${escapeHtml(item.speaker)}</em>` : ''}${item.link && articleHost(item.link) ? ` <a href="${escapeHtml(item.link)}" style="color:${PALETTE.primary};">Read the article (${escapeHtml(articleHost(item.link) || '')})</a>` : ''}</li>`
   )
   .join('')}
 </ul>`

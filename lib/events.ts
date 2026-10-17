@@ -1,7 +1,8 @@
-import { addDoc, deleteDoc, getDocs, limit as qLimit, orderBy, query, Timestamp, updateDoc, where, writeBatch } from 'firebase/firestore';
+import { addDoc, deleteDoc, getDocs, limit as qLimit, orderBy, query, runTransaction, Timestamp, updateDoc, where, writeBatch } from 'firebase/firestore';
 import { db } from './firebase/client';
 import { chunk, col, getRow, listRows, nowIso, payloadOf, ref, rowOf } from './firebase/db';
 import { Event, AgendaItem } from '@/types/supabase';
+import { reconcileSavedAgenda } from './agendaArticles';
 
 const byDate = (a: Event, b: Event) =>
   new Date(a.event_datetime).getTime() - new Date(b.event_datetime).getTime();
@@ -58,6 +59,35 @@ export async function updateEvent(
   } catch (err) {
     console.error('Failed to update event:', (err as Error).message);
     return false;
+  }
+}
+
+export type SaveAgendaResult =
+  | { ok: true; agenda: AgendaItem[]; preserved: AgendaItem[] }
+  | { ok: false; error: string };
+
+/**
+ * Store an agenda from the agenda maker without discarding what another editor
+ * saved in the meantime. The transaction reads the event as it is now, keeps
+ * any lines that were added after `baseline` (the agenda the draft was built
+ * from) and writes the draft plus those lines in one step, so two organizers
+ * editing the same meeting cannot silently overwrite each other's additions.
+ */
+export async function saveEventAgenda(eventId: string, draft: AgendaItem[], baseline: AgendaItem[]): Promise<SaveAgendaResult> {
+  try {
+    const eventRef = ref('events', eventId);
+    const result = await runTransaction(db, async tx => {
+      const snap = await tx.get(eventRef);
+      if (!snap.exists()) throw new Error('This event no longer exists.');
+      const stored = snap.data()?.agenda;
+      const { agenda, preserved } = reconcileSavedAgenda(draft, baseline, Array.isArray(stored) ? (stored as AgendaItem[]) : []);
+      tx.update(eventRef, payloadOf({ agenda, updated_at: nowIso() }));
+      return { agenda, preserved };
+    });
+    return { ok: true, ...result };
+  } catch (err) {
+    console.error('Failed to save agenda:', (err as Error).message);
+    return { ok: false, error: (err as Error).message || 'The agenda could not be saved.' };
   }
 }
 

@@ -25,6 +25,8 @@ export default function NewEventPage() {
         title: (i.title || '').trim(),
         speaker: (i.speaker || '').trim() || null,
         notes: (i.notes || '').trim() || null,
+        link: (i.link || '').trim() || null,
+        news_id: (i.news_id || '').trim() || null,
       }))
       .filter(i => i.title);
 

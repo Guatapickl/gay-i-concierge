@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { getEventById } from '@/lib/events';
+import { articleHost } from '@/lib/agendaArticles';
 import type { Event } from '@/types/supabase';
 
 export default function EventAgendaPage() {
@@ -44,6 +45,11 @@ export default function EventAgendaPage() {
                 {item?.speaker && <span className="text-sm text-foreground-muted">• {item.speaker}</span>}
               </div>
               {item?.notes && <p className="text-sm text-foreground-muted mt-1 whitespace-pre-line">{item.notes}</p>}
+              {item?.link && articleHost(item.link) && (
+                <a href={item.link} target="_blank" rel="noopener noreferrer" className="inline-block text-sm text-primary font-medium mt-2 break-all">
+                  Read the article ↗ <span className="text-foreground-muted text-xs">{articleHost(item.link)}</span>
+                </a>
+              )}
             </li>
           ))}
         </ul>

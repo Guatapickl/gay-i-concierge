@@ -1,0 +1,13 @@
+{
+  "name": "projects/gayiclub/locations/us-east4/backends/gayiclub-web/rollouts/build-2026-09-13-001",
+  "createTime": "2026-09-13T15:21:00.786207342Z",
+  "updateTime": "2026-09-13T15:23:38.122792Z",
+  "state": "SUCCEEDED",
+  "build": "projects/gayiclub/locations/us-east4/backends/gayiclub-web/builds/build-2026-09-13-001",
+  "labels": {
+    "deployment-tool": "cli-firebase"
+  },
+  "uid": "79986bcc-7840-4374-a719-03b9b84c56d9",
+  "etag": "nt9herZw-k4Uny5WJRLA4tpE-uTJodB-Dp3kQkINzk0",
+  "reconciling": false
+}

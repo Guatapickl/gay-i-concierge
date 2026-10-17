@@ -1,0 +1,38 @@
+# deploy started 2026-09-13T23:23:15Z from /tmp/news-discussion/deploy (rsync of the working tree)
+
+=== Deploying to 'gayiclub'...
+
+i  deploying firestore
+i  firestore: ensuring required API firestore.googleapis.com is enabled...
+✔  firestore: required API firestore.googleapis.com is enabled
+i  firestore: ensuring required API firestore.googleapis.com is enabled...
+i  firestore: reading indexes from firestore.indexes.json...
+i  cloud.firestore: checking firestore.rules for compilation errors...
+✔  cloud.firestore: rules file firestore.rules compiled successfully
+i  firestore: latest version of firestore.rules already up to date, skipping upload...
+✔  firestore: released rules firestore.rules to cloud.firestore
+
+✔  Deploy complete!
+
+Project Console: https://console.firebase.google.com/project/gayiclub/overview
+rules deploy exit 0
+
+=== Deploying to 'gayiclub'...
+
+i  deploying apphosting
+i  apphosting: Found backend(s) gayiclub-web
+i  apphosting: Zipped source for backend gayiclub-web
+i  apphosting: Uploading source for backend gayiclub-web...
+i  apphosting: Uploaded at gs://firebaseapphosting-sources-692568338842-us-east4/gayiclub-web--84113-5R7Dqqdam0ri-.zip
+i  apphosting: You may also track the rollout(s) at:
+	https://console.firebase.google.com/project/gayiclub/apphosting
+- Starting rollout(s) for backend(s) gayiclub-web; this may take a few minutes. It's safe to exit now.
+
+✔  apphosting: Rollout for backend gayiclub-web complete!
+✔  apphosting: Your backend is now deployed at:
+	https://gayiclub-web--gayiclub.us-east4.hosted.app
+
+✔  Deploy complete!
+
+Project Console: https://console.firebase.google.com/project/gayiclub/overview
+apphosting deploy exit 0

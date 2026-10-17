@@ -1,0 +1,54 @@
+{
+  "votesBefore": {
+    "total": 0
+  },
+  "memberVotesFound": [
+    {
+      "id": "0616b98ca3509e4d16075546460062f78093463f63627e5f0773cfdd233b0b8a",
+      "news_id": "968c32634dc2a1cb83f007064d0bd309276c504696b107928b2bc3d51ba9601b",
+      "active": true,
+      "withdrawals": 3,
+      "idMatches": true
+    }
+  ],
+  "organizerVotesFound": [
+    {
+      "id": "ba088462c6b529cc850e7b85fb463d976d5de0bb24c14295876fb4fbe3fbc517",
+      "news_id": "968c32634dc2a1cb83f007064d0bd309276c504696b107928b2bc3d51ba9601b",
+      "active": true,
+      "withdrawals": 1,
+      "idMatches": true
+    }
+  ],
+  "deletedMemberVotes": {
+    "deleted": [
+      "0616b98ca3509e4d16075546460062f78093463f63627e5f0773cfdd233b0b8a"
+    ]
+  },
+  "deletedOrganizerVotes": {
+    "deleted": [
+      "ba088462c6b529cc850e7b85fb463d976d5de0bb24c14295876fb4fbe3fbc517"
+    ]
+  },
+  "revokeAdmin": {
+    "revoked": "nQJGMNyET7XoFGywiDIJwesfydk2"
+  },
+  "deleteMember": {
+    "deleted": "EGOIwoYG3bM4z5uO6VtZ8ROYvWo2",
+    "email": "[qa email]"
+  },
+  "deleteOrganizer": {
+    "deleted": "nQJGMNyET7XoFGywiDIJwesfydk2",
+    "email": "[qa email]"
+  },
+  "adminsAfter": [
+    "d3aef0b9-a32b-469d-ab12-b38e493536c6"
+  ],
+  "votesAfter": {
+    "total": 0
+  },
+  "memberProfileDocCreated": false,
+  "organizerProfileDocCreated": false,
+  "at": "2026-09-13T23:28:46.632Z",
+  "clean": true
+}

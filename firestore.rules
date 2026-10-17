@@ -109,6 +109,9 @@ service cloud.firestore {
     match /robot_benchmarks/{id} { allow read: if signedIn(); allow write: if false; }
     // The authenticated API exposes totals and the caller's choice, never voter identities.
     match /robot_showcase_votes/{id} { allow read, write: if false; }
+    // "I want to talk about this" votes on news stories: written by /api/news/discussion
+    // only (one document per member and story), read back as totals plus the caller's choice.
+    match /news_discussion_votes/{id} { allow read, write: if false; }
 
     match /news_tombstones/{id} { allow read, write: if false; }
     match /meeting_automation_config/{id} { allow read, write: if false; }

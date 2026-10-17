@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Plus } from 'lucide-react';
+import { Plus, Users } from 'lucide-react';
 import { getUpcomingEvents } from '@/lib/events';
 import { saveRsvp, deleteRsvp, getRsvpedEventIds } from '@/lib/rsvp';
 import { currentUser } from '@/lib/firebase/authClient';
@@ -65,12 +65,20 @@ export default function EventsPage() {
           </p>
         </div>
         {isAdmin && (
-          <Link href="/events/new">
-            <Button variant="primary" size="md">
-              <Plus className="w-4 h-4" />
-              New Event
-            </Button>
-          </Link>
+          <div className="flex flex-wrap items-center gap-3">
+            <Link href="/events/rsvps">
+              <Button variant="secondary" size="md">
+                <Users className="w-4 h-4" />
+                Next meeting RSVPs
+              </Button>
+            </Link>
+            <Link href="/events/new">
+              <Button variant="primary" size="md">
+                <Plus className="w-4 h-4" />
+                New Event
+              </Button>
+            </Link>
+          </div>
         )}
       </div>
 

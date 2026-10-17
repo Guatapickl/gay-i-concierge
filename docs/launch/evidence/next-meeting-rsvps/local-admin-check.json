@@ -1,0 +1,195 @@
+{
+  "base": "http://localhost:4190",
+  "expect": "admin",
+  "email": "[member email]",
+  "startedAt": "2026-09-13T15:19:46.276Z",
+  "apiResponses": [
+    {
+      "url": "/api/events/attendees",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T15:19:47.665Z"
+    },
+    {
+      "url": "/api/events/attendees",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T15:19:47.671Z"
+    },
+    {
+      "url": "/api/events/attendees",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T15:19:50.004Z"
+    },
+    {
+      "url": "/api/events/attendees",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T15:19:56.600Z"
+    },
+    {
+      "url": "/api/events/attendees",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T15:19:59.698Z"
+    },
+    {
+      "url": "/api/events/attendees",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T15:20:02.411Z"
+    },
+    {
+      "url": "/api/events/attendees?event_id=poll-0b5a2940d5c62a933b8559cadeecb7cc799527a6",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T15:20:05.191Z"
+    },
+    {
+      "url": "/api/events/attendees",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T15:20:09.741Z"
+    }
+  ],
+  "steps": [
+    {
+      "step": "anonymous-page",
+      "path": "/auth/sign-in"
+    },
+    {
+      "step": "anonymous-api",
+      "noAuth": 401,
+      "bogusBearer": 401
+    },
+    {
+      "step": "sign-in",
+      "redirectedAway": true,
+      "path": "/",
+      "sessionCookie": true
+    },
+    {
+      "step": "cookie-only-api",
+      "status": 401
+    },
+    {
+      "step": "dashboard",
+      "heading": "Welcome back, Praxis",
+      "rsvpLink": true,
+      "nextMeetup": "Gay I Club Meeting"
+    },
+    {
+      "step": "screenshot",
+      "name": "local-admin-dashboard"
+    },
+    {
+      "step": "events-list",
+      "rsvpLink": true,
+      "newEvent": true
+    },
+    {
+      "step": "event-detail",
+      "title": "Gay I Club Meeting",
+      "rsvpLink": "/events/rsvps?event=poll-0b5a2940d5c62a933b8559cadeecb7cc799527a6",
+      "attendeeBadge": "2 attendees"
+    },
+    {
+      "step": "rsvp-view",
+      "path": "/events/rsvps",
+      "state": "attendees",
+      "heading": "Next meeting RSVPs",
+      "meeting": "Gay I Club Meeting",
+      "badges": [
+        "Next meeting",
+        "2 RSVPs"
+      ],
+      "rows": [
+        "[member email] No name on their profile, so their sign-in email is shown. RSVP'd Sep 11, 2:00 PM",
+        "2.Robert Washko RSVP'd Sep 11, 2:05 PM"
+      ],
+      "hasSelect": false,
+      "text": "Skip to content\nGay I Club\nEvents\nLIGHT\nP\n\nHOME\n\nDashboard\n\nCONNECT\n\nCommunication Hub\nCommunity\nCommunity Feed\n\nHAPPENINGS\n\nMeeting Calendar\nEvents\nNews Feed\nAnnouncements\nDate votes\n\nTOOLS\n\nResources\nAgenda Maker\nRobot Showcase\nYour profile\nGAY PEOPLE EXPLORING\nTHE AI FRONTIER\n\nORGANIZER TOOLS\n\nNext meeting RSVPs\n\nWho has RSVP'd to the club's next meeting. Visible to organizers only.\n\nAll events →\nSEP\n13\nNext meeting\nGay I Club Meeting\nSunday, September 13, 2026\n6:30 PM\n[private location]\nOpen event page →\n2 RSVPs\nUpdated Sep 13, 11:19 AM\nRefresh\n[member email]\n\nNo name on their profile, so their sign-in email is shown.\n\nRSVP'd Sep 11, 2:00 PM\n2.Robert Washko\nRSVP'd Sep 11, 2:05 PM\nGay I Club · a VibeShift AI project\n\n© 2026 VibeShift AI. All rights reserved.\n\nPrivacy Policy\nTerms of Use\nAccessibility"
+    },
+    {
+      "step": "screenshot",
+      "name": "local-admin-rsvps-desktop-dark"
+    },
+    {
+      "step": "screenshot",
+      "name": "local-admin-rsvps-desktop-light"
+    },
+    {
+      "step": "refresh-after-add",
+      "added": {
+        "added": "poll-0b5a2940d5c62a933b8559cadeecb7cc799527a6_p4bn7qt8Trcm7UxU257WsOsLS542"
+      },
+      "badges": [
+        "Next meeting",
+        "3 RSVPs"
+      ],
+      "rows": [
+        "1.[member email] No name on their profile, so their sign-in email is shown. RSVP'd Sep 11, 2:00 PM",
+        "2.Robert Washko RSVP'd Sep 11, 2:05 PM",
+        "3.Praxis QA member (temporary, delete after check) RSVP'd Sep 13, 11:19 AM"
+      ],
+      "state": "attendees"
+    },
+    {
+      "step": "screenshot",
+      "name": "local-admin-rsvps-after-add"
+    },
+    {
+      "step": "refresh-after-remove",
+      "removed": {
+        "removed": "poll-0b5a2940d5c62a933b8559cadeecb7cc799527a6_p4bn7qt8Trcm7UxU257WsOsLS542"
+      },
+      "badges": [
+        "Next meeting",
+        "2 RSVPs"
+      ],
+      "rows": [
+        "1.[member email] No name on their profile, so their sign-in email is shown. RSVP'd Sep 11, 2:00 PM",
+        "2.Robert Washko RSVP'd Sep 11, 2:05 PM"
+      ],
+      "state": "attendees"
+    },
+    {
+      "step": "rsvp-view-preselected",
+      "path": "/events/rsvps?event=poll-0b5a2940d5c62a933b8559cadeecb7cc799527a6",
+      "state": "attendees",
+      "heading": "Next meeting RSVPs",
+      "meeting": "Gay I Club Meeting",
+      "badges": [
+        "Next meeting",
+        "2 RSVPs"
+      ],
+      "rows": [
+        "[member email] No name on their profile, so their sign-in email is shown. RSVP'd Sep 11, 2:00 PM",
+        "2.Robert Washko RSVP'd Sep 11, 2:05 PM"
+      ],
+      "hasSelect": false,
+      "text": "Skip to content\nGay I Club\nEvents\nLIGHT\nP\n\nHOME\n\nDashboard\n\nCONNECT\n\nCommunication Hub\nCommunity\nCommunity Feed\n\nHAPPENINGS\n\nMeeting Calendar\nEvents\nNews Feed\nAnnouncements\nDate votes\n\nTOOLS\n\nResources\nAgenda Maker\nRobot Showcase\nYour profile\nGAY PEOPLE EXPLORING\nTHE AI FRONTIER\n\nORGANIZER TOOLS\n\nNext meeting RSVPs\n\nWho has RSVP'd to the club's next meeting. Visible to organizers only.\n\nAll events →\nSEP\n13\nNext meeting\nGay I Club Meeting\nSunday, September 13, 2026\n6:30 PM\n[private location]\nOpen event page →\n2 RSVPs\nUpdated Sep 13, 11:20 AM\nRefresh\n[member email]\n\nNo name on their profile, so their sign-in email is shown.\n\nRSVP'd Sep 11, 2:00 PM\n2.Robert Washko\nRSVP'd Sep 11, 2:05 PM\nGay I Club · a VibeShift AI project\n\n© 2026 VibeShift AI. All rights reserved.\n\nPrivacy Policy\nTerms of Use\nAccessibility"
+    },
+    {
+      "step": "screenshot",
+      "name": "local-admin-rsvps-mobile-dark"
+    },
+    {
+      "step": "screenshot",
+      "name": "local-admin-rsvps-mobile-light"
+    },
+    {
+      "step": "mobile",
+      "scrollWidth": 390,
+      "clientWidth": 390,
+      "innerWidth": 390
+    },
+    {
+      "step": "sign-out",
+      "sessionDeleteStatus": 200
+    }
+  ],
+  "finishedAt": "2026-09-13T15:20:13.829Z",
+  "redaction": "private meeting location and member emails replaced with placeholders"
+}

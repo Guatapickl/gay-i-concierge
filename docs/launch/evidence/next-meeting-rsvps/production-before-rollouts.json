@@ -1,0 +1,70 @@
+{
+  "rollouts": [
+    {
+      "name": "projects/gayiclub/locations/us-east4/backends/gayiclub-web/rollouts/build-2026-09-09-001",
+      "createTime": "2026-09-09T09:27:08.202899175Z",
+      "updateTime": "2026-09-09T09:29:35.857542Z",
+      "state": "SUCCEEDED",
+      "build": "projects/gayiclub/locations/us-east4/backends/gayiclub-web/builds/build-2026-09-09-001",
+      "labels": {
+        "deployment-tool": "cli-firebase"
+      },
+      "uid": "08a85fb6-ede8-48ac-b7f6-9ec65c565291",
+      "etag": "K4dtC5fSZOsBtIqqChAOrz6w2glGB604lgxYo4qSvQE",
+      "reconciling": false
+    },
+    {
+      "name": "projects/gayiclub/locations/us-east4/backends/gayiclub-web/rollouts/build-2026-09-04-001",
+      "createTime": "2026-09-04T14:18:58.112472716Z",
+      "updateTime": "2026-09-04T14:22:20.935501Z",
+      "state": "SUCCEEDED",
+      "build": "projects/gayiclub/locations/us-east4/backends/gayiclub-web/builds/build-2026-09-04-001",
+      "labels": {
+        "deployment-tool": "cli-firebase"
+      },
+      "uid": "b8d4d562-fa2e-4c30-86dc-ae9adbe7f647",
+      "etag": "u5baA9BYPOjvV9CiMMknO-0z6P055R0voCGiPMXcqXo",
+      "reconciling": false
+    },
+    {
+      "name": "projects/gayiclub/locations/us-east4/backends/gayiclub-web/rollouts/build-2026-09-04-002",
+      "createTime": "2026-09-04T15:44:27.012140160Z",
+      "updateTime": "2026-09-04T15:46:54.198300Z",
+      "state": "SUCCEEDED",
+      "build": "projects/gayiclub/locations/us-east4/backends/gayiclub-web/builds/build-2026-09-04-002",
+      "labels": {
+        "deployment-tool": "cli-firebase"
+      },
+      "uid": "3796721b-6723-4d66-9a12-816cf12454c2",
+      "etag": "Ngl9CnIBFNMmgsm6ioToJBRnVkvd283UdMiKPgCKgEs",
+      "reconciling": false
+    },
+    {
+      "name": "projects/gayiclub/locations/us-east4/backends/gayiclub-web/rollouts/build-2026-09-04-003",
+      "createTime": "2026-09-04T16:08:20.205267934Z",
+      "updateTime": "2026-09-04T16:11:27.922623Z",
+      "state": "SUCCEEDED",
+      "build": "projects/gayiclub/locations/us-east4/backends/gayiclub-web/builds/build-2026-09-04-003",
+      "labels": {
+        "deployment-tool": "cli-firebase"
+      },
+      "uid": "6e7bf90e-98e3-4d77-bea4-ab9be98c4788",
+      "etag": "rkxjtf65R3IaB7Eyre5AJwRmyBC5yQMVeORD5G8F0Ro",
+      "reconciling": false
+    },
+    {
+      "name": "projects/gayiclub/locations/us-east4/backends/gayiclub-web/rollouts/build-2026-09-06-008",
+      "createTime": "2026-09-06T14:45:53.387034287Z",
+      "updateTime": "2026-09-06T14:49:31.431313Z",
+      "state": "SUCCEEDED",
+      "build": "projects/gayiclub/locations/us-east4/backends/gayiclub-web/builds/build-2026-09-06-008",
+      "labels": {
+        "deployment-tool": "cli-firebase"
+      },
+      "uid": "80cc23a6-556f-4d12-989c-b9c68fbd8c56",
+      "etag": "awUsG5z3D3gHwnmHLX5VFbbvPJvErLCcRd-PpaE1_IU",
+      "reconciling": false
+    }
+  ],
+  "nextPageToken": "Cp0BClYKCHVzLWVhc3Q0EiFmaXJlYmFzZWFwcGhvc3RpbmcuZ29vZ2xlYXBpcy5jb20YASCa46iClBQqHmJhY2tlbmRzL2dheWljbHViLXdlYi9yb2xsb3V0cxIUYnVpbGQtMjAyNi0wOS0wNi0wMDgaJDgwY2MyM2E2LTU1NmYtNGQxMi05ODljLWI5YzY4ZmJkOGM1NiEyg2TR2WcPPw"
+}

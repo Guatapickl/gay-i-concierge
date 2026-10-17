@@ -297,8 +297,12 @@ Central table for club meetings. Supports both one-off events and recurring seri
   title: string;           // "Welcome & Introductions"
   speaker?: string | null;
   notes?: string | null;
+  link?: string | null;    // source URL of a news story added from the feed (rendered as a link)
+  news_id?: string | null; // news_items id the story came from; stable across ingestion refreshes
 }
 ```
+
+**Voted news stories** (`news_discussion_votes`, Firestore only, added 2026-09-13): one document per member and story, id = sha256 of `[news_id, user_id]`, fields `news_id`, `user_id`, `active` (false once withdrawn; a missing flag counts as active), `created_at`, `updated_at`, `withdrawn_at`, `revoted_at`, `vote_count`, `withdrawal_count`. Withdrawing keeps the document and flips `active`; voting again reactivates it, so the history stays on record and only active documents are counted. Nothing deletes these documents. Written and read only by `/api/news/discussion` (Admin SDK); client access is denied in `firestore.rules`. The API returns totals and the caller's own choice, never voter identities. Votes form the general "next meeting" pool (like `agenda_suggestions` with `event_id = null`); an organizer places a voted story on a specific agenda from the agenda maker, which records `link` and `news_id` on the `AgendaItem`.
 
 ### rsvps
 

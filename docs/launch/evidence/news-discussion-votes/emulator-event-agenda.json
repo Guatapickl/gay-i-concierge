@@ -1,0 +1,49 @@
+{
+  "storedAgendaAfterTwoSaves": [
+    {
+      "time": null,
+      "title": "Welcome & introductions",
+      "speaker": null,
+      "notes": "Existing saved item",
+      "link": null,
+      "news_id": null
+    },
+    {
+      "time": "7:15 PM",
+      "title": "Existing feature talk",
+      "speaker": "Sam",
+      "notes": null,
+      "link": null,
+      "news_id": null
+    },
+    {
+      "time": null,
+      "title": "QA story A: agents that plan their own evals",
+      "speaker": null,
+      "notes": "2 votes from the news feed · Example Lab",
+      "link": "https://example.com/qa/story-a?utm_source=rss",
+      "news_id": "qa-story-a"
+    },
+    {
+      "time": null,
+      "title": "Added by another editor after page load",
+      "speaker": "Other organizer",
+      "notes": "Stored while the maker was open",
+      "link": null,
+      "news_id": null
+    }
+  ],
+  "savedDetailsPreservedAndNoDuplicates": true,
+  "otherEditorLineKept": true,
+  "secondMeetingAgenda": [
+    {
+      "time": null,
+      "title": "QA story B: a policy brief on model licensing",
+      "speaker": null,
+      "notes": "2 votes from the news feed · Example Policy",
+      "link": "https://example.com/qa/story-b",
+      "news_id": "qa-story-b"
+    }
+  ],
+  "secondMeetingHoldsOnlyTheChosenStory": true
+}

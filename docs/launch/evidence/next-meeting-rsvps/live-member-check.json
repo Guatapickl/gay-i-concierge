@@ -1,0 +1,136 @@
+{
+  "base": "https://gayiclub.com",
+  "expect": "member",
+  "email": "[member email]",
+  "startedAt": "2026-09-13T15:26:40.509Z",
+  "apiResponses": [
+    {
+      "url": "/api/events/attendees",
+      "status": 401,
+      "cacheControl": "no-store",
+      "at": "2026-09-13T15:26:43.804Z"
+    },
+    {
+      "url": "/api/events/attendees",
+      "status": 401,
+      "cacheControl": "no-store",
+      "at": "2026-09-13T15:26:43.868Z"
+    },
+    {
+      "url": "/api/events/attendees",
+      "status": 401,
+      "cacheControl": "no-store",
+      "at": "2026-09-13T15:26:46.858Z"
+    },
+    {
+      "url": "/api/events/attendees",
+      "status": 403,
+      "cacheControl": "no-store",
+      "at": "2026-09-13T15:26:53.647Z"
+    },
+    {
+      "url": "/api/events/attendees?event_id=poll-0b5a2940d5c62a933b8559cadeecb7cc799527a6",
+      "status": 403,
+      "cacheControl": "no-store",
+      "at": "2026-09-13T15:26:56.205Z"
+    },
+    {
+      "url": "/api/events/attendees",
+      "status": 403,
+      "cacheControl": "no-store",
+      "at": "2026-09-13T15:26:58.370Z"
+    }
+  ],
+  "steps": [
+    {
+      "step": "anonymous-page",
+      "path": "/auth/sign-in"
+    },
+    {
+      "step": "anonymous-api",
+      "noAuth": 401,
+      "bogusBearer": 401
+    },
+    {
+      "step": "sign-in",
+      "redirectedAway": true,
+      "path": "/",
+      "sessionCookie": true
+    },
+    {
+      "step": "cookie-only-api",
+      "status": 401
+    },
+    {
+      "step": "dashboard",
+      "heading": "Welcome back, Praxis",
+      "rsvpLink": false,
+      "nextMeetup": "Gay I Club Meeting"
+    },
+    {
+      "step": "screenshot",
+      "name": "live-member-dashboard"
+    },
+    {
+      "step": "events-list",
+      "rsvpLink": false,
+      "newEvent": false
+    },
+    {
+      "step": "event-detail",
+      "title": "Gay I Club Meeting",
+      "rsvpLink": null,
+      "attendeeBadge": "2 attendees"
+    },
+    {
+      "step": "rsvp-view",
+      "path": "/events/rsvps",
+      "state": "forbidden",
+      "heading": "Next meeting RSVPs",
+      "meeting": null,
+      "badges": [],
+      "rows": [],
+      "hasSelect": false,
+      "text": "Skip to content\nGay I Club\nEvents\nLIGHT\nP\n\nHOME\n\nDashboard\n\nCONNECT\n\nCommunication Hub\nCommunity\nCommunity Feed\n\nHAPPENINGS\n\nMeeting Calendar\nEvents\nNews Feed\nAnnouncements\nDate votes\n\nTOOLS\n\nResources\nAgenda Maker\nRobot Showcase\nYour profile\nGAY PEOPLE EXPLORING\nTHE AI FRONTIER\n\nORGANIZER TOOLS\n\nNext meeting RSVPs\n\nWho has RSVP'd to the club's next meeting. Visible to organizers only.\n\nAll events →\n\nOrganizers only\n\nYou're signed in, but this account isn't on the organizer list, so the attendee list stays hidden.\n\nBack to events\nGay I Club · a VibeShift AI project\n\n© 2026 VibeShift AI. All rights reserved.\n\nPrivacy Policy\nTerms of Use\nAccessibility"
+    },
+    {
+      "step": "screenshot",
+      "name": "live-member-rsvps-desktop-dark"
+    },
+    {
+      "step": "screenshot",
+      "name": "live-member-rsvps-desktop-light"
+    },
+    {
+      "step": "rsvp-view-preselected",
+      "path": "/events/rsvps?event=poll-0b5a2940d5c62a933b8559cadeecb7cc799527a6",
+      "state": "forbidden",
+      "heading": "Next meeting RSVPs",
+      "meeting": null,
+      "badges": [],
+      "rows": [],
+      "hasSelect": false,
+      "text": "Skip to content\nGay I Club\nEvents\nLIGHT\nP\n\nHOME\n\nDashboard\n\nCONNECT\n\nCommunication Hub\nCommunity\nCommunity Feed\n\nHAPPENINGS\n\nMeeting Calendar\nEvents\nNews Feed\nAnnouncements\nDate votes\n\nTOOLS\n\nResources\nAgenda Maker\nRobot Showcase\nYour profile\nGAY PEOPLE EXPLORING\nTHE AI FRONTIER\n\nORGANIZER TOOLS\n\nNext meeting RSVPs\n\nWho has RSVP'd to the club's next meeting. Visible to organizers only.\n\nAll events →\n\nOrganizers only\n\nYou're signed in, but this account isn't on the organizer list, so the attendee list stays hidden.\n\nBack to events\nGay I Club · a VibeShift AI project\n\n© 2026 VibeShift AI. All rights reserved.\n\nPrivacy Policy\nTerms of Use\nAccessibility"
+    },
+    {
+      "step": "screenshot",
+      "name": "live-member-rsvps-mobile-dark"
+    },
+    {
+      "step": "screenshot",
+      "name": "live-member-rsvps-mobile-light"
+    },
+    {
+      "step": "mobile",
+      "scrollWidth": 390,
+      "clientWidth": 390,
+      "innerWidth": 390
+    },
+    {
+      "step": "sign-out",
+      "sessionDeleteStatus": 200
+    }
+  ],
+  "finishedAt": "2026-09-13T15:27:02.519Z",
+  "redaction": "private meeting location and member emails replaced with placeholders"
+}

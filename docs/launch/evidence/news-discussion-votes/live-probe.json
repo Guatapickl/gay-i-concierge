@@ -1,0 +1,82 @@
+{
+  "base": "https://gayiclub.com",
+  "tag": "live",
+  "story": "968c32634dc2a1cb83f007064d0bd309276c504696b107928b2bc3d51ba9601b",
+  "startedAt": "2026-09-13T23:27:55.922Z",
+  "checks": {
+    "concurrentVotes": {
+      "baseline": 0,
+      "statuses": [
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+      ],
+      "counts": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "listed": {
+        "news_id": "968c32634dc2a1cb83f007064d0bd309276c504696b107928b2bc3d51ba9601b",
+        "title": "Perplexity trusts GPT-6 Astra with end-to-end systems",
+        "source_url": "https://openai.com/index/perplexity-improving-accuracy-with-astra",
+        "source_name": "OpenAI",
+        "published_at": "2026-09-14T00:00:00.000Z",
+        "count": 1,
+        "voted_by_me": true,
+        "on_agendas": []
+      }
+    },
+    "concurrentWithdrawals": {
+      "statuses": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "badInput": {
+      "unknown": 404,
+      "malformed": 400,
+      "oversized": 413,
+      "badIds": 400
+    },
+    "noIdentity": {
+      "containsUid": false,
+      "containsEmail": false,
+      "keys": [
+        "news_id",
+        "title",
+        "source_url",
+        "source_name",
+        "published_at",
+        "count",
+        "voted_by_me",
+        "on_agendas"
+      ]
+    },
+    "rules": {
+      "read": "permission-denied",
+      "list": "permission-denied",
+      "write": "permission-denied"
+    }
+  },
+  "result": "passed",
+  "finishedAt": "2026-09-13T23:28:02.237Z"
+}

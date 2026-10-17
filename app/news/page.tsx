@@ -1,14 +1,18 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Sparkles, Activity, Filter, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { authHeader, currentUser } from '@/lib/firebase/authClient';
 import { getSavedNewsIds, getNewsItemsByIds, toggleSavedNews } from '@/lib/news';
 import type { NewsItem } from '@/types/supabase';
 import { Alert, LoadingSpinner } from '@/components/ui';
-import NewsCard from '@/components/NewsCard';
+import NewsCard, { type DiscussionState } from '@/components/NewsCard';
 import { isCurrentUserAdmin } from '@/lib/isAdmin';
+import { fetchNewsDiscussion, saveNewsDiscussionVote } from '@/lib/news-discussion-client';
+import { DiscussionLedger, type VoteTotals } from '@/lib/news-discussion-ledger';
+
+const DISCUSSION_BATCH = 100;
 
 export default function NewsFeedPage() {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -23,6 +27,34 @@ export default function NewsFeedPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  // "I want to talk about this" totals per story. A failed load is kept apart
+  // from "nobody voted": cards show "unavailable" instead of 0 until a retry.
+  const [votes, setVotes] = useState<VoteTotals>({});
+  const [votesStatus, setVotesStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
+  const [votesError, setVotesError] = useState<string | null>(null);
+
+  // Orders batch reads against single votes so a slow read never undoes a vote
+  // the server already confirmed (see lib/news-discussion-ledger.ts).
+  const ledger = useRef(new DiscussionLedger());
+
+  const loadDiscussion = async (uid: string | null, ids: string[]) => {
+    const token = ledger.current.beginLoad();
+    if (!uid || ids.length === 0) { setVotes({}); setVotesStatus('idle'); setVotesError(null); return; }
+    setVotesStatus('loading'); setVotesError(null);
+    try {
+      const loaded: VoteTotals = {};
+      for (let i = 0; i < ids.length; i += DISCUSSION_BATCH) {
+        const list = await fetchNewsDiscussion({ ids: ids.slice(i, i + DISCUSSION_BATCH) });
+        for (const article of list.articles) loaded[article.news_id] = { count: article.count, votedByMe: article.voted_by_me };
+      }
+      if (!ledger.current.isLatestLoad(token)) return; // a newer load reports instead
+      setVotes(prev => ledger.current.mergeLoad(token, prev, loaded));
+      setVotesStatus('ready');
+    } catch (err) {
+      if (!ledger.current.isLatestLoad(token)) return;
+      setVotesStatus('error'); setVotesError(err instanceof Error ? err.message : 'Unknown error');
+    }
+  };
 
   const fetchNews = async (isRefresh = false) => {
     if (isRefresh) {
@@ -85,6 +117,28 @@ export default function NewsFeedPage() {
   const filteredItems = useMemo(() => {
     return (savedOnly ? savedItems : items).filter(item => (filter === 'All' || item.tag === filter) && (!savedOnly || saved.has(item.id)));
   }, [items, savedItems, filter, savedOnly, saved]);
+
+  const allIds = useMemo(() => Array.from(new Set([...items, ...savedItems].map(item => item.id))), [items, savedItems]);
+
+  // Vote totals follow the stories on screen: every feed load or refresh
+  // re-reads them for the signed-in member (nothing is requested signed out).
+  useEffect(() => {
+    void loadDiscussion(userId, allIds);
+  }, [userId, allIds]);
+
+  const discussionFor = (id: string): DiscussionState => {
+    if (votesStatus === 'idle' || votesStatus === 'loading') return undefined;
+    const known = votes[id];
+    if (known) return known;
+    return votesStatus === 'error' ? null : { count: 0, votedByMe: false };
+  };
+
+  const handleToggleDiscussion = async (id: string, voted: boolean) => {
+    // Throws with the server's message on failure; NewsCard shows it and keeps the previous state.
+    const result = await saveNewsDiscussionVote(id, voted);
+    ledger.current.recordVote(id);
+    setVotes(prev => ({ ...prev, [id]: { count: result.count, votedByMe: result.voted_by_me } }));
+  };
 
   const handleToggleSave = async (id: string) => {
     if (!userId) {
@@ -196,6 +250,15 @@ export default function NewsFeedPage() {
         </button>
       </div>
 
+      {userId && votesStatus === 'error' && (
+        <Alert variant="error">
+          <div className="flex flex-wrap items-center gap-3">
+            <span>Discussion votes could not be loaded: {votesError}. Vote counts are shown as unavailable rather than zero.</span>
+            <button type="button" className="btn-secondary text-xs" onClick={() => loadDiscussion(userId, allIds)}>Retry</button>
+          </div>
+        </Alert>
+      )}
+
       {/* Error State */}
       {error && (
         <Alert variant="error" className="border-danger/25 bg-danger/5 text-danger p-5 rounded-lg">
@@ -257,6 +320,8 @@ export default function NewsFeedPage() {
                 userId={userId}
                 onToggleSave={handleToggleSave}
                 onRemove={isAdmin ? handleRemove : undefined}
+                discussion={discussionFor(item.id)}
+                onToggleDiscussion={handleToggleDiscussion}
               />
             ))}
           </motion.div>

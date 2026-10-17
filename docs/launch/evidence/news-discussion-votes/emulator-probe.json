@@ -1,0 +1,82 @@
+{
+  "base": "http://localhost:4191",
+  "tag": "emulator",
+  "story": "qa-story-a",
+  "startedAt": "2026-09-13T23:21:35.419Z",
+  "checks": {
+    "concurrentVotes": {
+      "baseline": 0,
+      "statuses": [
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+      ],
+      "counts": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "listed": {
+        "news_id": "qa-story-a",
+        "title": "QA story A: agents that plan their own evals",
+        "source_url": "https://example.com/qa/story-a?utm_source=rss",
+        "source_name": "Example Lab",
+        "published_at": "2026-09-12T10:00:00.000Z",
+        "count": 1,
+        "voted_by_me": true,
+        "on_agendas": []
+      }
+    },
+    "concurrentWithdrawals": {
+      "statuses": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "counts": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "badInput": {
+      "unknown": 404,
+      "malformed": 400,
+      "oversized": 413,
+      "badIds": 400
+    },
+    "noIdentity": {
+      "containsUid": false,
+      "containsEmail": false,
+      "keys": [
+        "news_id",
+        "title",
+        "source_url",
+        "source_name",
+        "published_at",
+        "count",
+        "voted_by_me",
+        "on_agendas"
+      ]
+    },
+    "rules": {
+      "read": "permission-denied",
+      "list": "permission-denied",
+      "write": "permission-denied"
+    }
+  },
+  "result": "passed",
+  "finishedAt": "2026-09-13T23:21:42.543Z"
+}

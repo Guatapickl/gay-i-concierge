@@ -1,14 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Download, FileText, Sparkles, Save } from 'lucide-react';
+import { Download, FileText, Link2, Sparkles, Save } from 'lucide-react';
 import { currentUser } from '@/lib/firebase/authClient';
 import { getRow } from '@/lib/firebase/db';
-import { getUpcomingEvents, updateEvent } from '@/lib/events';
+import { getUpcomingEvents, saveEventAgenda } from '@/lib/events';
 import { getSuggestions } from '@/lib/agendaSuggestions';
-import type { Event } from '@/types/supabase';
+import { agendaContainsArticle, appendArticles, articleHost, mergeSavedAgenda, sameSavedLine } from '@/lib/agendaArticles';
+import { fetchNewsDiscussion } from '@/lib/news-discussion-client';
+import type { DiscussionArticle } from '@/lib/news-discussion-types';
+import type { Event, AgendaItem as SavedAgendaItem } from '@/types/supabase';
 import { Alert, FormInput } from '@/components/ui';
+import VotedArticles, { votesLabel, type VotedArticlesState } from '@/components/VotedArticles';
 
 type AgendaItem = {
   id: number;
@@ -16,6 +20,14 @@ type AgendaItem = {
   duration: number;
   owner: string;
   note: string;
+  /** Source URL when the item came from a voted news story (or a saved agenda link). */
+  link?: string;
+  /** News item id, kept so "already on this agenda" survives title edits. */
+  news_id?: string;
+  /** Start time as stored on the event; the maker does not edit it but keeps it. */
+  time?: string | null;
+  /** Event whose saved agenda this line was loaded from (never written back). */
+  from_event?: string;
 };
 
 const TEMPLATES: { name: string; items: { text: string; duration: number; owner?: string }[] }[] = [
@@ -54,16 +66,23 @@ const TEMPLATES: { name: string; items: { text: string; duration: number; owner?
 let nextId = 1;
 const newId = () => nextId++;
 
+const DEFAULT_DRAFT = [
+  { text: 'Welcome & introductions', duration: 5, owner: '' },
+  { text: 'AI news roundup', duration: 15, owner: '' },
+  { text: 'Open discussion', duration: 15, owner: 'All' },
+  { text: 'Announcements & next steps', duration: 5, owner: '' },
+];
+const defaultDraft = (): AgendaItem[] => DEFAULT_DRAFT.map(line => ({ id: newId(), note: '', ...line }));
+/** True while the draft is still the untouched starting template. */
+const isDefaultDraft = (items: AgendaItem[]) =>
+  items.length === DEFAULT_DRAFT.length &&
+  items.every((item, idx) => item.text === DEFAULT_DRAFT[idx].text && item.owner === DEFAULT_DRAFT[idx].owner && item.duration === DEFAULT_DRAFT[idx].duration && !item.note && !item.link && !item.news_id);
+
 export default function AgendaMakerPage() {
   const [title, setTitle] = useState('Monthly Meetup');
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [location, setLocation] = useState('');
-  const [items, setItems] = useState<AgendaItem[]>([
-    { id: newId(), text: 'Welcome & introductions', duration: 5, owner: '', note: '' },
-    { id: newId(), text: 'AI news roundup', duration: 15, owner: '', note: '' },
-    { id: newId(), text: 'Open discussion', duration: 15, owner: 'All', note: '' },
-    { id: newId(), text: 'Announcements & next steps', duration: 5, owner: '', note: '' },
-  ]);
+  const [items, setItems] = useState<AgendaItem[]>(defaultDraft);
   const [newItemText, setNewItemText] = useState('');
   const [drafting, setDrafting] = useState(false);
   const [draftError, setDraftError] = useState<string | null>(null);
@@ -71,8 +90,97 @@ export default function AgendaMakerPage() {
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [saving, setSaving] = useState(false);
+  const savePending = useRef(false);
+  // A new selection or replacement draft must not receive an older save's
+  // baseline, status, or preserved lines, even after switching away and back.
+  const draftSession = useRef(0);
   const [saveMsg, setSaveMsg] = useState<string | null>(null);
+  // The chosen event's agenda as it was when loaded into the draft; the save
+  // compares the stored agenda against it to keep another editor's additions.
+  const [loadedAgenda, setLoadedAgenda] = useState<SavedAgendaItem[]>([]);
   const [importing, setImporting] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [voted, setVoted] = useState<VotedArticlesState>({ status: 'loading' });
+  const [votedRefreshing, setVotedRefreshing] = useState(false);
+  const [hideDiscussed, setHideDiscussed] = useState(true);
+
+  // Voted news stories (general "next meeting" pool). A failed load stays an
+  // error state; it is never shown as "no votes".
+  const loadVoted = useCallback(async (uid: string | null) => {
+    if (!uid) { setVoted({ status: 'signed-out' }); return; }
+    setVotedRefreshing(true);
+    try {
+      const list = await fetchNewsDiscussion({ agendas: true });
+      setVoted({ status: 'ready', articles: list.articles, generatedAt: list.generated_at });
+    } catch (err) {
+      setVoted({ status: 'error', message: err instanceof Error ? err.message : 'Unknown error' });
+    } finally {
+      setVotedRefreshing(false);
+    }
+  }, []);
+
+  const fromSaved = (item: SavedAgendaItem, eventId: string): AgendaItem => ({
+    id: newId(),
+    text: item.title || '',
+    duration: 10,
+    owner: item.speaker || '',
+    note: item.notes || '',
+    link: item.link || undefined,
+    news_id: item.news_id || undefined,
+    time: item.time ?? null,
+    from_event: eventId,
+  });
+
+  // Choosing an event loads its saved agenda into the draft, exactly as stored,
+  // so that "Save agenda" keeps what is already there and adds what you change.
+  // Lines that came from the previously chosen event go back to that event,
+  // also when the new event has no agenda yet; your own lines stay.
+  const selectEvent = (id: string) => {
+    if (id === linkedEventId) return;
+    draftSession.current++;
+    setLinkedEventId(id);
+    setSaveMsg(null);
+    const event = upcomingEvents.find(e => e.id === id);
+    if (!event) { setLoadedAgenda([]); return; }
+    const stored = Array.isArray(event.agenda) ? event.agenda : [];
+    setLoadedAgenda(stored);
+    const merged = mergeSavedAgenda(items, stored, item => fromSaved(item, id), { pristine: isDefaultDraft(items) });
+    if (merged.loaded === 0 && merged.dropped === 0) return;
+    setItems(merged.items.length > 0 ? merged.items : defaultDraft());
+    const plural = (n: number) => (n === 1 ? '' : 's');
+    const title = `“${event.title}”`;
+    if (merged.loaded === 0) {
+      setSaveMsg(
+        merged.items.length > 0
+          ? `${title} has no saved agenda yet. Kept your ${merged.kept} draft item${plural(merged.kept)}; ${merged.dropped} item${plural(merged.dropped)} loaded from the previous event stay with that event.`
+          : `${title} has no saved agenda yet. The ${merged.dropped} item${plural(merged.dropped)} loaded from the previous event stay with that event, so the draft starts from the template.`,
+      );
+      return;
+    }
+    setSaveMsg(
+      merged.kept > 0
+        ? `Loaded ${merged.loaded} saved item${plural(merged.loaded)} from ${title}, followed by ${merged.kept} draft item${plural(merged.kept)} not on it yet. Saving writes all of them to the event.`
+        : `Loaded ${merged.loaded} saved item${plural(merged.loaded)} from ${title}. Saving writes this list back to the event.`,
+    );
+  };
+
+  const placement = (article: DiscussionArticle) => ({
+    onDraft: agendaContainsArticle(items, { news_id: article.news_id, source_url: article.source_url }),
+  });
+
+  const addArticle = (article: DiscussionArticle) => {
+    const result = appendArticles(items, [article], a => ({
+      id: newId(),
+      text: a.title || a.source_url,
+      duration: 10,
+      owner: '',
+      note: `${votesLabel(a.count)} from the news feed${a.source_name ? ` · ${a.source_name}` : ''}`,
+      link: a.source_url,
+      news_id: a.news_id,
+    }));
+    setItems(result.items);
+    setSaveMsg(result.added.length > 0 ? `Added “${article.title}” to the agenda.` : `“${article.title}” is already on this agenda.`);
+  };
 
   const importSuggestions = async () => {
     setImporting(true);
@@ -107,11 +215,13 @@ export default function AgendaMakerPage() {
       const events = await getUpcomingEvents();
       setUpcomingEvents(events);
       const user = await currentUser();
+      setUserId(user?.uid ?? null);
       if (user) {
         setIsAdmin((await getRow('app_admins', user.uid)) !== null);
       }
+      await loadVoted(user?.uid ?? null);
     })();
-  }, []);
+  }, [loadVoted]);
 
   const totalMin = useMemo(() => items.reduce((s, i) => s + (Number(i.duration) || 0), 0), [items]);
 
@@ -135,6 +245,7 @@ export default function AgendaMakerPage() {
     setNewItemText('');
   };
   const loadTemplate = (t: typeof TEMPLATES[number]) => {
+    draftSession.current++;
     setItems(t.items.map(i => ({ id: newId(), text: i.text, duration: i.duration, owner: i.owner || '', note: '' })));
   };
 
@@ -164,6 +275,7 @@ export default function AgendaMakerPage() {
       }
       // Convert AI items (which use {time, title, speaker, notes}) to our shape.
       // Pull a duration estimate from the time hint when present.
+      draftSession.current++;
       setItems(
         aiItems.map((it: { title: string; speaker?: string; notes?: string }, idx: number) => ({
           id: newId() + idx,
@@ -189,7 +301,7 @@ export default function AgendaMakerPage() {
       ...items.map((it, idx) =>
         `${idx + 1}. ${it.text} (${it.duration} min)${it.owner ? ` — ${it.owner}` : ''}${
           it.note ? `\n   Note: ${it.note}` : ''
-        }`,
+        }${it.link ? `\n   Link: ${it.link}` : ''}`,
       ),
     ];
     const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
@@ -200,21 +312,64 @@ export default function AgendaMakerPage() {
     URL.revokeObjectURL(a.href);
   };
 
+  // Saving runs as a transaction on the event: lines another editor stored
+  // since this draft was loaded are kept and shown, never overwritten.
   const saveToEvent = async () => {
-    if (!linkedEventId) return;
+    if (!linkedEventId || savePending.current) return;
+    const eventId = linkedEventId;
+    const session = draftSession.current;
+    savePending.current = true;
     setSaving(true);
     setSaveMsg(null);
-    const agenda = items
-      .filter(i => i.text.trim())
-      .map(i => ({
-        time: null,
-        title: i.text.trim(),
-        speaker: i.owner.trim() || null,
-        notes: i.note.trim() || null,
-      }));
-    const ok = await updateEvent(linkedEventId, { agenda });
-    setSaving(false);
-    setSaveMsg(ok ? 'Saved to event' : 'Failed to save — admin permission may be missing.');
+    let result: Awaited<ReturnType<typeof saveEventAgenda>>;
+    try {
+      const agenda: SavedAgendaItem[] = items
+        .filter(i => i.text.trim())
+        .map(i => ({
+          time: i.time ?? null,
+          title: i.text.trim(),
+          speaker: i.owner.trim() || null,
+          notes: i.note.trim() || null,
+          link: i.link?.trim() || null,
+          news_id: i.news_id || null,
+        }));
+      result = await saveEventAgenda(eventId, agenda, loadedAgenda);
+    } catch (error) {
+      if (session === draftSession.current) {
+        setSaveMsg(`Failed to save: ${error instanceof Error ? error.message : 'Please try again.'}`);
+      }
+      return;
+    } finally {
+      savePending.current = false;
+      setSaving(false);
+    }
+    if (result.ok) {
+      // The transaction still belongs in the event cache if its draft closed.
+      setUpcomingEvents(prev => prev.map(e => (e.id === eventId ? { ...e, agenda: result.agenda } : e)));
+      void loadVoted(userId);
+    }
+    if (session !== draftSession.current) return;
+    if (!result.ok) {
+      setSaveMsg(`Failed to save: ${result.error || 'admin permission may be missing.'}`);
+      return;
+    }
+    setLoadedAgenda(result.agenda);
+    if (result.preserved.length > 0) {
+      setItems(prev => {
+        // An editor may have added (and edited) the same article while the
+        // transaction was pending. Keep their current line by article identity.
+        const next = [...prev];
+        for (const item of result.preserved) {
+          if (!next.some(draft => sameSavedLine({ ...draft, title: draft.text }, item))) {
+            next.push(fromSaved(item, eventId));
+          }
+        }
+        return next;
+      });
+      setSaveMsg(`Saved to event. Kept ${result.preserved.length} item${result.preserved.length === 1 ? '' : 's'} another editor added since you loaded this agenda.`);
+    } else {
+      setSaveMsg('Saved to event');
+    }
   };
 
   return (
@@ -276,8 +431,8 @@ export default function AgendaMakerPage() {
           </button>
         </div>
 
-        {saveMsg && !isAdmin && (
-          <p className="text-xs text-foreground-muted">{saveMsg}</p>
+        {saveMsg && !(isAdmin && upcomingEvents.length > 0) && (
+          <p className="text-xs text-foreground-muted" role="status">{saveMsg}</p>
         )}
         {draftError && (
           <Alert variant="error" onClose={() => setDraftError(null)}>
@@ -343,6 +498,13 @@ export default function AgendaMakerPage() {
                   className="input-field min-w-0 w-full flex-1 text-xs"
                 />
               </div>
+              {item.link && (
+                <p className="text-[11px] text-foreground-muted sm:pl-7 mt-2 break-all">
+                  <Link2 className="w-3 h-3 inline mr-1" aria-hidden="true" />
+                  Source link kept with this item:{' '}
+                  <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{articleHost(item.link) ?? item.link}</a>
+                </p>
+              )}
             </div>
           ))}
         </div>
@@ -364,6 +526,18 @@ export default function AgendaMakerPage() {
           </button>
         </div>
 
+        {/* Voted news stories: explicit picks only, nothing is added on its own */}
+        <VotedArticles
+          state={voted}
+          selectedEventId={linkedEventId || null}
+          placement={placement}
+          hideDiscussed={hideDiscussed}
+          onHideDiscussedChange={setHideDiscussed}
+          onAdd={addArticle}
+          onRefresh={() => void loadVoted(userId)}
+          refreshing={votedRefreshing}
+        />
+
         {/* Save to event */}
         {isAdmin && upcomingEvents.length > 0 && (
           <div className="card p-4 mt-2">
@@ -373,7 +547,8 @@ export default function AgendaMakerPage() {
             <div className="flex flex-wrap items-center gap-2">
               <select
                 value={linkedEventId}
-                onChange={e => setLinkedEventId(e.target.value)}
+                onChange={e => selectEvent(e.target.value)}
+                aria-label="Event to save this agenda to"
                 className="input-field flex-1 min-w-0 w-full text-sm"
               >
                 <option value="">— Choose event —</option>
@@ -393,7 +568,7 @@ export default function AgendaMakerPage() {
               </button>
             </div>
             {saveMsg && (
-              <p className={`text-xs mt-2 ${saveMsg.includes('Failed') ? 'text-danger' : 'text-success'}`}>
+              <p role="status" className={`text-xs mt-2 ${saveMsg.includes('Failed') ? 'text-danger' : 'text-success'}`}>
                 {saveMsg}
               </p>
             )}
@@ -428,6 +603,11 @@ export default function AgendaMakerPage() {
                   <div className="text-[11px] text-foreground-faint mt-0.5">
                     {it.duration} min{it.owner ? ` · ${it.owner}` : ''}
                   </div>
+                  {it.link && (
+                    <a href={it.link} target="_blank" rel="noopener noreferrer" className="text-[11px] text-primary hover:underline inline-flex items-center gap-1 mt-0.5 break-all">
+                      <Link2 className="w-3 h-3 shrink-0" aria-hidden="true" />{articleHost(it.link) ?? it.link}
+                    </a>
+                  )}
                 </div>
               </div>
             ))

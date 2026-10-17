@@ -17,7 +17,9 @@ import type { Event } from '@/types/supabase';
 import { getEventById } from '@/lib/events';
 import { getRsvpedEventIds, saveRsvp, deleteRsvp, getEventAttendees } from '@/lib/rsvp';
 import { currentUser } from '@/lib/firebase/authClient';
+import { isCurrentUserAdmin } from '@/lib/isAdmin';
 import { describeRecurrence } from '@/lib/recurrence';
+import { articleHost } from '@/lib/agendaArticles';
 import CalendarExportButtons from '@/components/CalendarExportButtons';
 import AgendaSuggestions from '@/components/AgendaSuggestions';
 import { Button, Alert } from '@/components/ui';
@@ -34,6 +36,7 @@ export default function EventDetailsPage() {
   const [isRsvped, setIsRsvped] = useState(false);
   const [rsvpLoading, setRsvpLoading] = useState(false);
   const [attendeeCount, setAttendeeCount] = useState(0);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     if (!eventId) return;
@@ -48,8 +51,9 @@ export default function EventDetailsPage() {
       const uid = user?.uid || null;
       setUserId(uid);
       if (uid) {
-        const ids = await getRsvpedEventIds(uid);
+        const [ids, admin] = await Promise.all([getRsvpedEventIds(uid), isCurrentUserAdmin(uid)]);
         setIsRsvped(ids.includes(eventId));
+        setIsAdmin(admin);
       }
       setLoading(false);
     })();
@@ -254,6 +258,16 @@ export default function EventDetailsPage() {
           {/* Calendar exports */}
           <CalendarExportButtons event={event} />
 
+          {/* Organizer-only attendee list */}
+          {isAdmin && (
+            <Link href={`/events/rsvps?event=${encodeURIComponent(event.id)}`}>
+              <Button variant="secondary" size="sm">
+                <Users className="w-4 h-4" />
+                See who&apos;s RSVP&apos;d
+              </Button>
+            </Link>
+          )}
+
           {/* Share */}
           <Button variant="ghost" size="sm" onClick={handleShare} className="ml-auto">
             <Share2 className="w-4 h-4" />
@@ -285,6 +299,16 @@ export default function EventDetailsPage() {
                     <p className="text-sm text-foreground-muted mt-1 whitespace-pre-line">
                       {item.notes}
                     </p>
+                  )}
+                  {item?.link && articleHost(item.link) && (
+                    <a
+                      href={item.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block text-sm text-primary font-medium mt-1 break-all"
+                    >
+                      Read the article ↗ <span className="text-foreground-muted text-xs">{articleHost(item.link)}</span>
+                    </a>
                   )}
                 </div>
               </li>

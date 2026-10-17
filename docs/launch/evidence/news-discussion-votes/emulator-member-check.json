@@ -1,0 +1,325 @@
+{
+  "base": "http://localhost:4191",
+  "tag": "emulator",
+  "role": "member",
+  "email": "[qa email]",
+  "startedAt": "2026-09-13T23:21:10.789Z",
+  "apiResponses": [
+    {
+      "url": "/api/news/discussion",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:13.070Z"
+    },
+    {
+      "url": "/api/news/discussion",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:13.077Z"
+    },
+    {
+      "url": "/api/news/discussion",
+      "status": 401,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:13.083Z"
+    },
+    {
+      "url": "/api/news/discussion?ids=qa-story-a%2Cqa-story-b",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:17.308Z"
+    },
+    {
+      "url": "/api/news/discussion?ids=qa-story-a%2Cqa-story-b",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:17.318Z"
+    },
+    {
+      "url": "/api/news/discussion",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:18.503Z"
+    },
+    {
+      "url": "/api/news/discussion?ids=qa-story-a%2Cqa-story-b",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:20.920Z"
+    },
+    {
+      "url": "/api/news/discussion?ids=qa-story-a%2Cqa-story-b",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:20.933Z"
+    },
+    {
+      "url": "/api/news/discussion",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:22.109Z"
+    },
+    {
+      "url": "/api/news/discussion?ids=qa-story-a%2Cqa-story-b",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:22.548Z"
+    },
+    {
+      "url": "/api/news/discussion?ids=qa-story-a%2Cqa-story-b",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:22.556Z"
+    },
+    {
+      "url": "/api/news/discussion",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:23.728Z"
+    },
+    {
+      "url": "/api/news/discussion",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:24.126Z"
+    },
+    {
+      "url": "/api/news/discussion?ids=qa-story-a%2Cqa-story-b",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:24.590Z"
+    },
+    {
+      "url": "/api/news/discussion?ids=qa-story-a%2Cqa-story-b",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:24.598Z"
+    },
+    {
+      "url": "/api/news/discussion?agendas=1",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:27.935Z"
+    },
+    {
+      "url": "/api/news/discussion?agendas=1",
+      "status": 200,
+      "cacheControl": "private, no-store",
+      "at": "2026-09-13T23:21:30.883Z"
+    }
+  ],
+  "console": [
+    {
+      "type": "error",
+      "text": "Error fetching events: \nfalse for 'list' @ L50"
+    }
+  ],
+  "steps": [
+    {
+      "step": "anonymous-feed",
+      "path": "/news",
+      "voteButtons": 0,
+      "cards": 2
+    },
+    {
+      "step": "anonymous-api",
+      "get": 401,
+      "put": 401,
+      "bogus": 401
+    },
+    {
+      "step": "anonymous-agenda",
+      "state": "signed-out",
+      "rows": 0
+    },
+    {
+      "step": "sign-in",
+      "path": "/",
+      "sessionCookie": true
+    },
+    {
+      "step": "feed-card",
+      "storyId": "qa-story-a",
+      "title": "QA story A: agents that plan their own evals",
+      "hasButton": true,
+      "label": "I want to talk about this",
+      "pressed": "false",
+      "disabled": false,
+      "state": "open",
+      "badge": "0 votes",
+      "status": null,
+      "link": "https://example.com/qa/story-a?utm_source=rss"
+    },
+    {
+      "step": "feed-vote",
+      "title": "QA story A: agents that plan their own evals",
+      "hasButton": true,
+      "label": "I want to talk about this",
+      "pressed": "true",
+      "disabled": false,
+      "state": "voted",
+      "badge": "1 vote",
+      "status": "Counted. Organizers can add this story to the next agenda.",
+      "link": "https://example.com/qa/story-a?utm_source=rss"
+    },
+    {
+      "step": "screenshot",
+      "name": "emulator-member-news-desktop-dark"
+    },
+    {
+      "step": "screenshot",
+      "name": "emulator-member-news-desktop-light"
+    },
+    {
+      "step": "feed-reload",
+      "title": "QA story A: agents that plan their own evals",
+      "hasButton": true,
+      "label": "I want to talk about this",
+      "pressed": "true",
+      "disabled": false,
+      "state": "voted",
+      "badge": "1 vote",
+      "status": null,
+      "link": "https://example.com/qa/story-a?utm_source=rss"
+    },
+    {
+      "step": "feed-withdraw",
+      "title": "QA story A: agents that plan their own evals",
+      "hasButton": true,
+      "label": "I want to talk about this",
+      "pressed": "false",
+      "disabled": false,
+      "state": "open",
+      "badge": "0 votes",
+      "status": "Vote withdrawn.",
+      "link": "https://example.com/qa/story-a?utm_source=rss"
+    },
+    {
+      "step": "feed-reload-2",
+      "title": "QA story A: agents that plan their own evals",
+      "hasButton": true,
+      "label": "I want to talk about this",
+      "pressed": "false",
+      "disabled": false,
+      "state": "open",
+      "badge": "0 votes",
+      "status": null,
+      "link": "https://example.com/qa/story-a?utm_source=rss"
+    },
+    {
+      "step": "feed-vote-b",
+      "title": "QA story B: a policy brief on model licensing",
+      "hasButton": true,
+      "label": "I want to talk about this",
+      "pressed": "true",
+      "disabled": false,
+      "state": "voted",
+      "badge": "1 vote",
+      "status": "Counted. Organizers can add this story to the next agenda.",
+      "link": "https://example.com/qa/story-b"
+    },
+    {
+      "step": "screenshot",
+      "name": "emulator-member-news-mobile-dark"
+    },
+    {
+      "step": "screenshot",
+      "name": "emulator-member-news-mobile-light"
+    },
+    {
+      "step": "news-mobile",
+      "scrollWidth": 390,
+      "clientWidth": 390
+    },
+    {
+      "step": "agenda-panel",
+      "state": "ready",
+      "rows": [
+        {
+          "id": "qa-story-a",
+          "onDraft": "false",
+          "title": "QA story A: agents that plan their own evals",
+          "link": "https://example.com/qa/story-a?utm_source=rss",
+          "badges": [
+            "1 vote"
+          ],
+          "addLabel": "Add",
+          "addDisabled": false
+        }
+      ],
+      "hasSave": false,
+      "hasSelect": false,
+      "hidden": "1"
+    },
+    {
+      "step": "agenda-add",
+      "row": {
+        "id": "qa-story-a",
+        "onDraft": "true",
+        "title": "QA story A: agents that plan their own evals",
+        "link": "https://example.com/qa/story-a?utm_source=rss",
+        "badges": [
+          "On this agenda",
+          "1 vote"
+        ],
+        "addLabel": "Added",
+        "addDisabled": true
+      },
+      "items": [
+        "Welcome & introductions",
+        "AI news roundup",
+        "Open discussion",
+        "Announcements & next steps",
+        "QA story A: agents that plan their own evals"
+      ],
+      "links": [
+        "https://example.com/qa/story-a?utm_source=rss"
+      ],
+      "status": "Added “QA story A: agents that plan their own evals” to the agenda."
+    },
+    {
+      "step": "screenshot",
+      "name": "emulator-member-agenda-desktop-dark"
+    },
+    {
+      "step": "screenshot",
+      "name": "emulator-member-agenda-desktop-light"
+    },
+    {
+      "step": "agenda-show-discussed",
+      "rowB": {
+        "id": "qa-story-b",
+        "onDraft": "false",
+        "title": "QA story B: a policy brief on model licensing",
+        "link": "https://example.com/qa/story-b",
+        "badges": [
+          "Discussed Aug 1, 2026",
+          "1 vote"
+        ],
+        "addLabel": "Add",
+        "addDisabled": false
+      }
+    },
+    {
+      "step": "screenshot",
+      "name": "emulator-member-agenda-mobile-dark"
+    },
+    {
+      "step": "screenshot",
+      "name": "emulator-member-agenda-mobile-light"
+    },
+    {
+      "step": "agenda-mobile",
+      "scrollWidth": 390,
+      "clientWidth": 390
+    },
+    {
+      "step": "sign-out",
+      "status": 200
+    }
+  ],
+  "storyId": "qa-story-a",
+  "storyLink": "https://example.com/qa/story-a?utm_source=rss",
+  "result": "passed",
+  "finishedAt": "2026-09-13T23:21:35.183Z"
+}
