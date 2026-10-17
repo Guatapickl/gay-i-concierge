@@ -1,0 +1,1 @@
+{"pending_or_sending":0,"event_reminders_enabled":false}
