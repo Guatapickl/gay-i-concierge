@@ -1,0 +1,10 @@
+--- POST invalid status, anonymous (expect 400 from the new validation):
+{"error":"status must be yes, maybe or no"}
+HTTP 400
+--- POST maybe, anonymous (expect 401):
+{"error":"unauthorized"}
+HTTP 401
+--- answer link signed out (expect redirect to sign-in with next):
+HTTP 307 -> https://gayiclub.com/auth/sign-in?next=%2Fevents%2Fpoll-ed363749bcccfa8a7ba4a3ec4420a69a169565b5%3Frsvp%3Dmaybe
+--- remind route still gated:
+HTTP 401
