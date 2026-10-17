@@ -1,0 +1,17 @@
+
+=== Deploying to 'gayiclub'...
+
+i  deploying apphosting
+i  apphosting: Found backend(s) gayiclub-web
+i  apphosting: Zipped source for backend gayiclub-web
+i  apphosting: Uploading source for backend gayiclub-web...
+i  apphosting: Uploaded at gs://firebaseapphosting-sources-692568338842-us-east4/gayiclub-web--6752-9NDRdtVx07U8-.zip
+i  apphosting: You may also track the rollout(s) at:
+	https://console.firebase.google.com/project/gayiclub/apphosting
+- Starting rollout(s) for backend(s) gayiclub-web; this may take a few minutes. It's safe to exit now.
+
+⚠  apphosting: Rollout for backend gayiclub-web failed.
+⬢  apphosting: FirebaseError: Failed to build your app. Please inspect the build logs at https://console.cloud.google.com/cloud-build/builds;region=us-east4/2d846a27-4051-43de-8bf6-e26b9e371219?project=692568338842
+
+Error: One or more rollouts failed. Please review the errors above and try again.
+deploy exit 1
