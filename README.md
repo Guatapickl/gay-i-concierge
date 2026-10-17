@@ -38,6 +38,10 @@ SUPABASE_SERVICE_ROLE_KEY=...  # server-only, used by alerts endpoints in produc
 
 Note: Ensure Supabase RLS policies allow the intended anon operations or move sensitive mutations server-side.
 
+## Turning the automatic 24h / 1h reminders on or off
+
+The automatic event reminders (sent to members who RSVP'd yes or maybe and opted into club email) have an organizer switch in Firestore: document `app_settings/reminders`, field `event_reminders_enabled`. `false` stops new reminders from being scheduled and cancels queued ones as they come due; `true` (or no document) resumes them. Organizer-sent meeting reminders are not affected. Flip it from the Firebase console or with the Admin SDK; only the server can read or write it.
+
 ## Sending a meeting reminder email
 
 Organizers can email everyone who has signed up at gayiclub.com about an upcoming meeting.

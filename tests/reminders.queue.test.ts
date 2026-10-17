@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 type Row = Record<string, unknown>;
-const state = vi.hoisted(() => ({ rows: new Map<string, Row>(), optedIn: true, rsvp: { exists: true, status: 'yes' as string | undefined }, serial: Promise.resolve(), beforeClaim: null as null | (() => void) }));
+const state = vi.hoisted(() => ({ rows: new Map<string, Row>(), optedIn: true, rsvp: { exists: true, status: 'yes' as string | undefined }, remindersEnabled: undefined as boolean | undefined, serial: Promise.resolve(), beforeClaim: null as null | (() => void) }));
 vi.mock('@/lib/firebase/admin', () => ({ adminDb: () => ({
   collection: (name: string) => {
     const query = {
@@ -13,7 +13,9 @@ vi.mock('@/lib/firebase/admin', () => ({ adminDb: () => ({
         update: async (data: Row) => { state.rows.set(id, { ...state.rows.get(id), ...data }); },
         get: async () => name === 'rsvps'
           ? { exists: state.rsvp.exists, data: () => ({ status: state.rsvp.status }) }
-          : { exists: state.rows.has(id), data: () => ({ ...state.rows.get(id) }) },
+          : name === 'app_settings'
+            ? { exists: state.remindersEnabled !== undefined, data: () => ({ event_reminders_enabled: state.remindersEnabled }) }
+            : { exists: state.rows.has(id), data: () => ({ ...state.rows.get(id) }) },
       }),
     };
     return query;
@@ -35,7 +37,7 @@ import { sendEmail } from '@/lib/email';
 import { processDueReminders } from '@/lib/reminders';
 
 beforeEach(() => {
-  vi.clearAllMocks(); state.rows.clear(); state.optedIn = true; state.rsvp = { exists: true, status: 'yes' }; state.serial = Promise.resolve(); state.beforeClaim = null;
+  vi.clearAllMocks(); state.rows.clear(); state.optedIn = true; state.rsvp = { exists: true, status: 'yes' }; state.remindersEnabled = undefined; state.serial = Promise.resolve(); state.beforeClaim = null;
   state.rows.set('queue-1', { status: 'pending', kind: 'poll_invite', send_at: '2020-01-01T00:00:00Z', attempts: 0, recipient_email: 'member@example.com', subject: 'Vote', body_html: '<p>Vote</p>' });
 });
 describe('reminder delivery claims', () => {
@@ -72,6 +74,22 @@ describe('reminder delivery claims', () => {
     state.rsvp = { exists: true, status: 'maybe' };
     await processDueReminders();
     expect(sendEmail).toHaveBeenCalledTimes(1);
+    expect(state.rows.get('queue-1')?.status).toBe('sent');
+  });
+  it('cancels event reminders while the organizer switch is off, and leaves other mail alone', async () => {
+    state.rows.set('queue-1', { ...state.rows.get('queue-1'), kind: 'event_reminder', event_id: 'ev-1', recipient_user_id: 'u-1' });
+    state.rows.set('queue-2', { status: 'pending', kind: 'meeting_reminder', send_at: '2020-01-01T00:00:00Z', attempts: 0, recipient_email: 'member@example.com', subject: 'Reminder', body_html: '<p>Hi</p>' });
+    state.remindersEnabled = false;
+    await processDueReminders();
+    expect(state.rows.get('queue-1')?.status).toBe('cancelled');
+    expect(state.rows.get('queue-1')?.error).toContain('turned off');
+    expect(state.rows.get('queue-2')?.status).toBe('sent');
+    expect(sendEmail).toHaveBeenCalledTimes(1);
+
+    // Switched back on (or no switch document at all): event reminders send again.
+    state.rows.set('queue-1', { ...state.rows.get('queue-1'), status: 'pending' });
+    state.remindersEnabled = true;
+    await processDueReminders();
     expect(state.rows.get('queue-1')?.status).toBe('sent');
   });
   it('retains nonpoll delivery and stable provider keys across retries', async () => {

@@ -14,6 +14,23 @@ import type { Event, EmailReminder } from '@/types/supabase';
 
 const REMINDER_OFFSETS_HOURS = [24, 1] as const;
 
+/**
+ * Organizer switch for the automatic 24h/1h event reminders, stored in
+ * Firestore at `app_settings/reminders` (`event_reminders_enabled`). A
+ * missing document means enabled. Set it to false to stop scheduling new
+ * reminders and to cancel queued ones as they come due; set it back to
+ * true to resume. Organizer-sent meeting reminders are not affected.
+ */
+export async function eventRemindersEnabled(): Promise<boolean> {
+  try {
+    const snap = await adminDb().collection('app_settings').doc('reminders').get();
+    return snap.exists ? snap.data()?.event_reminders_enabled !== false : true;
+  } catch (err) {
+    console.error('Failed to read the reminders switch, assuming enabled:', (err as Error).message);
+    return true;
+  }
+}
+
 /** Firestore `in` accepts ≤30 values. Local copy so this module never imports the client SDK. */
 function chunk<T>(arr: T[], size = 30): T[][] {
   const out: T[][] = [];
@@ -36,6 +53,7 @@ export async function scheduleEventReminders(eventId: string): Promise<{
   skipped: number;
 }> {
   const db = adminDb();
+  if (!(await eventRemindersEnabled())) return { scheduled: 0, skipped: 0 };
   const ev = await getEvent(eventId);
   if (!ev) return { scheduled: 0, skipped: 0 };
 
@@ -195,6 +213,7 @@ export async function processDueReminders(limit = 50): Promise<{
     return { attempted: 0, sent: 0, failed: 0 };
   }
   if (due.length === 0) return { attempted: 0, sent: 0, failed: 0 };
+  const eventRemindersOn = due.some(r => r.kind === 'event_reminder') ? await eventRemindersEnabled() : true;
 
   let attempted = 0;
   let sent = 0;
@@ -224,6 +243,11 @@ export async function processDueReminders(limit = 50): Promise<{
           await docRef.update({ status: 'cancelled', error: 'Poll invitation cancelled: recipient is not opted in.' });
           continue;
         }
+      }
+      // The organizer can switch automatic event reminders off entirely.
+      if (row.kind === 'event_reminder' && !eventRemindersOn) {
+        await docRef.update({ status: 'cancelled', error: 'Event reminder cancelled: automatic reminders are turned off.' });
+        continue;
       }
       // Event reminders follow the member's current answer: a withdrawn
       // RSVP or a "can't make it" given after queueing stops the reminder.

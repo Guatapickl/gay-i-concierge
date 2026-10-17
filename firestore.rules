@@ -16,6 +16,9 @@ service cloud.firestore {
     function owns(field) { return signedIn() && resource.data[field] == uid(); }
     function willOwn(field) { return signedIn() && request.resource.data[field] == uid(); }
 
+    // ---- server-only switches (e.g. app_settings/reminders); Admin SDK only
+    match /app_settings/{id} { allow read, write: if false; }
+
     // ---- admin roster (read-only for clients; managed in console/Admin SDK)
     match /app_admins/{userId} {
       allow read: if signedIn();
