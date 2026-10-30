@@ -9,6 +9,7 @@ import { adminDb } from './firebase/admin';
 import { adminPayloadOf, adminRowOf } from './firebase/adminDb';
 import { eventReminderEmail, rsvpConfirmationEmail } from './emailTemplates';
 import { sendEmail } from './email';
+import { listUnsubscribedEmails } from './meetingReminders';
 import { isAttending, rsvpStatusOf, type RsvpStatus } from './rsvpStatus';
 import type { Event, EmailReminder } from '@/types/supabase';
 
@@ -234,13 +235,12 @@ export async function processDueReminders(limit = 50): Promise<{
     attempted += 1;
 
     try {
-      // Poll invitations are opt-in updates. Recheck just before sending so
+      // Poll invitations go to registered members. Recheck just before sending so
       // an unsubscribe made after queueing still prevents delivery.
       if (row.kind === 'poll_invite') {
-        const subscribers = await db.collection('alerts_subscribers')
-          .where('email', '==', row.recipient_email).get();
-        if (!subscribers.docs.length || !subscribers.docs.every(s => s.data().email_opt_in === true)) {
-          await docRef.update({ status: 'cancelled', error: 'Poll invitation cancelled: recipient is not opted in.' });
+        const unsubscribed = await listUnsubscribedEmails(db, [row.recipient_email]);
+        if (unsubscribed.has(row.recipient_email.trim().toLowerCase())) {
+          await docRef.update({ status: 'cancelled', error: 'Poll invitation cancelled: recipient unsubscribed from club email.' });
           continue;
         }
       }

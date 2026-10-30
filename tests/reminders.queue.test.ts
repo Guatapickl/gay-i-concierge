@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 type Row = Record<string, unknown>;
-const state = vi.hoisted(() => ({ rows: new Map<string, Row>(), optedIn: true, rsvp: { exists: true, status: 'yes' as string | undefined }, remindersEnabled: undefined as boolean | undefined, serial: Promise.resolve(), beforeClaim: null as null | (() => void) }));
+const state = vi.hoisted(() => ({ rows: new Map<string, Row>(), optedIn: true, subscriberRows: null as null | Record<string, unknown>[], rsvp: { exists: true, status: 'yes' as string | undefined }, remindersEnabled: undefined as boolean | undefined, serial: Promise.resolve(), beforeClaim: null as null | (() => void) }));
 vi.mock('@/lib/firebase/admin', () => ({ adminDb: () => ({
   collection: (name: string) => {
     const query = {
       where: () => query, orderBy: () => query, limit: () => query,
       get: async () => name === 'alerts_subscribers'
-        ? { empty: false, docs: [{ data: () => ({ email_opt_in: state.optedIn }) }] }
+        ? { empty: false, docs: (state.subscriberRows ?? [{ email: 'member@example.com', email_opt_in: state.optedIn }]).map(row => ({ data: () => row })) }
         : { docs: [...state.rows].filter(([, row]) => row.status === 'pending').map(([id, row]) => ({ id, exists: true, data: () => ({ ...row }) })) },
       doc: (id: string) => ({
         id,
@@ -37,7 +37,7 @@ import { sendEmail } from '@/lib/email';
 import { processDueReminders } from '@/lib/reminders';
 
 beforeEach(() => {
-  vi.clearAllMocks(); state.rows.clear(); state.optedIn = true; state.rsvp = { exists: true, status: 'yes' }; state.remindersEnabled = undefined; state.serial = Promise.resolve(); state.beforeClaim = null;
+  vi.clearAllMocks(); state.rows.clear(); state.optedIn = true; state.subscriberRows = null; state.rsvp = { exists: true, status: 'yes' }; state.remindersEnabled = undefined; state.serial = Promise.resolve(); state.beforeClaim = null;
   state.rows.set('queue-1', { status: 'pending', kind: 'poll_invite', send_at: '2020-01-01T00:00:00Z', attempts: 0, recipient_email: 'member@example.com', subject: 'Vote', body_html: '<p>Vote</p>' });
 });
 describe('reminder delivery claims', () => {
@@ -54,6 +54,21 @@ describe('reminder delivery claims', () => {
   });
   it('honors a poll invitation opt-out after it was queued', async () => {
     state.optedIn = false;
+    await processDueReminders();
+    expect(sendEmail).not.toHaveBeenCalled();
+    expect(state.rows.get('queue-1')?.status).toBe('cancelled');
+  });
+  it('delivers a registered member invitation without a subscription record', async () => {
+    state.subscriberRows = [];
+    await processDueReminders();
+    expect(sendEmail).toHaveBeenCalledTimes(1);
+    expect(state.rows.get('queue-1')?.status).toBe('sent');
+  });
+  it('honors a normalized explicit opt-out even when another record is opted in', async () => {
+    state.subscriberRows = [
+      { email: 'member@example.com', email_opt_in: true },
+      { email: ' MEMBER@example.com ', email_opt_in: false },
+    ];
     await processDueReminders();
     expect(sendEmail).not.toHaveBeenCalled();
     expect(state.rows.get('queue-1')?.status).toBe('cancelled');

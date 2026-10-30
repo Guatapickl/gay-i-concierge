@@ -334,6 +334,10 @@ export default function PollPage() {
             </Button>
           </div>
 
+          <p className="text-xs text-foreground-faint">
+            Vote invitations go to all registered members except those who opted out of club email. Members already invited to this poll are skipped.
+          </p>
+
           {!poll.event_id && (
             <div className="space-y-3 pt-2 border-t border-border">
               <div className="flex items-center gap-2">

@@ -356,8 +356,11 @@ ${button('Rank the dates', voteUrl)}
     '',
     `Rank the dates you can attend and mark any you can't make: ${voteUrl}`,
     'A clear winner is booked automatically; Robert decides ties.',
+    '',
+    "You're receiving this because you have a Gay I Club account at gayiclub.com.",
+    `Unsubscribe from club email: ${SITE_URL}/alerts/unsubscribe`,
   ].join('\n');
-  return { subject, html: shell({ title: subject, preheader: 'Rank the dates for our next meeting', body }), text };
+  return { subject, html: shell({ title: subject, preheader: 'Rank the dates for our next meeting', body, footer: `You're receiving this because you have a Gay I Club account at gayiclub.com.` }), text };
 }
 
 /** Announce the booked meeting after a poll closes. */

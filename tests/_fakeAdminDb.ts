@@ -18,6 +18,7 @@ type Filter = { field: string; op: string; value: unknown };
 export class FakeAdminDb {
   readonly collections = new Map<string, Map<string, Record<string, unknown>>>();
   private counter = 0;
+  private serial: Promise<unknown> = Promise.resolve();
 
   seed(name: string, docs: FakeDoc[]) {
     const col = this.col(name);
@@ -90,6 +91,27 @@ export class FakeAdminDb {
         };
       },
     };
+  }
+
+  runTransaction<T>(update: (tx: {
+    get: (ref: { collection: string; id: string }) => Promise<{ exists: boolean }>;
+    create: (ref: { collection: string; id: string }, data: Record<string, unknown>) => void;
+  }) => Promise<T>): Promise<T> {
+    const execute = async () => {
+      const ops: (() => void)[] = [];
+      const result = await update({
+        get: async ref => ({ exists: this.col(ref.collection).has(ref.id) }),
+        create: (ref, data) => {
+          if (this.col(ref.collection).has(ref.id)) throw new Error('already exists');
+          ops.push(() => this.col(ref.collection).set(ref.id, { ...data }));
+        },
+      });
+      for (const op of ops) op();
+      return result;
+    };
+    const result = this.serial.then(execute);
+    this.serial = result.then(() => undefined, () => undefined);
+    return result;
   }
 
   batch() {

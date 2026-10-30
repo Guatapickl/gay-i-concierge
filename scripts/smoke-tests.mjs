@@ -34,7 +34,7 @@ console.log('Running smoke tests...');
 // Core pages and APIs
 has('app/events/page.tsx');
 has('app/events/[id]/page.tsx');
-contains('app/events/page.tsx', /getRsvpedEventIds/, 'events page loads member RSVP state');
+contains('app/events/page.tsx', /getRsvpStatuses\(uid\)/, 'events page loads member RSVP state');
 has('app/alerts/page.tsx');
 has('app/alerts/unsubscribe/page.tsx');
 has('app/alerts/confirm/page.tsx');

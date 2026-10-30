@@ -1,7 +1,9 @@
+import { createHash } from 'node:crypto';
 import { NextResponse } from 'next/server';
-import { adminDb, isAdminUid, userFromRequest } from '@/lib/firebase/admin';
+import { adminAuth, adminDb, isAdminUid, userFromRequest } from '@/lib/firebase/admin';
 import { adminPayloadOf, adminRowOf } from '@/lib/firebase/adminDb';
 import { pollInviteEmail, pollResultEmail } from '@/lib/emailTemplates';
+import { listAccountEmails, listUnsubscribedEmails } from '@/lib/meetingReminders';
 import type { Event, MeetingPoll, MeetingPollOption } from '@/types/supabase';
 
 export const runtime = 'nodejs';
@@ -17,7 +19,7 @@ function chunk<T>(arr: T[], size = 30): T[][] {
  * Admin-only. Queues poll emails into `email_reminders` so the existing
  * reminder cron delivers them (Resend transport, retries, audit trail).
  *
- *   { type: 'invite' }  → every opted-in email subscriber gets "rank the dates"
+ *   { type: 'invite' }  → every registered member except opt-outs gets "rank the dates"
  *   { type: 'result' }  → every opted-in subscriber gets the booked meeting
  *
  * Idempotent per (poll, recipient, type): re-running never double-sends.
@@ -65,33 +67,57 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     ({ subject, html, text } = pollResultEmail(poll, event));
   }
 
-  // Recipients: every member who opted into club email.
-  const subSnap = await db.collection('alerts_subscribers').where('email_opt_in', '==', true).get();
-  const recipients = subSnap.docs
-    .map(d => d.data() as { email?: string | null; user_id?: string | null })
-    .filter(s => !!s.email)
-    .map(s => ({ email: s.email as string, user_id: s.user_id ?? null }));
+  let recipients: { email: string; user_id: string | null }[];
+  if (type === 'invite') {
+    const { byEmail } = await listAccountEmails(adminAuth());
+    const unsubscribed = await listUnsubscribedEmails(db, [...byEmail.keys()]);
+    recipients = [...byEmail]
+      .filter(([email]) => !unsubscribed.has(email) && !/@(?:[^@]+\.)?example\.(?:com|org|net)$/.test(email))
+      .map(([email, user_id]) => ({ email, user_id }));
+  } else {
+    // Result announcements retain their existing opted-in subscriber audience.
+    const subSnap = await db.collection('alerts_subscribers').where('email_opt_in', '==', true).get();
+    recipients = subSnap.docs
+      .map(d => d.data() as { email?: string | null; user_id?: string | null })
+      .filter(s => !!s.email)
+      .map(s => ({ email: s.email as string, user_id: s.user_id ?? null }));
+  }
   if (recipients.length === 0) {
-    return NextResponse.json({ ok: true, queued: 0, skipped: 0, note: 'no opted-in email subscribers' });
+    return NextResponse.json({ ok: true, queued: 0, skipped: 0, note: 'no eligible email recipients' });
   }
 
   const kind = type === 'invite' ? 'poll_invite' : 'poll_result';
   const marker = `poll:${pollId}:${kind}`;
+  const invitationQueueId = (email: string) => createHash('sha256').update(`${pollId}:poll_invite:${email}`).digest('hex');
   const done = new Set<string>();
-  for (const emails of chunk(recipients.map(r => r.email))) {
-    const snap = await db
-      .collection('email_reminders')
-      .where('kind', '==', kind)
-      .where('subject', '==', subject)
-      .where('recipient_email', 'in', emails)
-      .get();
-    for (const d of snap.docs) done.add((d.data() as { recipient_email: string }).recipient_email);
+  if (type === 'invite') {
+    // Legacy invitations store the poll in their body marker. Include the
+    // owner's one-time administrative sends without relying on a mutable title.
+    const snap = await db.collection('email_reminders')
+      .where('kind', 'in', ['poll_invite', 'admin_poll_invite']).get();
+    const eligible = new Set(recipients.map(r => r.email));
+    for (const doc of snap.docs) {
+      const row = doc.data();
+      const email = typeof row.recipient_email === 'string' ? row.recipient_email.trim().toLowerCase() : '';
+      if (eligible.has(email) && (row.poll_id === pollId || row.body_text?.includes(`[${marker}]`) || doc.id === invitationQueueId(email))) done.add(email);
+    }
+  } else {
+    for (const emails of chunk(recipients.map(r => r.email))) {
+      const snap = await db
+        .collection('email_reminders')
+        .where('kind', '==', kind)
+        .where('subject', '==', subject)
+        .where('recipient_email', 'in', emails)
+        .get();
+      for (const d of snap.docs) done.add((d.data() as { recipient_email: string }).recipient_email);
+    }
   }
 
   const now = new Date().toISOString();
   const rows = recipients
     .filter(r => !done.has(r.email))
     .map(r => ({
+      poll_id: pollId,
       event_id: eventId,
       recipient_email: r.email,
       recipient_user_id: r.user_id,
@@ -108,17 +134,33 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       created_at: now,
     }));
 
+  let queued = 0;
   if (rows.length > 0) {
     try {
       const col = db.collection('email_reminders');
-      for (const part of chunk(rows, 400)) {
-        const batch = db.batch();
-        for (const row of part) batch.set(col.doc(), adminPayloadOf(row));
-        await batch.commit();
+      if (type === 'invite') {
+        // Use the automation's stable ID and an atomic create so concurrent
+        // organizer clicks (or automation retries) cannot queue another copy.
+        for (const row of rows) {
+          const ref = col.doc(invitationQueueId(row.recipient_email));
+          const created = await db.runTransaction(async tx => {
+            if ((await tx.get(ref)).exists) return false;
+            tx.create(ref, adminPayloadOf(row));
+            return true;
+          });
+          if (created) queued += 1;
+        }
+      } else {
+        for (const part of chunk(rows, 400)) {
+          const batch = db.batch();
+          for (const row of part) batch.set(col.doc(), adminPayloadOf(row));
+          await batch.commit();
+          queued += part.length;
+        }
       }
     } catch (e) {
       return NextResponse.json({ error: e instanceof Error ? e.message : 'queue failed' }, { status: 500 });
     }
   }
-  return NextResponse.json({ ok: true, queued: rows.length, skipped: done.size });
+  return NextResponse.json({ ok: true, queued, skipped: done.size + rows.length - queued });
 }

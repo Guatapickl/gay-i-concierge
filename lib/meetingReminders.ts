@@ -130,13 +130,14 @@ export async function listAccountEmails(auth: Auth): Promise<{ byEmail: Map<stri
 /** Emails with an explicit club-email unsubscribe on file. */
 export async function listUnsubscribedEmails(db: Firestore, emails: string[]): Promise<Set<string>> {
   const out = new Set<string>();
-  for (const part of chunk(emails)) {
-    const snap = await db.collection('alerts_subscribers').where('email', 'in', part).get();
-    for (const doc of snap.docs) {
-      const data = doc.data();
-      const email = normalizeEmail(data.email);
-      if (email && data.email_opt_in === false) out.add(email);
-    }
+  if (emails.length === 0) return out;
+  const candidates = new Set(emails.map(email => email.trim().toLowerCase()));
+  // Match legacy mixed-case addresses as well as normalized subscriptions.
+  const snap = await db.collection('alerts_subscribers').where('email_opt_in', '==', false).get();
+  for (const doc of snap.docs) {
+    const data = doc.data();
+    const email = normalizeEmail(data.email);
+    if (email && data.email_opt_in === false && candidates.has(email)) out.add(email);
   }
   return out;
 }
