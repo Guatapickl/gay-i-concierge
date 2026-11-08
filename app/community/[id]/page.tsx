@@ -15,6 +15,7 @@ import { currentUser } from '@/lib/firebase/authClient';
 import { getRow } from '@/lib/firebase/db';
 import { LoadingSpinner } from '@/components/ui';
 import type { DirectoryMember } from '@/lib/directory';
+import { memberDisplayName } from '@/lib/memberName';
 
 const EXPERIENCE_CONFIG: Record<string, { label: string; description: string; color: string; icon: React.ReactNode }> = {
   none: {
@@ -184,7 +185,7 @@ export default function MemberProfilePage() {
               <div className="flex items-start justify-between gap-3 flex-wrap">
                 <div>
                   <h1 className="text-display-md font-display text-foreground">
-                    {member.full_name || 'Anonymous Member'}
+                    {memberDisplayName(member.full_name)}
                   </h1>
                   <div className="flex items-center gap-3 mt-2 flex-wrap">
                     <span

@@ -1,5 +1,6 @@
 import { it, expect, vi, beforeEach } from 'vitest';
 import { existsSync } from 'node:fs';
+import { basicProfile } from '@/lib/firebase/userProfiles';
 const { userFromRequest, get } = vi.hoisted(() => ({ userFromRequest: vi.fn(), get: vi.fn() }));
 vi.mock('@/lib/firebase/admin', () => ({ userFromRequest, adminDb: () => ({ collection: () => ({ get, orderBy: () => ({ get }), doc: () => ({ get }) }) }) }));
 beforeEach(() => { vi.clearAllMocks(); });
@@ -28,4 +29,15 @@ it('includes profiles that have no creation timestamp', async () => {
   userFromRequest.mockResolvedValue({ uid: 'member' });
   get.mockResolvedValue({ docs: [{ id: 'new', data: () => ({ full_name: 'New member', updated_at: '2026-01-01' }) }] });
   expect((await (await GET(new Request('https://example.test/api/directory'))).json()).members[0]).toMatchObject({ id: 'new', full_name: 'New member' });
+});
+
+it('lists a sign-up or backfill profile with a null name and never an email', async () => {
+  const { GET } = await import('@/app/api/directory/route');
+  userFromRequest.mockResolvedValue({ uid: 'member' });
+  const auto = basicProfile({ uid: 'quiet', displayName: undefined, metadata: { creationTime: 'Sun, 06 Sep 2026 14:03:11 GMT' } });
+  get.mockResolvedValue({ docs: [{ id: 'quiet', data: () => auto }] });
+  const res = await GET(new Request('https://example.test/api/directory'));
+  const body = await res.json();
+  expect(body).toEqual({ members: [{ id: 'quiet', full_name: null, experience_level: null, interests: null, created_at: '2026-09-06T14:03:11.000Z' }] });
+  expect(JSON.stringify(body)).not.toContain('@');
 });

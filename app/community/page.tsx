@@ -8,6 +8,7 @@ import { getDirectoryMembers } from '@/lib/directory';
 import { LoadingSpinner } from '@/components/ui';
 import InviteCard from '@/components/InviteCard';
 import type { DirectoryMember } from '@/lib/directory';
+import { memberDisplayName } from '@/lib/memberName';
 
 const EXPERIENCE_LABELS: Record<string, { label: string; color: string }> = {
   none: { label: 'New to AI', color: '#a8a29e' },
@@ -268,7 +269,7 @@ function MemberCard({ member }: { member: DirectoryMember }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2">
             <h3 className="text-sm font-bold text-foreground truncate group-hover:text-primary-muted transition-colors">
-              {member.full_name || 'Anonymous Member'}
+              {memberDisplayName(member.full_name)}
             </h3>
             <ArrowRight className="w-3.5 h-3.5 text-foreground-faint opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" />
           </div>
