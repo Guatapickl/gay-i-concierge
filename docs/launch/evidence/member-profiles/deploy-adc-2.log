@@ -1,0 +1,22 @@
+=== deploy start 2026-11-08T00:29:46Z commit 0594687b48a2fd0eaad4c8170ceac2565a4613a1
+
+=== Deploying to 'gayiclub'...
+
+i  deploying apphosting
+i  apphosting: Found backend(s) gayiclub-web
+i  apphosting: Zipped source for backend gayiclub-web
+i  apphosting: Uploading source for backend gayiclub-web...
+i  apphosting: Uploaded at gs://firebaseapphosting-sources-692568338842-us-east4/gayiclub-web--26970-T7Q0MZPvgjAR-.zip
+i  apphosting: You may also track the rollout(s) at:
+	https://console.firebase.google.com/project/gayiclub/apphosting
+- Starting rollout(s) for backend(s) gayiclub-web; this may take a few minutes. It's safe to exit now.
+
+✔  apphosting: Rollout for backend gayiclub-web complete!
+✔  apphosting: Your backend is now deployed at:
+	https://gayiclub-web--gayiclub.us-east4.hosted.app
+
+✔  Deploy complete!
+
+Project Console: https://console.firebase.google.com/project/gayiclub/overview
+DEPLOY_EXIT=0
+=== deploy end 2026-11-08T00:33:52Z
