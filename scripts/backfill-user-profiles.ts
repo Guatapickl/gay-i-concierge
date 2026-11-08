@@ -24,7 +24,8 @@ const apply = args.includes('--apply');
 const projectFlag = args.indexOf('--project');
 if (projectFlag !== -1) process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID = args[projectFlag + 1];
 const unknown = args.filter((a, i) => a !== '--apply' && a !== '--project' && !(i > 0 && args[i - 1] === '--project'));
-if (unknown.length || (projectFlag !== -1 && !args[projectFlag + 1])) {
+const projectValue = projectFlag === -1 ? undefined : args[projectFlag + 1];
+if (unknown.length || (projectFlag !== -1 && (!projectValue || projectValue.startsWith('--')))) {
   console.error(`usage: backfill-user-profiles [--project <firebase-project-id>] [--apply]  (unexpected: ${unknown.join(' ')})`);
   process.exit(2);
 }
@@ -47,7 +48,7 @@ async function main() {
     users.push(...page.users);
     pageToken = page.pageToken;
   } while (pageToken);
-  users.sort((a, b) => a.metadata.creationTime.localeCompare(b.metadata.creationTime));
+  users.sort((a, b) => new Date(a.metadata.creationTime).getTime() - new Date(b.metadata.creationTime).getTime());
 
   console.log(`${apply ? 'APPLY' : 'DRY RUN'} project=${process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID} accounts=${users.length}`);
   let existing = 0;
@@ -76,12 +77,13 @@ async function main() {
       console.log(`skipped (profile appeared before the write) uid=${user.uid}`);
     }
   }
-  const after = await db.collection(USER_PROFILES).get();
+  const after = (await db.collection(USER_PROFILES).count().get()).data().count;
   console.log(
     `summary accounts=${users.length} existing=${existing} missing=${missing.length} created=${created} modified=0 skipped=${raced} ` +
-      `profiles_after=${after.size}${apply ? '' : ' (dry run, nothing written)'}`,
+      `profiles_after=${after}${apply ? '' : ' (dry run, nothing written)'}`,
   );
-  if (apply && created !== missing.length) process.exitCode = 1;
+  // A profile that appeared during the run (a member signing in) is the wanted end state, not a failure.
+  if (apply && created + raced !== missing.length) process.exitCode = 1;
 }
 
 main().catch(e => {
