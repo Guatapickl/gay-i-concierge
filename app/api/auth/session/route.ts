@@ -2,12 +2,14 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { publicRequestUrl } from '@/lib/publicRequestUrl';
 import { createSessionCookie, SESSION_COOKIE } from '@/lib/firebase/session';
+import { ensureProfileForIdToken } from '@/lib/firebase/userProfiles';
 
 export const runtime = 'nodejs';
 
 /**
  * Firebase session bridge (replaces Supabase's cookie-refreshing middleware).
- * POST { idToken } after sign-in → sets the __session cookie for SSR.
+ * POST { idToken } after sign-in → sets the __session cookie for SSR and
+ * creates the account's basic user_profiles document on its first sign-in.
  * DELETE on sign-out → clears it.
  */
 function isSameOrigin(req: Request) {
@@ -35,6 +37,13 @@ export async function POST(req: Request) {
       path: '/',
       maxAge: 14 * 24 * 60 * 60,
     });
+    // Best effort: a profile problem must not block the sign-in itself. The
+    // next sign-in (or scripts/backfill-user-profiles.ts) creates the profile.
+    try {
+      await ensureProfileForIdToken(body.idToken);
+    } catch (e) {
+      console.error('user profile create failed:', e instanceof Error ? e.message : e);
+    }
     return NextResponse.json({ ok: true });
   } catch (e) {
     return NextResponse.json({ error: e instanceof Error ? e.message : 'session failed' }, { status: 401 });
