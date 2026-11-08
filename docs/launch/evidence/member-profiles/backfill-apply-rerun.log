@@ -1,0 +1,6 @@
+
+> gay-i-concierge@0.1.0 profiles:backfill
+> vite-node --config vitest.config.ts scripts/backfill-user-profiles.ts --project gayiclub --apply
+
+APPLY project=gayiclub accounts=11
+summary accounts=11 existing=11 missing=0 created=0 modified=0 skipped=0 profiles_after=11

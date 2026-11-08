@@ -1,0 +1,31 @@
+i  emulators: Starting emulators: auth, firestore
+i  emulators: Detected demo project ID "demo-gayiclub", emulated services will use a demo configuration and attempts to access non-emulated services for this project will fail.
+⚠  hub: emulator hub unable to start on port 4400, starting on 4401 instead.
+⚠  logging: Logging Emulator unable to start on port 4500, starting on 4501 instead.
+i  firestore: Firestore Emulator logging to firestore-debug.log
+✔  firestore: Firestore Emulator was started in standard edition.
+✔  firestore: Firestore Emulator UI websocket is running on 9151.
+i  Running script: RUN_FIREBASE_RULES_TESTS=1 npx vitest run tests/user-profiles.emulator.test.ts tests/privacy.rules.test.ts
+
+ RUN  v3.2.4 /Volumes/Projects/gay-i-concierge
+
+stderr | tests/privacy.rules.test.ts > private data denies other members and preserves ownership
+[2026-11-08T00:14:27.324Z]  @firebase/firestore: Firestore (11.10.0): GrpcConnection RPC 'Write' stream 0x51eec0b8 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L40:24 for 'update' @ L40, false for 'update' @ L40
+
+ ✓ tests/privacy.rules.test.ts (1 test) 723ms
+   ✓ private data denies other members and preserves ownership  722ms
+ ✓ tests/user-profiles.emulator.test.ts (3 tests) 3743ms
+   ✓ user profiles on the Firestore emulator > creates exactly one profile under concurrent first sign-ins and never rewrites it  3632ms
+
+ Test Files  2 passed (2)
+      Tests  4 passed (4)
+   Start at  19:14:26
+   Duration  4.34s (transform 34ms, setup 0ms, collect 511ms, tests 4.47s, environment 0ms, prepare 58ms)
+
+✔  Script exited successfully (code 0)
+i  emulators: Shutting down emulators.
+i  firestore: Stopping Firestore Emulator
+i  auth: Stopping Authentication Emulator
+i  hub: Stopping emulator hub
+i  logging: Stopping Logging Emulator

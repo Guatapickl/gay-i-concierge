@@ -1,0 +1,9 @@
+
+> gay-i-concierge@0.1.0 profiles:backfill
+> vite-node --config vitest.config.ts scripts/backfill-user-profiles.ts --project gayiclub
+
+DRY RUN project=gayiclub accounts=11
+would create uid=BvBkMw3NbFXMsRunTCW1Zl9cPw52 full_name=null created_at=2026-09-07T08:03:12.000Z
+would create uid=KJLv7B8tPpQgvtbZGkxf7Q46G3K3 full_name=null created_at=2026-09-06T23:00:15.000Z
+would create uid=jg4nROTfHyQKupHe2BbRzZw5UKm2 full_name="kartik desai" created_at=2026-09-09T00:32:30.000Z
+summary accounts=11 existing=8 missing=3 created=0 modified=0 skipped=0 profiles_after=8 (dry run, nothing written)

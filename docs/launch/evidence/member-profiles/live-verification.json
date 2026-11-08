@@ -1,0 +1,155 @@
+{
+  "checkedAt": "2026-11-08T00:23:49.301Z",
+  "origin": "https://gayiclub.com",
+  "ok": true,
+  "steps": [
+    {
+      "name": "temp-user-created",
+      "at": "2026-11-08T00:23:46.316Z",
+      "uid": "qa-profile-check-1794097425615",
+      "hasEmail": false,
+      "hasDisplayName": false,
+      "accountCreated": "2026-11-08T00:23:45.000Z"
+    },
+    {
+      "name": "custom-token-sign-in",
+      "at": "2026-11-08T00:23:46.465Z",
+      "pass": true,
+      "status": 200
+    },
+    {
+      "name": "directory-anonymous-401",
+      "at": "2026-11-08T00:23:46.602Z",
+      "pass": true,
+      "status": 401
+    },
+    {
+      "name": "directory-before-first-sign-in",
+      "at": "2026-11-08T00:23:46.928Z",
+      "status": 200,
+      "count": 11,
+      "tempMemberListed": false,
+      "containsAtSign": false,
+      "nullNames": 8,
+      "fields": [
+        "created_at",
+        "experience_level",
+        "full_name",
+        "id",
+        "interests"
+      ]
+    },
+    {
+      "name": "directory-lists-all-11-accounts",
+      "at": "2026-11-08T00:23:46.928Z",
+      "pass": true,
+      "count": 11
+    },
+    {
+      "name": "directory-never-exposes-email",
+      "at": "2026-11-08T00:23:46.928Z",
+      "pass": true
+    },
+    {
+      "name": "session-post-200",
+      "at": "2026-11-08T00:23:47.511Z",
+      "pass": true,
+      "status": 200,
+      "body": {
+        "ok": true
+      },
+      "setsSessionCookie": true
+    },
+    {
+      "name": "profile-auto-created-on-first-sign-in",
+      "at": "2026-11-08T00:23:47.797Z",
+      "pass": true,
+      "exists": true,
+      "keys": [
+        "created_at",
+        "full_name",
+        "id"
+      ],
+      "full_name": null,
+      "created_at": "2026-11-08T00:23:45.000Z",
+      "accountCreated": "2026-11-08T00:23:45.000Z"
+    },
+    {
+      "name": "directory-after-first-sign-in",
+      "at": "2026-11-08T00:23:47.946Z",
+      "status": 200,
+      "count": 12,
+      "tempMemberListed": true,
+      "containsAtSign": false,
+      "nullNames": 9,
+      "fields": [
+        "created_at",
+        "experience_level",
+        "full_name",
+        "id",
+        "interests"
+      ]
+    },
+    {
+      "name": "directory-shows-new-account-with-null-name",
+      "at": "2026-11-08T00:23:47.946Z",
+      "pass": true,
+      "count": 12,
+      "entry": {
+        "id": "qa-profile-check-1794097425615",
+        "full_name": null,
+        "experience_level": null,
+        "interests": null,
+        "created_at": "2026-11-08T00:23:45.000Z"
+      }
+    },
+    {
+      "name": "second-sign-in-leaves-profile-unchanged",
+      "at": "2026-11-08T00:23:48.280Z",
+      "pass": true,
+      "status": 200
+    },
+    {
+      "name": "served-bundle-uses-new-member-label:/community",
+      "at": "2026-11-08T00:23:48.548Z",
+      "pass": true,
+      "path": "/community",
+      "chunks": [
+        {
+          "ref": "static/chunks/app/community/page-bc89f6194ac2c93a.js",
+          "hasNewMember": true,
+          "hasAnonymousMember": false
+        }
+      ]
+    },
+    {
+      "name": "served-bundle-uses-new-member-label:/community/not-a-real-member",
+      "at": "2026-11-08T00:23:48.549Z",
+      "pass": true,
+      "path": "/community/not-a-real-member",
+      "chunks": [
+        {
+          "ref": "static/chunks/app/community/%5Bid%5D/page-6736cf5b8c626b6e.js",
+          "hasNewMember": true,
+          "hasAnonymousMember": false
+        }
+      ]
+    },
+    {
+      "name": "directory-back-to-11-after-cleanup",
+      "at": "2026-11-08T00:23:48.806Z",
+      "pass": true,
+      "status": 200,
+      "count": 11
+    },
+    {
+      "name": "final-state-11-accounts-11-profiles",
+      "at": "2026-11-08T00:23:49.300Z",
+      "pass": true,
+      "authUsers": 11,
+      "profiles": 11,
+      "tempUserRemoved": true,
+      "tempProfileRemoved": true
+    }
+  ]
+}

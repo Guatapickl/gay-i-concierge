@@ -1,0 +1,32 @@
+{
+  "checkedAt": "2026-11-08T00:23:20.849Z",
+  "ok": true,
+  "pages": [
+    {
+      "path": "/community",
+      "status": 307,
+      "chunks": [
+        {
+          "ref": "static/chunks/app/community/page-bc89f6194ac2c93a.js",
+          "status": 200,
+          "bytes": 19594,
+          "hasNewMember": true,
+          "hasAnonymousMember": false
+        }
+      ]
+    },
+    {
+      "path": "/community/not-a-real-member",
+      "status": 307,
+      "chunks": [
+        {
+          "ref": "static/chunks/app/community/%5Bid%5D/page-6736cf5b8c626b6e.js",
+          "status": 200,
+          "bytes": 10550,
+          "hasNewMember": true,
+          "hasAnonymousMember": false
+        }
+      ]
+    }
+  ]
+}

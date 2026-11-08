@@ -1,0 +1,5 @@
+ ✓ tests/user-profiles.emulator.test.ts (3 tests) 4262ms
+   ✓ user profiles on the Firestore emulator > creates exactly one profile under concurrent first sign-ins and never rewrites it  4068ms
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Duration  4.58s (transform 21ms, setup 0ms, collect 151ms, tests 4.26s, environment 0ms, prepare 27ms)
