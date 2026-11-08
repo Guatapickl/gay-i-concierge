@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { authHeader, currentUser, providerIds, setPassword } from '@/lib/firebase/authClient';
 import { getRow, listRows, nowIso, payloadOf, ref } from '@/lib/firebase/db';
+import { profileSavePayload } from '@/lib/profileSave';
 import { limit, orderBy, setDoc, where } from 'firebase/firestore';
 import { Button, FormInput, Alert, LoadingSpinner } from '@/components/ui';
 import MyRsvps from '@/components/MyRsvps';
@@ -100,16 +101,17 @@ export default function ProfilePage() {
     setError(null);
     setSavedMessage('');
     try {
-      // Upsert user profile
-      await setDoc(ref('user_profiles', userId), payloadOf({
-        id: userId,
-        full_name: fullName || null,
-        beta_opt_in: betaOptIn,
-        experience_level: experience,
+      // Upsert user profile. Merge keeps created_at (written at sign-up or by
+      // the backfill) and any other existing fields; the payload never sets it.
+      await setDoc(ref('user_profiles', userId), payloadOf(profileSavePayload({
+        userId,
+        fullName,
+        betaOptIn,
+        experienceLevel: experience,
         interests: selectedInterests,
-        email: userEmail, // keep in sync for convenience
-        updated_at: nowIso(),
-      }), { merge: true });
+        email: userEmail,
+        updatedAt: nowIso(),
+      })), { merge: true });
 
       let preferenceMessage = '';
       if (userEmail && emailOptIn !== originalEmailOptIn) {
