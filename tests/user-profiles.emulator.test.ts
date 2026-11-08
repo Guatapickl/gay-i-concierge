@@ -75,8 +75,9 @@ describe.skipIf(process.env.RUN_FIREBASE_RULES_TESTS !== '1')('user profiles on 
     // Same write the Profile page makes: profileSavePayload through payloadOf
     // (ISO strings in timestamp fields become Timestamps, `id` is dropped), merged.
     const payload = profileSavePayload({ userId: user.uid, fullName: 'Settled Name', betaOptIn: true, experienceLevel: 'beginner', interests: ['AI'], email: 'member@example.test', updatedAt: '2026-11-07T10:00:00.000Z' });
-    const { id: _dropped, updated_at, ...fields } = payload;
-    await setDoc(doc(getFirestore(clientApp), USER_PROFILES, user.uid), { ...fields, updated_at: ClientTimestamp.fromDate(new Date(updated_at)) }, { merge: true });
+    const fields: Record<string, unknown> = { ...payload, updated_at: ClientTimestamp.fromDate(new Date(payload.updated_at)) };
+    delete fields.id;
+    await setDoc(doc(getFirestore(clientApp), USER_PROFILES, user.uid), fields, { merge: true });
 
     const after = (await db.collection(USER_PROFILES).doc(user.uid).get()).data()!;
     expect((after.created_at as Timestamp).toDate().toISOString()).toBe(createdAt);
