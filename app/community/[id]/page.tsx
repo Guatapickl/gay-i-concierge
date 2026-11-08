@@ -12,9 +12,8 @@ import {
   Clock,
 } from 'lucide-react';
 import { currentUser } from '@/lib/firebase/authClient';
-import { getRow } from '@/lib/firebase/db';
 import { LoadingSpinner } from '@/components/ui';
-import type { DirectoryMember } from '@/lib/directory';
+import { getMemberProfile, type DirectoryMember } from '@/lib/directory';
 import { memberDisplayName } from '@/lib/memberName';
 
 const EXPERIENCE_CONFIG: Record<string, { label: string; description: string; color: string; icon: React.ReactNode }> = {
@@ -95,10 +94,11 @@ export default function MemberProfilePage() {
 
       setIsOwnProfile(user.uid === memberId);
 
-      // Fetch member profile
+      // Fetch the allowlisted profile through the authenticated directory API;
+      // Firestore rules only let a member read their own user_profiles document.
       let data: DirectoryMember | null = null;
       try {
-        data = await getRow<DirectoryMember>('user_profiles', memberId);
+        data = await getMemberProfile(memberId);
       } catch (error) {
         console.error('Error fetching member:', error instanceof Error ? error.message : String(error));
       }
