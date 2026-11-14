@@ -11,5 +11,5 @@
 - [x] Extend `tests/poll-outcomes.test.ts` to book a poll titled `Next Gay-I-Club meeting: which dates work?` and expect `Next Gay-I-Club meeting`; verify custom poll titles and explicit meeting titles survive. Run the focused test and observe the legacy-title failure.
 - [x] In `app/vote/new/page.tsx`, change the title default to `Next meeting`. In `lib/poll-outcomes.ts`, use `ctx.poll.title.replace(/\s*:\s*which dates work\?\s*$/i, '')` as the fallback when no explicit title is supplied.
 - [x] Run focused booking tests, the unit suite, TypeScript checking, and lint for changed source files. Review the diff. Result: 358 unit tests passed, 9 emulator tests skipped; TypeScript and changed-file lint passed.
-- [ ] Commit, integrate the isolated change, and deploy the tracked source with `firebase deploy --only apphosting --project gayiclub --non-interactive --force` using existing Application Default Credentials.
-- [ ] Verify the deployed poll-creation bundle and reread both live titles.
+- [x] Commit, integrate the isolated change, and deploy the tracked source with `firebase deploy --only apphosting --project gayiclub --non-interactive --force` using existing Application Default Credentials. Source commit: `d40d6d2`, pushed to main; deployment completed successfully.
+- [x] Verify the deployed poll-creation bundle and reread both live titles. Verified at 2026-11-14 13:38:20 UTC: both titles are corrected, no event or poll title contains the legacy question, and the live new-poll bundle contains the new default without the old default.
