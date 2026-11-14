@@ -12,7 +12,7 @@ type Row = { date: string; time: string };
 export default function NewPollPage() {
   const router = useRouter();
   const [checking, setChecking] = useState(true);
-  const [title, setTitle] = useState('Next meeting: which dates work?');
+  const [title, setTitle] = useState('Next meeting');
   const [description, setDescription] = useState('Rank the dates from best to worst. We will book the top pick.');
   const [closesAt, setClosesAt] = useState('');
   const [defaultTime, setDefaultTime] = useState('19:00');

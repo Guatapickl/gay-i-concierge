@@ -87,7 +87,7 @@ function createBooking(db: Firestore, tx: Transaction, ctx: Context, input: Poll
   if (Date.parse(instant) <= now.getTime()) throw new PollActionError('The selected meeting date and time has passed.', 409);
   // A deterministic orphan must never be silently reassigned to another option.
   if (ctx.eventSnap.exists) throw new PollActionError('An event already exists for this poll; review the existing meeting.', 409);
-  const event: Event = { id: ctx.eventRef.id, title: nonempty(input.title) || ctx.poll.title, description: input.description ?? ctx.poll.description ?? null, event_datetime: instant, location: defaults.location, created_at: nowIso(now), updated_at: nowIso(now) };
+  const event: Event = { id: ctx.eventRef.id, title: nonempty(input.title) || ctx.poll.title.replace(/\s*:\s*which dates work\?\s*$/i, ''), description: input.description ?? ctx.poll.description ?? null, event_datetime: instant, location: defaults.location, created_at: nowIso(now), updated_at: nowIso(now) };
   tx.create(ctx.eventRef, adminPayloadOf({ ...event, source_poll_id: ctx.poll.id }));
   tx.update(ctx.pollRef, adminPayloadOf({ status: 'closed', result_status: 'scheduled', selected_option_id: option.id, event_id: event.id, updated_at: nowIso(now), ballot_revision: Number(ctx.poll.ballot_revision || 0) + 1 }));
   if (ctx.decisionSnap.exists) tx.update(decisions(db).doc(tieId(ctx.poll.id)), { state: 'resolved', selectedOptionId: option.id, eventId: event.id, resolvedAt: nowIso(now) });

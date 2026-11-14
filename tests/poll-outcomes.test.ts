@@ -51,6 +51,20 @@ beforeEach(() => {
 });
 
 describe('deadline outcomes', () => {
+  it.each([
+    ['Next Gay-I-Club meeting: which dates work?', 'Next Gay-I-Club meeting'],
+    ['Next meeting: WHICH DATES WORK?', 'Next meeting'],
+    ['September meeting', 'September meeting'],
+  ])('books the poll "%s" with the meeting title "%s"', async (title, expected) => {
+    store.rows.get(pollPath)!.title = title;
+    expect((await runPollOutcomes(now)).booked).toBe(1);
+    expect(entries('events')[0][1].title).toBe(expected);
+  });
+  it('preserves an explicit organizer title when booking a date poll', async () => {
+    store.rows.get(pollPath)!.title = 'Next Gay-I-Club meeting: which dates work?';
+    await bookPoll('p', 'owner', { optionId: 'a', title: 'AI demo night' }, now);
+    expect(entries('events')[0][1].title).toBe('AI demo night');
+  });
   it('books and queues the owner report exactly once across overlapping jobs', async () => {
     const results = await Promise.all([runPollOutcomes(now), runPollOutcomes(now)]);
     expect(results.reduce((n, r) => n + r.booked, 0)).toBe(1);
